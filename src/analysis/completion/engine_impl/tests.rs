@@ -24,6 +24,7 @@ fn test_range() -> Range {
 }
 
 /// 创建测试用的 URL
+#[allow(dead_code)]
 fn test_url() -> Url {
     Url::parse("file:///test.rs").unwrap()
 }
@@ -412,7 +413,7 @@ fn test_complete_with_toml_context() {
 
     // 现在应该返回配置项补全（任务 9.2 已实现）
     // 由于 host 已存在，应该只补全 port
-    assert!(completions.len() > 0);
+    assert!(!completions.is_empty());
 }
 
 #[test]
@@ -582,7 +583,7 @@ fn test_complete_config_properties_in_section() {
     let completions = engine.complete(CompletionContext::Toml, position, Some(&doc), None);
 
     // 应该提供 port 的补全（host 已存在，应该被去重）
-    assert!(completions.len() > 0);
+    assert!(!completions.is_empty());
 
     // 检查是否包含 port
     let port_completion = completions.iter().find(|c| c.label == "port");
@@ -762,7 +763,7 @@ fn test_complete_redis_section() {
     let completions = engine.complete(CompletionContext::Toml, position, Some(&doc), None);
 
     // 应该提供 redis 配置项的补全
-    assert!(completions.len() > 0);
+    assert!(!completions.is_empty());
 
     // 检查是否包含 url
     let url_completion = completions.iter().find(|c| c.label == "url");
@@ -897,8 +898,8 @@ fn test_value_to_string() {
     assert_eq!(engine.value_to_string(&int_val), "42");
 
     // 测试浮点数值
-    let float_val = crate::schema::Value::Float(3.14);
-    assert_eq!(engine.value_to_string(&float_val), "3.14");
+    let float_val = crate::schema::Value::Float(3.5);
+    assert_eq!(engine.value_to_string(&float_val), "3.5");
 
     // 测试布尔值
     let bool_val = crate::schema::Value::Boolean(true);
@@ -1001,6 +1002,7 @@ mod property_tests {
     }
 
     // 生成环境变量名
+    #[allow(dead_code)]
     fn env_var_name() -> impl Strategy<Value = String> {
         prop::string::string_regex("[A-Z][A-Z0-9_]*").unwrap()
     }
@@ -1486,7 +1488,7 @@ fn test_config_property_insertion_has_complete_format() {
         let insert_text = completion
             .insert_text
             .as_ref()
-            .expect(&format!("补全项 '{}' 应该有 insert_text", completion.label));
+            .unwrap_or_else(|| panic!("补全项 '{}' 应该有 insert_text", completion.label));
 
         // 验证插入文本包含配置项名称
         assert!(
@@ -1583,7 +1585,7 @@ fn test_enum_value_insertion_has_quotes() {
         let insert_text = completion
             .insert_text
             .as_ref()
-            .expect(&format!("枚举值 '{}' 应该有 insert_text", completion.label));
+            .unwrap_or_else(|| panic!("枚举值 '{}' 应该有 insert_text", completion.label));
 
         // 验证插入文本包含引号
         assert!(
@@ -1605,10 +1607,10 @@ fn test_env_var_insertion_has_snippet_format() {
 
     // 验证每个环境变量的插入文本都是 snippet 格式
     for completion in completions {
-        let insert_text = completion.insert_text.as_ref().expect(&format!(
-            "环境变量 '{}' 应该有 insert_text",
-            completion.label
-        ));
+        let insert_text = completion
+            .insert_text
+            .as_ref()
+            .unwrap_or_else(|| panic!("环境变量 '{}' 应该有 insert_text", completion.label));
 
         // 验证插入文本包含变量名
         assert!(
@@ -2055,7 +2057,7 @@ fn test_value_to_string_for_all_value_types() {
         (crate::schema::Value::String("test".to_string()), "\"test\""),
         (crate::schema::Value::Integer(42), "42"),
         (crate::schema::Value::Integer(-10), "-10"),
-        (crate::schema::Value::Float(3.14), "3.14"),
+        (crate::schema::Value::Float(3.5), "3.5"),
         (crate::schema::Value::Float(-2.5), "-2.5"),
         (crate::schema::Value::Boolean(true), "true"),
         (crate::schema::Value::Boolean(false), "false"),

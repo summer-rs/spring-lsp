@@ -86,7 +86,7 @@ impl ComponentScanner {
         for entry in WalkDir::new(&src_path)
             .into_iter()
             .filter_map(|e| e.ok())
-            .filter(|e| e.path().extension().map_or(false, |ext| ext == "rs"))
+            .filter(|e| e.path().extension().is_some_and(|ext| ext == "rs"))
         {
             file_count += 1;
             let file_path = entry.path();
@@ -372,15 +372,13 @@ mod tests {
 
     #[test]
     fn test_component_scanner_new() {
-        let scanner = ComponentScanner::new();
-        // 验证扫描器创建成功
-        assert!(true);
+        let _scanner = ComponentScanner::new();
+        // 验证扫描器创建成功（不会 panic）
     }
 
     #[test]
     fn test_component_scanner_default() {
-        let scanner = ComponentScanner::default();
-        // 验证默认扫描器创建成功
-        assert!(true);
+        let _scanner = ComponentScanner::default();
+        // 验证默认扫描器创建成功（不会 panic）
     }
 }

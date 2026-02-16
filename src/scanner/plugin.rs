@@ -167,9 +167,8 @@ mod tests {
 
     #[test]
     fn test_plugin_scanner_new() {
-        let scanner = PluginScanner::new();
-        // 验证扫描器创建成功
-        assert!(true);
+        let _scanner = PluginScanner::new();
+        // 验证扫描器创建成功（不会 panic）
     }
 
     #[test]

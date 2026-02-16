@@ -306,9 +306,8 @@ fn test_macro_analyzer_creation() {
 
 #[test]
 fn test_macro_analyzer_default() {
-    let analyzer = MacroAnalyzer::default();
-    // 验证 Default trait 实现
-    let _ = analyzer;
+    let _analyzer = MacroAnalyzer;
+    // 验证单元结构体创建（不需要 default()）
 }
 
 #[test]
@@ -2012,7 +2011,7 @@ fn test_validate_route_macro_empty_path() {
     let diagnostics = analyzer.validate_macro(&SpringMacro::Route(route));
 
     // 应该产生错误诊断
-    assert!(diagnostics.len() > 0);
+    assert!(!diagnostics.is_empty());
     assert!(diagnostics
         .iter()
         .any(|d| d.message.contains("路由路径不能为空")));
@@ -2033,7 +2032,7 @@ fn test_validate_route_macro_path_without_slash() {
     let diagnostics = analyzer.validate_macro(&SpringMacro::Route(route));
 
     // 应该产生错误诊断
-    assert!(diagnostics.len() > 0);
+    assert!(!diagnostics.is_empty());
     assert!(diagnostics
         .iter()
         .any(|d| d.message.contains("必须以 '/' 开头")));
@@ -2054,7 +2053,7 @@ fn test_validate_route_macro_no_methods() {
     let diagnostics = analyzer.validate_macro(&SpringMacro::Route(route));
 
     // 应该产生错误诊断
-    assert!(diagnostics.len() > 0);
+    assert!(!diagnostics.is_empty());
     assert!(diagnostics
         .iter()
         .any(|d| d.message.contains("至少指定一个 HTTP 方法")));
@@ -2075,7 +2074,7 @@ fn test_validate_route_macro_empty_handler_name() {
     let diagnostics = analyzer.validate_macro(&SpringMacro::Route(route));
 
     // 应该产生错误诊断
-    assert!(diagnostics.len() > 0);
+    assert!(!diagnostics.is_empty());
     assert!(diagnostics
         .iter()
         .any(|d| d.message.contains("处理器函数名称不能为空")));
@@ -2114,7 +2113,7 @@ fn test_validate_route_macro_nested_braces() {
     let diagnostics = analyzer.validate_macro(&SpringMacro::Route(route));
 
     // 应该产生错误诊断
-    assert!(diagnostics.len() > 0);
+    assert!(!diagnostics.is_empty());
     assert!(diagnostics.iter().any(|d| d.message.contains("不能嵌套")));
 }
 
@@ -2133,7 +2132,7 @@ fn test_validate_route_macro_unmatched_closing_brace() {
     let diagnostics = analyzer.validate_macro(&SpringMacro::Route(route));
 
     // 应该产生错误诊断
-    assert!(diagnostics.len() > 0);
+    assert!(!diagnostics.is_empty());
     assert!(diagnostics.iter().any(|d| d.message.contains("缺少开括号")));
 }
 
@@ -2152,7 +2151,7 @@ fn test_validate_route_macro_unclosed_brace() {
     let diagnostics = analyzer.validate_macro(&SpringMacro::Route(route));
 
     // 应该产生错误诊断
-    assert!(diagnostics.len() > 0);
+    assert!(!diagnostics.is_empty());
     assert!(diagnostics.iter().any(|d| d.message.contains("缺少闭括号")));
 }
 
@@ -2171,7 +2170,7 @@ fn test_validate_route_macro_empty_param_name() {
     let diagnostics = analyzer.validate_macro(&SpringMacro::Route(route));
 
     // 应该产生错误诊断
-    assert!(diagnostics.len() > 0);
+    assert!(!diagnostics.is_empty());
     assert!(diagnostics
         .iter()
         .any(|d| d.message.contains("参数名称不能为空")));
@@ -2192,7 +2191,7 @@ fn test_validate_route_macro_invalid_param_name() {
     let diagnostics = analyzer.validate_macro(&SpringMacro::Route(route));
 
     // 应该产生错误诊断
-    assert!(diagnostics.len() > 0);
+    assert!(!diagnostics.is_empty());
     assert!(diagnostics
         .iter()
         .any(|d| d.message.contains("只能包含字母、数字和下划线")));
@@ -2227,7 +2226,7 @@ fn test_validate_cron_job_empty_expression() {
     let diagnostics = analyzer.validate_macro(&SpringMacro::Job(job));
 
     // 应该产生错误诊断
-    assert!(diagnostics.len() > 0);
+    assert!(!diagnostics.is_empty());
     assert!(diagnostics
         .iter()
         .any(|d| d.message.contains("Cron 表达式不能为空")));
@@ -2244,7 +2243,7 @@ fn test_validate_cron_job_invalid_parts() {
     let diagnostics = analyzer.validate_macro(&SpringMacro::Job(job));
 
     // 应该产生错误诊断
-    assert!(diagnostics.len() > 0);
+    assert!(!diagnostics.is_empty());
     assert!(diagnostics
         .iter()
         .any(|d| d.message.contains("应该包含 6 个部分")));
@@ -2275,7 +2274,7 @@ fn test_validate_fix_delay_job_zero_seconds() {
     let diagnostics = analyzer.validate_macro(&SpringMacro::Job(job));
 
     // 应该产生警告诊断
-    assert!(diagnostics.len() > 0);
+    assert!(!diagnostics.is_empty());
     assert_eq!(
         diagnostics[0].severity,
         Some(lsp_types::DiagnosticSeverity::WARNING)
@@ -2308,7 +2307,7 @@ fn test_validate_fix_rate_job_zero_seconds() {
     let diagnostics = analyzer.validate_macro(&SpringMacro::Job(job));
 
     // 应该产生错误诊断
-    assert!(diagnostics.len() > 0);
+    assert!(!diagnostics.is_empty());
     assert_eq!(
         diagnostics[0].severity,
         Some(lsp_types::DiagnosticSeverity::ERROR)
@@ -2489,8 +2488,8 @@ fn test_validate_error_codes() {
     let diagnostics2 = analyzer.validate_macro(&SpringMacro::Route(route2));
 
     // 不同的错误应该有不同的错误代码
-    assert!(diagnostics1.len() > 0);
-    assert!(diagnostics2.len() > 0);
+    assert!(!diagnostics1.is_empty());
+    assert!(!diagnostics2.is_empty());
 
     if let (Some(code1), Some(code2)) = (&diagnostics1[0].code, &diagnostics2[0].code) {
         assert_ne!(code1, code2);

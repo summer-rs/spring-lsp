@@ -47,7 +47,7 @@ impl JobScanner {
         for entry in WalkDir::new(&src_path)
             .into_iter()
             .filter_map(|e| e.ok())
-            .filter(|e| e.path().extension().map_or(false, |ext| ext == "rs"))
+            .filter(|e| e.path().extension().is_some_and(|ext| ext == "rs"))
         {
             let file_path = entry.path();
 
@@ -196,15 +196,13 @@ mod tests {
 
     #[test]
     fn test_job_scanner_new() {
-        let scanner = JobScanner::new();
-        // 验证扫描器创建成功
-        assert!(true);
+        let _scanner = JobScanner::new();
+        // 验证扫描器创建成功（不会 panic）
     }
 
     #[test]
     fn test_job_scanner_default() {
-        let scanner = JobScanner::default();
-        // 验证默认扫描器创建成功
-        assert!(true);
+        let _scanner = JobScanner::default();
+        // 验证默认扫描器创建成功（不会 panic）
     }
 }

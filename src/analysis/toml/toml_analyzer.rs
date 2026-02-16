@@ -1004,9 +1004,9 @@ impl TomlAnalyzer {
                         // 替换为占位符（使用默认值或空字符串）
                         let placeholder = if let Some(default_val) = &default {
                             // 如果默认值是布尔值或数字，直接使用
-                            if default_val == "true" || default_val == "false" {
-                                default_val.clone()
-                            } else if default_val.parse::<i64>().is_ok()
+                            if default_val == "true"
+                                || default_val == "false"
+                                || default_val.parse::<i64>().is_ok()
                                 || default_val.parse::<f64>().is_ok()
                             {
                                 default_val.clone()
