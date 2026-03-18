@@ -3,7 +3,7 @@ import { LocalAppManager } from './controllers/LocalAppManager';
 import { LocalAppController } from './controllers/LocalAppController';
 import { LanguageClientManager } from './languageClient/LanguageClientManager';
 import { CommandManager } from './commands';
-import { SpringApp } from './models/SpringApp';
+import { SummerApp } from './models/SummerApp';
 import {
   AppsTreeDataProvider,
   JobsTreeDataProvider,
@@ -20,13 +20,13 @@ import { GutterDecorationManager } from './gutter';
  * 当满足激活条件时，VSCode 会调用此函数
  */
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
-  console.log('Spring LSP extension is now activating...');
+  console.log('Summer LSP extension is now activating...');
 
   try {
     // 1. 创建输出通道（用于扩展自身的日志）
-    const outputChannel = vscode.window.createOutputChannel('Spring LSP');
+    const outputChannel = vscode.window.createOutputChannel('Summer LSP');
     context.subscriptions.push(outputChannel);
-    outputChannel.appendLine('Spring LSP extension starting...');
+    outputChannel.appendLine('Summer LSP extension starting...');
 
     // 2. 创建语言客户端管理器（会创建单独的语言服务器输出通道）
     outputChannel.appendLine('Initializing language client...');
@@ -97,46 +97,46 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         `Warning: Language server failed to start: ${error instanceof Error ? error.message : String(error)}`
       );
       vscode.window.showWarningMessage(
-        'Spring LSP language server failed to start. Some features may not be available.',
+        'Summer LSP language server failed to start. Some features may not be available.',
         'Open Settings',
         'View Documentation'
       ).then(selection => {
         if (selection === 'Open Settings') {
           vscode.commands.executeCommand(
             'workbench.action.openSettings',
-            'spring-rs.serverPath'
+            'summer-rs.serverPath'
           );
         } else if (selection === 'View Documentation') {
           vscode.env.openExternal(
-            vscode.Uri.parse('https://spring-rs.github.io/')
+            vscode.Uri.parse('https://summer-rs.github.io/')
           );
         }
       });
     }
 
     // 9. 设置上下文变量
-    await vscode.commands.executeCommand('setContext', 'spring:activated', true);
+    await vscode.commands.executeCommand('setContext', 'summer:activated', true);
 
     // 10. 显示欢迎消息（仅首次激活）
-    const hasShownWelcome = context.globalState.get<boolean>('spring.hasShownWelcome');
+    const hasShownWelcome = context.globalState.get<boolean>('summer.hasShownWelcome');
     if (!hasShownWelcome) {
       const selection = await vscode.window.showInformationMessage(
-        'Welcome to Spring LSP for Rust! 🚀',
+        'Welcome to Summer LSP for Rust! 🚀',
         'Show Welcome Page',
         'Dismiss'
       );
       if (selection === 'Show Welcome Page') {
-        await vscode.commands.executeCommand('spring-rs.showWelcome');
+        await vscode.commands.executeCommand('summer-rs.showWelcome');
       }
-      await context.globalState.update('spring.hasShownWelcome', true);
+      await context.globalState.update('summer.hasShownWelcome', true);
     }
 
-    outputChannel.appendLine('Spring LSP extension activated successfully!');
-    console.log('Spring LSP extension is now active!');
+    outputChannel.appendLine('Summer LSP extension activated successfully!');
+    console.log('Summer LSP extension is now active!');
   } catch (error) {
-    console.error('Failed to activate Spring LSP extension:', error);
+    console.error('Failed to activate Summer LSP extension:', error);
     vscode.window.showErrorMessage(
-      `Failed to activate Spring LSP extension: ${error instanceof Error ? error.message : String(error)}`
+      `Failed to activate Summer LSP extension: ${error instanceof Error ? error.message : String(error)}`
     );
     throw error;
   }
@@ -157,7 +157,7 @@ function registerViews(
 } {
   // 1. 注册 Apps 视图（带应用选择功能）
   const appsProvider = new AppsTreeDataProvider(appManager);
-  const appsView = vscode.window.createTreeView('spring.apps', {
+  const appsView = vscode.window.createTreeView('summer.apps', {
     treeDataProvider: appsProvider,
     showCollapseAll: false,
     canSelectMany: false  // 只能选择一个应用
@@ -166,7 +166,7 @@ function registerViews(
 
   // 2. 注册 Components 视图
   const componentsProvider = new ComponentsTreeDataProviderEnhanced(languageClient, context);
-  const componentsView = vscode.window.createTreeView('spring.components', {
+  const componentsView = vscode.window.createTreeView('summer.components', {
     treeDataProvider: componentsProvider,
     showCollapseAll: true
   });
@@ -174,7 +174,7 @@ function registerViews(
 
   // 3. 注册 Routes 视图
   const routesProvider = new RoutesTreeDataProviderEnhanced(languageClient, context);
-  const routesView = vscode.window.createTreeView('spring.routes', {
+  const routesView = vscode.window.createTreeView('summer.routes', {
     treeDataProvider: routesProvider,
     showCollapseAll: true
   });
@@ -182,7 +182,7 @@ function registerViews(
 
   // 4. 注册 Jobs 视图
   const jobsProvider = new JobsTreeDataProvider(languageClient, context);
-  const jobsView = vscode.window.createTreeView('spring.jobs', {
+  const jobsView = vscode.window.createTreeView('summer.jobs', {
     treeDataProvider: jobsProvider,
     showCollapseAll: true
   });
@@ -190,7 +190,7 @@ function registerViews(
 
   // 5. 注册 Plugins 视图
   const pluginsProvider = new PluginsTreeDataProvider(languageClient);
-  const pluginsView = vscode.window.createTreeView('spring.plugins', {
+  const pluginsView = vscode.window.createTreeView('summer.plugins', {
     treeDataProvider: pluginsProvider,
     showCollapseAll: true
   });
@@ -198,14 +198,14 @@ function registerViews(
 
   // 6. 注册 Configurations 视图
   const configurationsProvider = new ConfigurationsTreeDataProviderEnhanced(languageClient, context);
-  const configurationsView = vscode.window.createTreeView('spring.configurations', {
+  const configurationsView = vscode.window.createTreeView('summer.configurations', {
     treeDataProvider: configurationsProvider,
     showCollapseAll: true
   });
   context.subscriptions.push(configurationsView);
 
   // 监听应用选择事件，刷新所有视图（必须在监听复选框事件之前设置）
-  appsProvider.onDidSelectApp((app: SpringApp) => {
+  appsProvider.onDidSelectApp((app: SummerApp) => {
     console.log(`App selected: ${app.name}, refreshing all views...`);
     
     // 刷新所有视图
@@ -253,7 +253,7 @@ function registerViews(
   };
 
   // 监听应用状态变化，刷新当前选中应用的视图
-  appManager.onDidChangeApps((app: SpringApp | undefined) => {
+  appManager.onDidChangeApps((app: SummerApp | undefined) => {
     const selectedApp = appsProvider.getSelectedApp();
     
     if (app && selectedApp && app.path === selectedApp.path) {
@@ -276,7 +276,7 @@ function registerViews(
     
     // 更新上下文变量
     const hasRunningApp = appManager.getAppList().some(a => a.state === 'running');
-    vscode.commands.executeCommand('setContext', 'spring:hasRunningApp', hasRunningApp);
+    vscode.commands.executeCommand('setContext', 'summer:hasRunningApp', hasRunningApp);
   });
 
   // 初始化配置视图
@@ -339,14 +339,14 @@ function setupDebugSessionListeners(
  * 当扩展被停用时，VSCode 会调用此函数
  */
 export function deactivate(): void {
-  console.log('Spring LSP extension is now deactivating...');
+  console.log('Summer LSP extension is now deactivating...');
   
   // 清理上下文变量
-  vscode.commands.executeCommand('setContext', 'spring:activated', false);
-  vscode.commands.executeCommand('setContext', 'spring:hasRunningApp', false);
+  vscode.commands.executeCommand('setContext', 'summer:activated', false);
+  vscode.commands.executeCommand('setContext', 'summer:hasRunningApp', false);
   
   // 注意：所有资源都通过 context.subscriptions 自动清理
   // 不需要手动调用 dispose
   
-  console.log('Spring LSP extension deactivated');
+  console.log('Summer LSP extension deactivated');
 }

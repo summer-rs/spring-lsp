@@ -1,6 +1,6 @@
-# Spring LSP 配置文件
+# Summer LSP 配置文件
 # 
-# 此文件用于配置 spring-lsp 语言服务器的行为
+# 此文件用于配置 summer-lsp 语言服务器的行为
 
 [diagnostics]
 # 禁用特定类型的诊断

@@ -1,12 +1,12 @@
 [package]
-name = "spring-lsp"
+name = "summer-lsp"
 version = "0.2.0"
 edition = "2021"
-authors = ["spring-rs contributors"]
+authors = ["summer-rs contributors"]
 license = "MIT OR Apache-2.0"
-description = "Language Server Protocol implementation for spring-rs framework"
-repository = "https://github.com/spring-rs/spring-lsp"
-keywords = ["lsp", "language-server", "spring-rs", "toml", "rust"]
+description = "Language Server Protocol implementation for summer-rs framework"
+repository = "https://github.com/summer-rs/summer-lsp"
+keywords = ["lsp", "language-server", "summer-rs", "toml", "rust"]
 categories = ["development-tools"]
 readme = "README.md"
 
@@ -57,6 +57,9 @@ regex = "1.10"
 # 目录遍历
 walkdir = "2.4"
 
+# JSON Schema 生成
+schemars = "0.8"
+
 # 终端检测（用于日志颜色）
 atty = "0.2"
 
@@ -69,9 +72,9 @@ tempfile = "3.8"
 pretty_assertions = "1.4"
 
 [[bin]]
-name = "spring-lsp"
+name = "summer-lsp"
 path = "src/main.rs"
 
 [lib]
-name = "spring_lsp"
+name = "summer_lsp"
 path = "src/lib.rs"

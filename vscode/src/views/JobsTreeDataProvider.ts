@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { SpringApp } from '../models';
+import { SummerApp } from '../models';
 import { LanguageClientManager } from '../languageClient';
 import { Job, JobsResponse } from '../types';
 import { navigateToLocation } from '../utils';
@@ -38,7 +38,7 @@ export class JobsTreeDataProvider
   /**
    * 当前选中的应用
    */
-  private currentApp: SpringApp | undefined;
+  private currentApp: SummerApp | undefined;
 
   /**
    * 语言客户端管理器
@@ -89,7 +89,7 @@ export class JobsTreeDataProvider
   private async refreshStaticByPath(appPath: string): Promise<void> {
     try {
       const response = await this.clientManager.sendRequest<JobsResponse>(
-        'spring/jobs',
+        'summer/jobs',
         { appPath }
       );
 
@@ -108,7 +108,7 @@ export class JobsTreeDataProvider
    * 
    * @param app 要刷新的应用（可选）
    */
-  public async refresh(app?: SpringApp): Promise<void> {
+  public async refresh(app?: SummerApp): Promise<void> {
     if (!app) {
       this.clearRuntime();
       return;
@@ -128,7 +128,7 @@ export class JobsTreeDataProvider
   /**
    * 刷新运行时信息
    */
-  private async refreshRuntime(app: SpringApp): Promise<void> {
+  private async refreshRuntime(app: SummerApp): Promise<void> {
     if (!app.port) {
       return;
     }
@@ -237,7 +237,7 @@ export class JobTreeItem extends vscode.TreeItem {
     this.context = context;
 
     // 设置上下文值（用于菜单显示）
-    this.contextValue = 'spring:job';
+    this.contextValue = 'summer:job';
 
     // 设置工具提示
     this.tooltip = this.buildTooltip();
@@ -250,7 +250,7 @@ export class JobTreeItem extends vscode.TreeItem {
 
     // 设置点击命令（跳转到处理器）
     this.command = {
-      command: 'spring.job.navigate',
+      command: 'summer.job.navigate',
       title: 'Go to Handler',
       arguments: [job.location],
     };

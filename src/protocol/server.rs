@@ -1,6 +1,6 @@
 //! LSP 服务器核心实现
 //!
-//! 本模块实现了 spring-lsp 的核心 LSP 服务器功能，包括：
+//! 本模块实现了 summer-lsp 的核心 LSP 服务器功能，包括：
 //!
 //! ## 服务器能力
 //!
@@ -115,7 +115,7 @@ impl LspServer {
     ///
     /// 这个方法创建服务器实例并初始化 LSP 连接
     pub fn start() -> Result<Self> {
-        tracing::info!("Starting spring-lsp server");
+        tracing::info!("Starting summer-lsp server");
 
         // 通过标准输入输出创建 LSP 连接
         let (connection, _io_threads) = Connection::stdio();
@@ -357,17 +357,17 @@ impl LspServer {
             // 工作空间符号请求
             "workspace/symbol" => self.handle_workspace_symbol(req),
             // 状态查询请求
-            "spring-lsp/status" => self.handle_status_query(req),
+            "summer-lsp/status" => self.handle_status_query(req),
             // 自定义请求：获取组件列表
-            "spring/components" => self.handle_components_request(req),
+            "summer/components" => self.handle_components_request(req),
             // 自定义请求：获取路由列表
-            "spring/routes" => self.handle_routes_request(req),
+            "summer/routes" => self.handle_routes_request(req),
             // 自定义请求：获取任务列表
-            "spring/jobs" => self.handle_jobs_request(req),
+            "summer/jobs" => self.handle_jobs_request(req),
             // 自定义请求：获取插件列表
-            "spring/plugins" => self.handle_plugins_request(req),
+            "summer/plugins" => self.handle_plugins_request(req),
             // 自定义请求：获取配置列表
-            "spring/configurations" => self.handle_configurations_request(req),
+            "summer/configurations" => self.handle_configurations_request(req),
             _ => {
                 tracing::warn!("Unhandled request method: {}", req.method);
                 // 返回方法未实现错误
@@ -629,7 +629,7 @@ impl LspServer {
                                         "parse_error".to_string(),
                                     )),
                                     code_description: None,
-                                    source: Some("spring-lsp".to_string()),
+                                    source: Some("summer-lsp".to_string()),
                                     message: format!("TOML parse error: {}", e),
                                     related_information: None,
                                     tags: None,
@@ -698,11 +698,11 @@ impl LspServer {
         Ok(())
     }
 
-    /// 处理 spring/routes 请求
+    /// 处理 summer/routes 请求
     ///
     /// 扫描项目中的所有路由并返回路由列表
     fn handle_routes_request(&self, req: Request) -> Result<()> {
-        tracing::info!("Handling spring/routes request");
+        tracing::info!("Handling summer/routes request");
 
         use crate::scanner::route::{RouteScanner, RoutesRequest, RoutesResponse};
 
@@ -752,11 +752,11 @@ impl LspServer {
         Ok(())
     }
 
-    /// 处理 spring/components 请求
+    /// 处理 summer/components 请求
     ///
     /// 扫描项目中的所有组件并返回组件列表
     fn handle_components_request(&self, req: Request) -> Result<()> {
-        tracing::info!("Handling spring/components request");
+        tracing::info!("Handling summer/components request");
 
         use crate::scanner::component::{ComponentScanner, ComponentsRequest, ComponentsResponse};
 
@@ -809,11 +809,11 @@ impl LspServer {
         Ok(())
     }
 
-    /// 处理 spring/jobs 请求
+    /// 处理 summer/jobs 请求
     ///
     /// 扫描项目中的所有定时任务并返回任务列表
     fn handle_jobs_request(&self, req: Request) -> Result<()> {
-        tracing::info!("Handling spring/jobs request");
+        tracing::info!("Handling summer/jobs request");
 
         use crate::scanner::job::{JobScanner, JobsRequest, JobsResponse};
 
@@ -860,11 +860,11 @@ impl LspServer {
         Ok(())
     }
 
-    /// 处理 spring/plugins 请求
+    /// 处理 summer/plugins 请求
     ///
     /// 扫描项目中的所有插件并返回插件列表
     fn handle_plugins_request(&self, req: Request) -> Result<()> {
-        tracing::info!("Handling spring/plugins request");
+        tracing::info!("Handling summer/plugins request");
 
         use crate::scanner::plugin::{PluginScanner, PluginsRequest, PluginsResponse};
 
@@ -914,11 +914,11 @@ impl LspServer {
         Ok(())
     }
 
-    /// 处理 spring/configurations 请求
+    /// 处理 summer/configurations 请求
     ///
     /// 扫描项目中的所有配置结构并返回配置列表
     fn handle_configurations_request(&self, req: Request) -> Result<()> {
-        tracing::debug!("Handling spring/configurations request");
+        tracing::debug!("Handling summer/configurations request");
 
         use crate::scanner::config::{
             ConfigScanner, ConfigurationsRequest, ConfigurationsResponse,
@@ -1561,7 +1561,7 @@ impl LspServer {
                 ..Default::default()
             },
             server_info: Some(ServerInfo {
-                name: "spring-lsp".to_string(),
+                name: "summer-lsp".to_string(),
                 version: Some(env!("CARGO_PKG_VERSION").to_string()),
             }),
         })
@@ -1619,7 +1619,7 @@ impl LspServer {
 
     /// 优雅关闭服务器
     pub fn shutdown(&mut self) -> Result<()> {
-        tracing::info!("Shutting down spring-lsp server");
+        tracing::info!("Shutting down summer-lsp server");
 
         // 清理资源
         tracing::debug!("Clearing all diagnostics...");
@@ -1787,7 +1787,7 @@ mod tests {
         // 验证服务器信息
         assert!(result.server_info.is_some());
         let server_info = result.server_info.unwrap();
-        assert_eq!(server_info.name, "spring-lsp");
+        assert_eq!(server_info.name, "summer-lsp");
         assert!(server_info.version.is_some());
 
         // 验证服务器能力

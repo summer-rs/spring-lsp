@@ -87,7 +87,7 @@ export class RouteTreeItem extends vscode.TreeItem {
 
         // 点击时跳转到处理器函数
         this.command = {
-            command: 'spring.route.navigate',
+            command: 'summer.route.navigate',
             title: 'Go to Handler',
             arguments: [this.route]
         };
@@ -203,7 +203,7 @@ export class RoutesDataProvider implements vscode.TreeDataProvider<vscode.TreeIt
 
         try {
             const response = await this.languageClient.sendRequest<{ routes: Route[] }>(
-                'spring/routes',
+                'summer/routes',
                 { appPath: workspacePath }
             );
 

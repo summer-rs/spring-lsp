@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { SpringApp } from '../models';
+import { SummerApp } from '../models';
 import { LanguageClientManager } from '../languageClient';
 import { ConfigurationStruct, ConfigurationsResponse } from '../types';
 import { ViewMode, VIEW_MODE_KEYS } from '../types/viewMode';
@@ -19,7 +19,7 @@ export class ConfigurationsTreeDataProviderEnhanced
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
   private configurations: ConfigurationStruct[] = [];
-  private currentApp: SpringApp | undefined;
+  private currentApp: SummerApp | undefined;
   private viewMode: ViewMode = ViewMode.List;
 
   constructor(
@@ -133,7 +133,7 @@ export class ConfigurationsTreeDataProviderEnhanced
   private async refreshStaticByPath(appPath: string): Promise<void> {
     try {
       const response = await this.clientManager.sendRequest<ConfigurationsResponse>(
-        'spring/configurations',
+        'summer/configurations',
         { appPath }
       );
 
@@ -147,7 +147,7 @@ export class ConfigurationsTreeDataProviderEnhanced
     }
   }
 
-  public async refresh(app?: SpringApp): Promise<void> {
+  public async refresh(app?: SummerApp): Promise<void> {
     if (!app) {
       this.configurations = [];
       this.currentApp = undefined;
@@ -215,7 +215,7 @@ class ConfigStructTreeNode extends vscode.TreeItem {
   ) {
     super(configStruct.name, vscode.TreeItemCollapsibleState.None);
 
-    this.contextValue = 'spring:configStruct';
+    this.contextValue = 'summer:configStruct';
     this.description = `[${configStruct.prefix}]`;
     this.tooltip = this.buildTooltip();
     
@@ -227,7 +227,7 @@ class ConfigStructTreeNode extends vscode.TreeItem {
 
     if (configStruct.location) {
       this.command = {
-        command: 'spring.configuration.navigate',
+        command: 'summer.configuration.navigate',
         title: 'Go to Definition',
         arguments: [configStruct.location],
       };

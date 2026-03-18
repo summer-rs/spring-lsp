@@ -1,6 +1,6 @@
 //! 日志系统配置和管理
 //!
-//! 本模块提供 spring-lsp 的日志系统配置，支持：
+//! 本模块提供 summer-lsp 的日志系统配置，支持：
 //! - 通过环境变量配置日志级别
 //! - 输出到文件和标准错误流
 //! - 结构化日志（包含时间戳、级别、模块等）
@@ -9,14 +9,14 @@
 //!
 //! ## 环境变量
 //!
-//! - `SPRING_LSP_LOG_LEVEL`: 日志级别（trace, debug, info, warn, error），默认为 info
-//! - `SPRING_LSP_VERBOSE`: 启用详细日志模式（设置为 1 或 true）
-//! - `SPRING_LSP_LOG_FILE`: 日志文件路径（可选，如果不设置则只输出到 stderr）
+//! - `SUMMER_LSP_LOG_LEVEL`: 日志级别（trace, debug, info, warn, error），默认为 info
+//! - `SUMMER_LSP_VERBOSE`: 启用详细日志模式（设置为 1 或 true）
+//! - `SUMMER_LSP_LOG_FILE`: 日志文件路径（可选，如果不设置则只输出到 stderr）
 //!
 //! ## 使用示例
 //!
 //! ```rust,no_run
-//! use spring_lsp::logging::init_logging;
+//! use summer_lsp::logging::init_logging;
 //!
 //! // 初始化日志系统
 //! init_logging().expect("Failed to initialize logging");
@@ -54,15 +54,15 @@ impl Default for LogConfig {
 impl LogConfig {
     /// 从环境变量加载配置
     pub fn from_env() -> Self {
-        let level = env::var("SPRING_LSP_LOG_LEVEL")
+        let level = env::var("SUMMER_LSP_LOG_LEVEL")
             .unwrap_or_else(|_| "info".to_string())
             .to_lowercase();
 
-        let verbose = env::var("SPRING_LSP_VERBOSE")
+        let verbose = env::var("SUMMER_LSP_VERBOSE")
             .map(|v| v == "1" || v.to_lowercase() == "true")
             .unwrap_or(false);
 
-        let log_file = env::var("SPRING_LSP_LOG_FILE").ok().map(PathBuf::from);
+        let log_file = env::var("SUMMER_LSP_LOG_FILE").ok().map(PathBuf::from);
 
         Self {
             level,
@@ -83,10 +83,10 @@ impl LogConfig {
 
         // 在详细模式下，显示所有模块的日志
         if self.verbose {
-            EnvFilter::new(format!("spring_lsp={},lsp_server={}", level, level))
+            EnvFilter::new(format!("summer_lsp={},lsp_server={}", level, level))
         } else {
-            // 正常模式下，只显示 spring_lsp 的日志
-            EnvFilter::new(format!("spring_lsp={}", level))
+            // 正常模式下，只显示 summer_lsp 的日志
+            EnvFilter::new(format!("summer_lsp={}", level))
         }
     }
 
@@ -206,69 +206,69 @@ mod tests {
     #[test]
     fn test_log_config_from_env() {
         // 保存原始环境变量
-        let original_level = env::var("SPRING_LSP_LOG_LEVEL").ok();
-        let original_verbose = env::var("SPRING_LSP_VERBOSE").ok();
-        let original_file = env::var("SPRING_LSP_LOG_FILE").ok();
+        let original_level = env::var("SUMMER_LSP_LOG_LEVEL").ok();
+        let original_verbose = env::var("SUMMER_LSP_VERBOSE").ok();
+        let original_file = env::var("SUMMER_LSP_LOG_FILE").ok();
 
         // 设置测试环境变量
-        env::set_var("SPRING_LSP_LOG_LEVEL", "debug");
-        env::set_var("SPRING_LSP_VERBOSE", "true");
-        env::set_var("SPRING_LSP_LOG_FILE", "/tmp/spring-lsp.log");
+        env::set_var("SUMMER_LSP_LOG_LEVEL", "debug");
+        env::set_var("SUMMER_LSP_VERBOSE", "true");
+        env::set_var("SUMMER_LSP_LOG_FILE", "/tmp/summer-lsp.log");
 
         let config = LogConfig::from_env();
         assert_eq!(config.level, "debug");
         assert!(config.verbose);
-        assert_eq!(config.log_file, Some(PathBuf::from("/tmp/spring-lsp.log")));
+        assert_eq!(config.log_file, Some(PathBuf::from("/tmp/summer-lsp.log")));
 
         // 恢复原始环境变量
         match original_level {
-            Some(v) => env::set_var("SPRING_LSP_LOG_LEVEL", v),
-            None => env::remove_var("SPRING_LSP_LOG_LEVEL"),
+            Some(v) => env::set_var("SUMMER_LSP_LOG_LEVEL", v),
+            None => env::remove_var("SUMMER_LSP_LOG_LEVEL"),
         }
         match original_verbose {
-            Some(v) => env::set_var("SPRING_LSP_VERBOSE", v),
-            None => env::remove_var("SPRING_LSP_VERBOSE"),
+            Some(v) => env::set_var("SUMMER_LSP_VERBOSE", v),
+            None => env::remove_var("SUMMER_LSP_VERBOSE"),
         }
         match original_file {
-            Some(v) => env::set_var("SPRING_LSP_LOG_FILE", v),
-            None => env::remove_var("SPRING_LSP_LOG_FILE"),
+            Some(v) => env::set_var("SUMMER_LSP_LOG_FILE", v),
+            None => env::remove_var("SUMMER_LSP_LOG_FILE"),
         }
     }
 
     #[test]
     fn test_log_config_verbose_variants() {
         // 保存原始环境变量
-        let original = env::var("SPRING_LSP_VERBOSE").ok();
+        let original = env::var("SUMMER_LSP_VERBOSE").ok();
 
         // 测试 "1"
-        env::set_var("SPRING_LSP_VERBOSE", "1");
+        env::set_var("SUMMER_LSP_VERBOSE", "1");
         let config = LogConfig::from_env();
         assert!(config.verbose);
 
         // 测试 "true"
-        env::set_var("SPRING_LSP_VERBOSE", "true");
+        env::set_var("SUMMER_LSP_VERBOSE", "true");
         let config = LogConfig::from_env();
         assert!(config.verbose);
 
         // 测试 "TRUE"
-        env::set_var("SPRING_LSP_VERBOSE", "TRUE");
+        env::set_var("SUMMER_LSP_VERBOSE", "TRUE");
         let config = LogConfig::from_env();
         assert!(config.verbose);
 
         // 测试 "false"
-        env::set_var("SPRING_LSP_VERBOSE", "false");
+        env::set_var("SUMMER_LSP_VERBOSE", "false");
         let config = LogConfig::from_env();
         assert!(!config.verbose);
 
         // 测试未设置
-        env::remove_var("SPRING_LSP_VERBOSE");
+        env::remove_var("SUMMER_LSP_VERBOSE");
         let config = LogConfig::from_env();
         assert!(!config.verbose);
 
         // 恢复原始环境变量
         match original {
-            Some(v) => env::set_var("SPRING_LSP_VERBOSE", v),
-            None => env::remove_var("SPRING_LSP_VERBOSE"),
+            Some(v) => env::set_var("SUMMER_LSP_VERBOSE", v),
+            None => env::remove_var("SUMMER_LSP_VERBOSE"),
         }
     }
 
@@ -314,22 +314,22 @@ mod tests {
     #[test]
     fn test_log_config_case_insensitive() {
         // 保存原始环境变量
-        let original = env::var("SPRING_LSP_LOG_LEVEL").ok();
+        let original = env::var("SUMMER_LSP_LOG_LEVEL").ok();
 
         // 测试大写
-        env::set_var("SPRING_LSP_LOG_LEVEL", "DEBUG");
+        env::set_var("SUMMER_LSP_LOG_LEVEL", "DEBUG");
         let config = LogConfig::from_env();
         assert_eq!(config.level, "debug");
 
         // 测试混合大小写
-        env::set_var("SPRING_LSP_LOG_LEVEL", "WaRn");
+        env::set_var("SUMMER_LSP_LOG_LEVEL", "WaRn");
         let config = LogConfig::from_env();
         assert_eq!(config.level, "warn");
 
         // 恢复原始环境变量
         match original {
-            Some(v) => env::set_var("SPRING_LSP_LOG_LEVEL", v),
-            None => env::remove_var("SPRING_LSP_LOG_LEVEL"),
+            Some(v) => env::set_var("SUMMER_LSP_LOG_LEVEL", v),
+            None => env::remove_var("SUMMER_LSP_LOG_LEVEL"),
         }
     }
 }

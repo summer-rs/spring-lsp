@@ -1,11 +1,11 @@
 import { AppState } from './AppState';
 
 /**
- * Spring RS 应用数据模型
+ * Summer RS 应用数据模型
  * 
- * 表示工作空间中的一个 Spring RS 应用
+ * 表示工作空间中的一个 Summer RS 应用
  */
-export class SpringApp {
+export class SummerApp {
   /**
    * 应用目录的绝对路径
    */
@@ -57,7 +57,7 @@ export class SpringApp {
   public contextPath?: string;
 
   /**
-   * 创建一个新的 SpringApp 实例
+   * 创建一个新的 SummerApp 实例
    * 
    * @param path 应用目录的绝对路径
    * @param name 应用名称
@@ -158,20 +158,20 @@ export class SpringApp {
   }
 
   /**
-   * 检查应用是否是 Spring RS 应用
+   * 检查应用是否是 Summer RS 应用
    * 
-   * 通过检查是否依赖 spring-rs 相关的包来判断
+   * 通过检查是否依赖 summer-rs 相关的包来判断
    */
-  public isSpringRsApp(): boolean {
-    const springPackages = ['spring', 'spring-web', 'spring-sqlx', 'spring-redis'];
-    return springPackages.some((pkg) => this.hasDependency(pkg));
+  public isSummerRsApp(): boolean {
+    const summerPackages = ['summer', 'summer-web', 'summer-sqlx', 'summer-redis'];
+    return summerPackages.some((pkg) => this.hasDependency(pkg));
   }
 
   /**
    * 创建应用的副本
    */
-  public clone(): SpringApp {
-    const app = new SpringApp(this.path, this.name, this.version, [...this.dependencies], this.state);
+  public clone(): SummerApp {
+    const app = new SummerApp(this.path, this.name, this.version, [...this.dependencies], this.state);
     app.pid = this.pid;
     app.port = this.port;
     app.profile = this.profile;
@@ -199,10 +199,10 @@ export class SpringApp {
   }
 
   /**
-   * 从 JSON 对象创建 SpringApp 实例
+   * 从 JSON 对象创建 SummerApp 实例
    */
-  public static fromJSON(json: Record<string, unknown>): SpringApp {
-    const app = new SpringApp(
+  public static fromJSON(json: Record<string, unknown>): SummerApp {
+    const app = new SummerApp(
       json.path as string,
       json.name as string,
       json.version as string,

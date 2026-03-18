@@ -184,9 +184,21 @@ impl TomlAnalyzer {
             // 检查是否悬停在配置节的某个属性上
             for (key, property) in &section.properties {
                 if self.position_in_range(position, property.range) {
-                    // 检查配置项是否在 Schema 中定义
-                    let is_defined = self.schema_provider.has_property(prefix, key);
+                    // 尝试从 Schema 中获取详细信息
+                    if let Some(plugin_schema) = self.schema_provider.get_plugin(prefix) {
+                        if let Some(property_schema) = plugin_schema.properties.get(key) {
+                            // 使用详细的 hover 信息
+                            return Some(self.create_property_hover(
+                                prefix,
+                                key,
+                                property,
+                                property_schema,
+                            ));
+                        }
+                    }
 
+                    // 如果 Schema 中没有定义，使用基础 hover 信息
+                    let is_defined = self.schema_provider.has_property(prefix, key);
                     return Some(
                         self.create_basic_property_hover(prefix, key, property, is_defined),
                     );
@@ -460,9 +472,12 @@ impl TomlAnalyzer {
         // 2. 验证配置节和属性
         for (prefix, section) in &doc.config_sections {
             // 检查配置节是否在 Schema 中定义
-            if self.schema_provider.has_plugin(prefix) {
-                // 验证配置节中的属性
-                diagnostics.extend(self.validate_section_properties(section));
+            if let Some(plugin_schema) = self.schema_provider.get_plugin(prefix) {
+                // 使用高级验证方法验证配置节
+                diagnostics.extend(self.validate_section(section, &plugin_schema));
+
+                // 验证必需属性
+                diagnostics.extend(self.validate_required_properties(section, &plugin_schema));
             } else {
                 // 配置节未在 Schema 中定义
                 diagnostics.push(Diagnostic {
@@ -472,7 +487,7 @@ impl TomlAnalyzer {
                         "undefined-section".to_string(),
                     )),
                     message: format!("配置节 '{}' 未在 Schema 中定义", prefix),
-                    source: Some("spring-lsp".to_string()),
+                    source: Some("summer-lsp".to_string()),
                     ..Default::default()
                 });
             }
@@ -482,6 +497,7 @@ impl TomlAnalyzer {
     }
 
     /// 验证配置节中的属性（简化版）
+    #[allow(dead_code)]
     fn validate_section_properties(&self, section: &ConfigSection) -> Vec<Diagnostic> {
         let mut diagnostics = Vec::new();
 
@@ -495,7 +511,7 @@ impl TomlAnalyzer {
                         "undefined-property".to_string(),
                     )),
                     message: format!("配置项 '{}' 未在 Schema 中定义", key),
-                    source: Some("spring-lsp".to_string()),
+                    source: Some("summer-lsp".to_string()),
                     ..Default::default()
                 });
             }
@@ -517,7 +533,7 @@ impl TomlAnalyzer {
                         "empty-var-name".to_string(),
                     )),
                     message: "环境变量名不能为空".to_string(),
-                    source: Some("spring-lsp".to_string()),
+                    source: Some("summer-lsp".to_string()),
                     ..Default::default()
                 });
             }
@@ -538,7 +554,7 @@ impl TomlAnalyzer {
                         "环境变量名 '{}' 不符合命名规范，建议使用大写字母、数字和下划线",
                         env_var.name
                     ),
-                    source: Some("spring-lsp".to_string()),
+                    source: Some("summer-lsp".to_string()),
                     ..Default::default()
                 });
             }
@@ -566,7 +582,7 @@ impl TomlAnalyzer {
                             "deprecated-property".to_string(),
                         )),
                         message: format!("配置项 '{}' 已废弃: {}", key, deprecated_msg),
-                        source: Some("spring-lsp".to_string()),
+                        source: Some("summer-lsp".to_string()),
                         ..Default::default()
                     });
                 }
@@ -576,19 +592,85 @@ impl TomlAnalyzer {
 
                 // 验证值范围
                 diagnostics.extend(self.validate_property_range(property, property_schema));
+
+                // 如果是嵌套的 Object 类型，递归验证其内部属性
+                if let (
+                    ConfigValue::Table(table),
+                    crate::schema::TypeInfo::Object {
+                        properties: nested_props,
+                    },
+                ) = (&property.value, &property_schema.type_info)
+                {
+                    diagnostics.extend(self.validate_nested_table(
+                        table,
+                        nested_props,
+                        property.range,
+                    ));
+                }
             } else {
-                // 配置项未在 Schema 中定义
-                diagnostics.push(Diagnostic {
-                    range: property.range,
-                    severity: Some(DiagnosticSeverity::ERROR),
-                    code: Some(lsp_types::NumberOrString::String(
-                        "undefined-property".to_string(),
-                    )),
-                    message: format!("配置项 '{}' 未在 Schema 中定义", key),
-                    source: Some("spring-lsp".to_string()),
-                    ..Default::default()
-                });
+                // 对于 Table 类型的属性，如果 Schema 中没有定义，完全跳过验证
+                // 因为这可能是动态配置、扩展配置或嵌套配置段
+                if !matches!(property.value, ConfigValue::Table(_)) {
+                    // 对非 Table 类型的未定义属性产生警告（而不是错误）
+                    // 因为 Schema 可能不完整，或者是扩展配置
+                    diagnostics.push(Diagnostic {
+                        range: property.range,
+                        severity: Some(DiagnosticSeverity::HINT),
+                        code: Some(lsp_types::NumberOrString::String(
+                            "undefined-property".to_string(),
+                        )),
+                        message: format!("配置项 '{}' 未在 Schema 中定义", key),
+                        source: Some("summer-lsp".to_string()),
+                        ..Default::default()
+                    });
+                }
+                // Table 类型的未定义属性：不产生任何诊断信息
             }
+        }
+
+        diagnostics
+    }
+
+    /// 验证嵌套的 Table 配置
+    fn validate_nested_table(
+        &self,
+        table: &HashMap<String, ConfigValue>,
+        schema_properties: &HashMap<String, crate::schema::PropertySchema>,
+        parent_range: Range,
+    ) -> Vec<Diagnostic> {
+        let mut diagnostics = Vec::new();
+
+        for (key, value) in table {
+            if let Some(property_schema) = schema_properties.get(key) {
+                // 创建临时的 ConfigProperty 用于验证
+                let temp_property = ConfigProperty {
+                    key: key.clone(),
+                    value: value.clone(),
+                    range: parent_range, // 使用父级范围，因为嵌套属性没有独立的范围信息
+                };
+
+                // 验证类型
+                diagnostics.extend(self.validate_property_type(&temp_property, property_schema));
+
+                // 验证值范围
+                diagnostics.extend(self.validate_property_range(&temp_property, property_schema));
+
+                // 递归验证更深层的嵌套
+                if let (
+                    ConfigValue::Table(nested_table),
+                    crate::schema::TypeInfo::Object {
+                        properties: nested_props,
+                    },
+                ) = (value, &property_schema.type_info)
+                {
+                    diagnostics.extend(self.validate_nested_table(
+                        nested_table,
+                        nested_props,
+                        parent_range,
+                    ));
+                }
+            }
+            // 注意：嵌套 Table 中未定义的属性不报错，因为可能是动态配置
         }
 
         diagnostics
@@ -626,7 +708,7 @@ impl TomlAnalyzer {
                     "配置项 '{}' 的类型不匹配：期望 {}，实际 {}",
                     property.key, expected_type, actual_type
                 ),
-                source: Some("spring-lsp".to_string()),
+                source: Some("summer-lsp".to_string()),
                 ..Default::default()
             });
         }
@@ -654,7 +736,8 @@ impl TomlAnalyzer {
             ) => {
                 // 检查枚举值
                 if let Some(enum_vals) = enum_values {
-                    if !enum_vals.contains(s) {
+                    // 如果值包含环境变量，跳过枚举验证
+                    if !self.contains_env_var(s) && !enum_vals.contains(s) {
                         diagnostics.push(Diagnostic {
                             range: property.range,
                             severity: Some(DiagnosticSeverity::ERROR),
@@ -665,15 +748,15 @@ impl TomlAnalyzer {
                                 "配置项 '{}' 的值 '{}' 不在允许的枚举值中：{:?}",
                                 property.key, s, enum_vals
                             ),
-                            source: Some("spring-lsp".to_string()),
+                            source: Some("summer-lsp".to_string()),
                             ..Default::default()
                         });
                     }
                 }
 
-                // 检查最小长度
+                // 检查最小长度（跳过环境变量）
                 if let Some(min_len) = min_length {
-                    if s.len() < *min_len {
+                    if !self.contains_env_var(s) && s.len() < *min_len {
                         diagnostics.push(Diagnostic {
                             range: property.range,
                             severity: Some(DiagnosticSeverity::ERROR),
@@ -686,15 +769,15 @@ impl TomlAnalyzer {
                                 s.len(),
                                 min_len
                             ),
-                            source: Some("spring-lsp".to_string()),
+                            source: Some("summer-lsp".to_string()),
                             ..Default::default()
                         });
                     }
                 }
 
-                // 检查最大长度
+                // 检查最大长度（跳过环境变量）
                 if let Some(max_len) = max_length {
-                    if s.len() > *max_len {
+                    if !self.contains_env_var(s) && s.len() > *max_len {
                         diagnostics.push(Diagnostic {
                             range: property.range,
                             severity: Some(DiagnosticSeverity::ERROR),
@@ -707,7 +790,7 @@ impl TomlAnalyzer {
                                 s.len(),
                                 max_len
                             ),
-                            source: Some("spring-lsp".to_string()),
+                            source: Some("summer-lsp".to_string()),
                             ..Default::default()
                         });
                     }
@@ -728,7 +811,7 @@ impl TomlAnalyzer {
                                 "配置项 '{}' 的值 {} 小于最小值 {}",
                                 property.key, i, min_val
                             ),
-                            source: Some("spring-lsp".to_string()),
+                            source: Some("summer-lsp".to_string()),
                             ..Default::default()
                         });
                     }
@@ -746,7 +829,7 @@ impl TomlAnalyzer {
                                 "配置项 '{}' 的值 {} 超过最大值 {}",
                                 property.key, i, max_val
                             ),
-                            source: Some("spring-lsp".to_string()),
+                            source: Some("summer-lsp".to_string()),
                             ..Default::default()
                         });
                     }
@@ -767,7 +850,7 @@ impl TomlAnalyzer {
                                 "配置项 '{}' 的值 {} 小于最小值 {}",
                                 property.key, f, min_val
                             ),
-                            source: Some("spring-lsp".to_string()),
+                            source: Some("summer-lsp".to_string()),
                             ..Default::default()
                         });
                     }
@@ -785,7 +868,7 @@ impl TomlAnalyzer {
                                 "配置项 '{}' 的值 {} 超过最大值 {}",
                                 property.key, f, max_val
                             ),
-                            source: Some("spring-lsp".to_string()),
+                            source: Some("summer-lsp".to_string()),
                             ..Default::default()
                         });
                     }
@@ -815,7 +898,7 @@ impl TomlAnalyzer {
                         "missing-required-property".to_string(),
                     )),
                     message: format!("缺少必需的配置项 '{}'", key),
-                    source: Some("spring-lsp".to_string()),
+                    source: Some("summer-lsp".to_string()),
                     ..Default::default()
                 });
             }
@@ -848,6 +931,13 @@ impl TomlAnalyzer {
         }
     }
 
+    /// 检查字符串是否包含环境变量引用
+    ///
+    /// 环境变量格式：${VAR_NAME} 或 ${VAR_NAME:default}
+    fn contains_env_var(&self, s: &str) -> bool {
+        s.contains("${") && s.contains('}')
+    }
+
     /// 解析 TOML 文档
     ///
     /// 使用 taplo 解析 TOML 内容，提取环境变量引用和配置节
@@ -863,8 +953,8 @@ impl TomlAnalyzer {
     /// # 示例
     ///
     /// ```
-    /// use spring_lsp::toml_analyzer::TomlAnalyzer;
-    /// use spring_lsp::schema::SchemaProvider;
+    /// use summer_lsp::toml_analyzer::TomlAnalyzer;
+    /// use summer_lsp::schema::SchemaProvider;
     ///
     /// let schema_provider = SchemaProvider::new();
     /// let analyzer = TomlAnalyzer::new(schema_provider);
@@ -1042,7 +1132,7 @@ impl TomlAnalyzer {
         root: &taplo::dom::Node,
         content: &str,
     ) -> HashMap<String, ConfigSection> {
-        let mut sections = HashMap::new();
+        let mut sections: HashMap<String, ConfigSection> = HashMap::new();
 
         // 获取根表
         if let Some(table) = root.as_table() {
@@ -1051,26 +1141,89 @@ impl TomlAnalyzer {
             // 使用 get() 获取 Arc 引用，然后迭代
             let entries_arc = entries.get();
             for (key, value) in entries_arc.iter() {
-                let prefix = key.value().to_string();
+                let key_str = key.value().to_string();
+
+                // 处理嵌套的配置段，如 [web.middlewares]
+                // 提取顶层前缀（点号之前的部分）
+                let prefix = if let Some(dot_pos) = key_str.find('.') {
+                    key_str[..dot_pos].to_string()
+                } else {
+                    key_str.clone()
+                };
 
                 // 只处理表类型的节（配置节）
                 if value.as_table().is_some() {
+                    // 如果已经有这个前缀的配置段，合并属性
                     let properties = self.extract_properties(value, content);
                     let range = self.node_to_range(value, content);
 
-                    sections.insert(
-                        prefix.clone(),
-                        ConfigSection {
-                            prefix,
-                            properties,
-                            range,
-                        },
-                    );
+                    if let Some(existing_section) = sections.get_mut(&prefix) {
+                        // 如果是嵌套配置（如 web.middlewares），将其作为嵌套属性添加
+                        if key_str.contains('.') {
+                            let nested_key = key_str[prefix.len() + 1..].to_string();
+                            // 将 HashMap<String, ConfigProperty> 转换为 HashMap<String, ConfigValue>
+                            let nested_table = self.properties_to_value_table(&properties);
+                            existing_section.properties.insert(
+                                nested_key,
+                                ConfigProperty {
+                                    key: key_str.clone(),
+                                    value: ConfigValue::Table(nested_table),
+                                    range,
+                                },
+                            );
+                        } else {
+                            // 合并同级属性
+                            existing_section.properties.extend(properties);
+                        }
+                    } else {
+                        // 创建新的配置段
+                        let mut section_properties = HashMap::new();
+
+                        if key_str.contains('.') {
+                            // 嵌套配置，创建嵌套结构
+                            let nested_key = key_str[prefix.len() + 1..].to_string();
+                            // 将 HashMap<String, ConfigProperty> 转换为 HashMap<String, ConfigValue>
+                            let nested_table = self.properties_to_value_table(&properties);
+                            section_properties.insert(
+                                nested_key,
+                                ConfigProperty {
+                                    key: key_str.clone(),
+                                    value: ConfigValue::Table(nested_table),
+                                    range,
+                                },
+                            );
+                        } else {
+                            // 顶层配置
+                            section_properties = properties;
+                        }
+
+                        sections.insert(
+                            prefix.clone(),
+                            ConfigSection {
+                                prefix,
+                                properties: section_properties,
+                                range,
+                            },
+                        );
+                    }
                 }
             }
         }
 
         sections
+    }
+
+    /// 将 ConfigProperty 映射转换为 ConfigValue 映射
+    ///
+    /// 用于将嵌套配置段的属性转换为 ConfigValue::Table 所需的格式
+    fn properties_to_value_table(
+        &self,
+        properties: &HashMap<String, ConfigProperty>,
+    ) -> HashMap<String, ConfigValue> {
+        properties
+            .iter()
+            .map(|(key, prop)| (key.clone(), prop.value.clone()))
+            .collect()
     }
 
     /// 提取配置属性
@@ -1298,5 +1451,479 @@ port = ${PORT:8080}
 
         let doc = result.unwrap();
         assert_eq!(doc.env_vars.len(), 2, "应该提取到 2 个环境变量");
+    }
+}
+
+#[cfg(test)]
+mod env_var_validation_tests {
+    use super::*;
+    use lsp_types::DiagnosticSeverity;
+
+    #[test]
+    fn test_env_var_in_enum_should_not_error() {
+        // 创建一个带枚举类型的 Schema
+        let mut schema = crate::schema::ConfigSchema {
+            plugins: std::collections::HashMap::new(),
+        };
+
+        schema.plugins.insert(
+            "logger".to_string(),
+            serde_json::json!({
+                "type": "object",
+                "properties": {
+                    "level": {
+                        "type": "string",
+                        "enum": ["trace", "debug", "info", "warn", "error"],
+                        "description": "日志级别"
+                    }
+                }
+            }),
+        );
+
+        let schema_provider = crate::schema::SchemaProvider::from_schema(schema);
+        let analyzer = TomlAnalyzer::new(schema_provider);
+
+        // 使用环境变量的配置
+        let content = r#"
+[logger]
+level = "${RUST_LOG:info}"
+"#;
+
+        let doc = analyzer.parse(content).unwrap();
+        let diagnostics = analyzer.validate(&doc);
+
+        // 不应该有枚举值错误
+        let enum_errors: Vec<_> = diagnostics
+            .iter()
+            .filter(|d| {
+                d.code.as_ref().and_then(|c| match c {
+                    lsp_types::NumberOrString::String(s) => Some(s.as_str()),
+                    _ => None,
+                }) == Some("invalid-enum-value")
+            })
+            .collect();
+
+        assert!(
+            enum_errors.is_empty(),
+            "环境变量不应该触发枚举值错误，但发现了: {:?}",
+            enum_errors
+        );
+    }
+
+    #[test]
+    fn test_invalid_enum_without_env_var_should_error() {
+        // 创建一个带枚举类型的 Schema
+        let mut schema = crate::schema::ConfigSchema {
+            plugins: std::collections::HashMap::new(),
+        };
+
+        schema.plugins.insert(
+            "logger".to_string(),
+            serde_json::json!({
+                "type": "object",
+                "properties": {
+                    "level": {
+                        "type": "string",
+                        "enum": ["trace", "debug", "info", "warn", "error"],
+                        "description": "日志级别"
+                    }
+                }
+            }),
+        );
+
+        let schema_provider = crate::schema::SchemaProvider::from_schema(schema);
+        let analyzer = TomlAnalyzer::new(schema_provider);
+
+        // 使用无效的枚举值（不是环境变量）
+        let content = r#"
+[logger]
+level = "invalid_level"
+"#;
+
+        let doc = analyzer.parse(content).unwrap();
+        let diagnostics = analyzer.validate(&doc);
+
+        // 应该有枚举值错误
+        let enum_errors: Vec<_> = diagnostics
+            .iter()
+            .filter(|d| {
+                d.severity == Some(DiagnosticSeverity::ERROR)
+                    && d.code.as_ref().and_then(|c| match c {
+                        lsp_types::NumberOrString::String(s) => Some(s.as_str()),
+                        _ => None,
+                    }) == Some("invalid-enum-value")
+            })
+            .collect();
+
+        assert!(!enum_errors.is_empty(), "无效的枚举值应该触发错误");
+    }
+
+    #[test]
+    fn test_env_var_in_string_length_should_not_error() {
+        // 创建一个带长度限制的 Schema
+        let mut schema = crate::schema::ConfigSchema {
+            plugins: std::collections::HashMap::new(),
+        };
+
+        schema.plugins.insert(
+            "web".to_string(),
+            serde_json::json!({
+                "type": "object",
+                "properties": {
+                    "host": {
+                        "type": "string",
+                        "minLength": 5,
+                        "maxLength": 20,
+                        "description": "主机地址"
+                    }
+                }
+            }),
+        );
+
+        let schema_provider = crate::schema::SchemaProvider::from_schema(schema);
+        let analyzer = TomlAnalyzer::new(schema_provider);
+
+        // 使用环境变量（长度可能不符合要求）
+        let content = r#"
+[web]
+host = "${HOST:0.0.0.0}"
+"#;
+
+        let doc = analyzer.parse(content).unwrap();
+        let diagnostics = analyzer.validate(&doc);
+
+        // 不应该有长度错误
+        let length_errors: Vec<_> = diagnostics
+            .iter()
+            .filter(|d| {
+                d.code
+                    .as_ref()
+                    .and_then(|c| match c {
+                        lsp_types::NumberOrString::String(s) => Some(s.as_str()),
+                        _ => None,
+                    })
+                    .map(|s| s.contains("string-too-short") || s.contains("string-too-long"))
+                    .unwrap_or(false)
+            })
+            .collect();
+
+        assert!(
+            length_errors.is_empty(),
+            "环境变量不应该触发长度错误，但发现了: {:?}",
+            length_errors
+        );
+    }
+
+    #[test]
+    fn test_contains_env_var() {
+        let schema_provider = crate::schema::SchemaProvider::new();
+        let analyzer = TomlAnalyzer::new(schema_provider);
+
+        // 测试各种环境变量格式
+        assert!(analyzer.contains_env_var("${VAR}"));
+        assert!(analyzer.contains_env_var("${VAR:default}"));
+        assert!(analyzer.contains_env_var("prefix_${VAR}_suffix"));
+        assert!(analyzer.contains_env_var("${VAR1}_${VAR2}"));
+
+        // 不包含环境变量
+        assert!(!analyzer.contains_env_var("normal_string"));
+        assert!(!analyzer.contains_env_var("$VAR"));
+        assert!(!analyzer.contains_env_var("{VAR}"));
+        assert!(!analyzer.contains_env_var(""));
+    }
+}
+
+#[cfg(test)]
+mod nested_config_tests {
+    use super::*;
+
+    #[test]
+    fn test_nested_section_parsing() {
+        let schema_provider = crate::schema::SchemaProvider::new();
+        let analyzer = TomlAnalyzer::new(schema_provider);
+
+        // 测试嵌套配置段
+        let content = r#"
+[web.middlewares]
+compression = { enable = true }
+cors = { enable = true, allow_origins = ["https://example.com"], max_age = 60 }
+"#;
+
+        let result = analyzer.parse(content);
+        assert!(
+            result.is_ok(),
+            "嵌套配置段应该能正常解析: {:?}",
+            result.err()
+        );
+
+        let doc = result.unwrap();
+
+        // 验证配置段被正确提取
+        assert!(
+            doc.config_sections.contains_key("web"),
+            "应该提取到 'web' 配置段"
+        );
+
+        let web_section = &doc.config_sections["web"];
+
+        // 验证嵌套属性存在
+        assert!(
+            web_section.properties.contains_key("middlewares"),
+            "应该包含 'middlewares' 嵌套属性"
+        );
+
+        // 验证嵌套属性是 Table 类型
+        let middlewares_prop = &web_section.properties["middlewares"];
+        match &middlewares_prop.value {
+            ConfigValue::Table(table) => {
+                assert!(
+                    table.contains_key("compression"),
+                    "middlewares 应该包含 'compression' 属性"
+                );
+                assert!(
+                    table.contains_key("cors"),
+                    "middlewares 应该包含 'cors' 属性"
+                );
+            }
+            _ => panic!("middlewares 应该是 Table 类型"),
+        }
+    }
+
+    #[test]
+    fn test_inline_table_parsing() {
+        let schema_provider = crate::schema::SchemaProvider::new();
+        let analyzer = TomlAnalyzer::new(schema_provider);
+
+        // 测试内联表
+        let content = r#"
+[opendal]
+options = { endpoint = "${WEB_DAV_HOST:https://example.com}", username = "${WEB_DAV_USERNAME:user}", password = "${WEB_DAV_PASSWORD:pass}" }
+"#;
+
+        let result = analyzer.parse(content);
+        assert!(result.is_ok(), "内联表应该能正常解析: {:?}", result.err());
+
+        let doc = result.unwrap();
+
+        // 验证配置段被正确提取
+        assert!(
+            doc.config_sections.contains_key("opendal"),
+            "应该提取到 'opendal' 配置段"
+        );
+
+        let opendal_section = &doc.config_sections["opendal"];
+
+        // 验证 options 属性存在
+        assert!(
+            opendal_section.properties.contains_key("options"),
+            "应该包含 'options' 属性"
+        );
+
+        // 验证 options 是 Table 类型
+        let options_prop = &opendal_section.properties["options"];
+        match &options_prop.value {
+            ConfigValue::Table(table) => {
+                assert!(
+                    table.contains_key("endpoint"),
+                    "options 应该包含 'endpoint' 属性"
+                );
+                assert!(
+                    table.contains_key("username"),
+                    "options 应该包含 'username' 属性"
+                );
+                assert!(
+                    table.contains_key("password"),
+                    "options 应该包含 'password' 属性"
+                );
+
+                // 验证环境变量字符串被保留（因为在引号内）
+                if let ConfigValue::String(endpoint) = &table["endpoint"] {
+                    assert!(
+                        endpoint.contains("${WEB_DAV_HOST") || endpoint.starts_with("https://"),
+                        "endpoint 应该包含环境变量引用或默认值，实际值: {}",
+                        endpoint
+                    );
+                }
+            }
+            _ => panic!("options 应该是 Table 类型"),
+        }
+
+        // 注意：引号内的环境变量不会被提取（这是预期行为）
+        // 因为它们是合法的 TOML 字符串值
+        println!("提取到的环境变量数量: {}", doc.env_vars.len());
+    }
+
+    #[test]
+    fn test_multiple_nested_sections() {
+        let schema_provider = crate::schema::SchemaProvider::new();
+        let analyzer = TomlAnalyzer::new(schema_provider);
+
+        // 测试多个嵌套配置段
+        let content = r#"
+[web]
+host = "0.0.0.0"
+port = 8080
+
+[web.middlewares]
+compression = { enable = true }
+cors = { enable = true }
+
+[web.routes]
+prefix = "/api"
+"#;
+
+        let result = analyzer.parse(content);
+        assert!(
+            result.is_ok(),
+            "多个嵌套配置段应该能正常解析: {:?}",
+            result.err()
+        );
+
+        let doc = result.unwrap();
+
+        // 验证配置段被正确提取
+        assert!(
+            doc.config_sections.contains_key("web"),
+            "应该提取到 'web' 配置段"
+        );
+
+        let web_section = &doc.config_sections["web"];
+
+        // 验证顶层属性
+        assert!(
+            web_section.properties.contains_key("host"),
+            "应该包含 'host' 属性"
+        );
+        assert!(
+            web_section.properties.contains_key("port"),
+            "应该包含 'port' 属性"
+        );
+
+        // 验证嵌套属性
+        assert!(
+            web_section.properties.contains_key("middlewares"),
+            "应该包含 'middlewares' 嵌套属性"
+        );
+        assert!(
+            web_section.properties.contains_key("routes"),
+            "应该包含 'routes' 嵌套属性"
+        );
+    }
+
+    #[test]
+    fn test_nested_section_with_env_vars() {
+        let schema_provider = crate::schema::SchemaProvider::new();
+        let analyzer = TomlAnalyzer::new(schema_provider);
+
+        // 测试嵌套配置段中的环境变量
+        let content = r#"
+[web.middlewares]
+compression = { enable = ${ENABLE_COMPRESSION:true} }
+cors = { allow_origins = ["${CORS_ORIGIN:https://example.com}"] }
+"#;
+
+        let result = analyzer.parse(content);
+        assert!(
+            result.is_ok(),
+            "嵌套配置段中的环境变量应该能正常解析: {:?}",
+            result.err()
+        );
+
+        let doc = result.unwrap();
+
+        // 验证环境变量被提取
+        assert!(!doc.env_vars.is_empty(), "应该提取到环境变量");
+
+        // 验证配置结构
+        assert!(
+            doc.config_sections.contains_key("web"),
+            "应该提取到 'web' 配置段"
+        );
+    }
+
+    #[test]
+    fn test_nested_config_validation_warning() {
+        let schema_provider = crate::schema::SchemaProvider::new();
+        let analyzer = TomlAnalyzer::new(schema_provider);
+
+        // 测试未在 Schema 中定义的嵌套配置不应该产生任何诊断
+        let content = r#"
+[web]
+port = 8080
+
+[web.middlewares]
+compression = { enable = true }
+"#;
+
+        let doc = analyzer.parse(content).unwrap();
+        let diagnostics = analyzer.validate(&doc);
+
+        // 查找关于 middlewares 的诊断
+        let middlewares_diagnostics: Vec<_> = diagnostics
+            .iter()
+            .filter(|d| d.message.contains("middlewares"))
+            .collect();
+
+        // 嵌套配置不应该产生任何诊断
+        assert!(
+            middlewares_diagnostics.is_empty(),
+            "嵌套配置不应该产生诊断信息，但发现了: {:?}",
+            middlewares_diagnostics
+        );
+    }
+
+    #[test]
+    fn test_undefined_plain_property_still_errors() {
+        // 创建一个自定义 Schema，明确定义 web 插件的属性
+        let mut schema = crate::schema::ConfigSchema {
+            plugins: std::collections::HashMap::new(),
+        };
+
+        schema.plugins.insert(
+            "web".to_string(),
+            serde_json::json!({
+                "type": "object",
+                "properties": {
+                    "port": {
+                        "type": "integer",
+                        "description": "Web server port"
+                    }
+                }
+            }),
+        );
+
+        let schema_provider = crate::schema::SchemaProvider::from_schema(schema);
+        let analyzer = TomlAnalyzer::new(schema_provider);
+
+        // 测试未定义的普通属性产生提示
+        let content = r#"
+[web]
+port = 8080
+unknown_plain_property = "test"
+"#;
+
+        let doc = analyzer.parse(content).unwrap();
+        let diagnostics = analyzer.validate(&doc);
+
+        // 查找关于 unknown_plain_property 的诊断
+        let property_diagnostics: Vec<_> = diagnostics
+            .iter()
+            .filter(|d| d.message.contains("unknown_plain_property"))
+            .collect();
+
+        // 应该产生诊断
+        assert!(
+            !property_diagnostics.is_empty(),
+            "未定义的普通属性应该产生诊断"
+        );
+
+        // 应该是提示级别（HINT）
+        for diag in &property_diagnostics {
+            assert_eq!(
+                diag.severity,
+                Some(DiagnosticSeverity::HINT),
+                "未定义的普通属性应该是提示级别"
+            );
+        }
     }
 }

@@ -53,7 +53,7 @@ export class PluginTreeItem extends vscode.TreeItem {
 
         // 点击时跳转到定义
         this.command = {
-            command: 'spring.plugin.navigate',
+            command: 'summer.plugin.navigate',
             title: 'Go to Definition',
             arguments: [this.plugin]
         };
@@ -151,7 +151,7 @@ export class PluginsDataProvider implements vscode.TreeDataProvider<vscode.TreeI
 
         try {
             const response = await this.languageClient.sendRequest<{ plugins: Plugin[] }>(
-                'spring/plugins',
+                'summer/plugins',
                 { appPath: workspacePath }
             );
 

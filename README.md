@@ -1,6 +1,6 @@
-# spring-lsp
+# summer-lsp
 
-A Language Server Protocol (LSP) implementation for the [spring-rs](https://github.com/spring-rs/spring-rs) framework, providing intelligent IDE support for Rust applications built with spring-rs.
+A Language Server Protocol (LSP) implementation for the [summer-rs](https://github.com/summer-rs/summer-rs) framework, providing intelligent IDE support for Rust applications built with summer-rs.
 
 ## Features
 
@@ -12,7 +12,7 @@ A Language Server Protocol (LSP) implementation for the [spring-rs](https://gith
 - **Schema-based validation** with automatic schema loading
 
 ### 🔧 Rust Macro Analysis
-- **Macro recognition** for spring-rs macros (`#[derive(Service)]`, `#[inject]`, route macros, job macros)
+- **Macro recognition** for summer-rs macros (`#[derive(Service)]`, `#[inject]`, route macros, job macros)
 - **Macro expansion** with readable generated code
 - **Parameter validation** and error reporting
 - **Hover tooltips** with macro documentation and usage examples
@@ -41,20 +41,20 @@ A Language Server Protocol (LSP) implementation for the [spring-rs](https://gith
 
 ### From Source
 ```bash
-git clone https://github.com/spring-rs/spring-lsp
-cd spring-lsp
+git clone https://github.com/summer-rs/summer-lsp
+cd summer-lsp
 cargo build --release
 ```
 
-The binary will be available at `target/release/spring-lsp`.
+The binary will be available at `target/release/summer-lsp`.
 
 ### From crates.io
 ```bash
-cargo install spring-lsp
+cargo install summer-lsp
 ```
 
 ### Pre-built Binaries
-Download pre-built binaries from the [releases page](https://github.com/spring-rs/spring-lsp/releases):
+Download pre-built binaries from the [releases page](https://github.com/summer-rs/summer-lsp/releases):
 
 - Linux x86_64 (glibc and musl)
 - macOS x86_64 and ARM64
@@ -66,7 +66,7 @@ Download pre-built binaries from the [releases page](https://github.com/spring-r
 
 #### Option 1: Install the Extension (Recommended)
 
-Install the official Spring RS LSP extension:
+Install the official Summer RS LSP extension:
 
 1. From VSCode Marketplace (coming soon)
 2. Or install from VSIX:
@@ -74,7 +74,7 @@ Install the official Spring RS LSP extension:
    cd vscode
    npm install
    npm run package
-   code --install-extension spring-rs-lsp-0.1.0.vsix
+   code --install-extension summer-rs-lsp-0.1.0.vsix
    ```
 
 The extension will automatically detect and start the language server.
@@ -85,9 +85,9 @@ If you prefer manual setup, add to your `settings.json`:
 
 ```json
 {
-  "spring-rs-lsp.enable": true,
-  "spring-rs-lsp.serverPath": "/path/to/spring-lsp",
-  "spring-rs-lsp.trace.server": "verbose"
+  "summer-rs-lsp.enable": true,
+  "summer-rs-lsp.serverPath": "/path/to/summer-lsp",
+  "summer-rs-lsp.trace.server": "verbose"
 }
 ```
 
@@ -95,10 +95,10 @@ See [vscode/README.md](vscode/README.md) for more details.
 
 ### Neovim (with nvim-lspconfig)
 ```lua
-require'lspconfig'.spring_lsp.setup{
-  cmd = {"/path/to/spring-lsp"},
+require'lspconfig'.summer_lsp.setup{
+  cmd = {"/path/to/summer-lsp"},
   filetypes = {"toml", "rust"},
-  root_dir = require'lspconfig'.util.root_pattern("Cargo.toml", ".spring-lsp.toml"),
+  root_dir = require'lspconfig'.util.root_pattern("Cargo.toml", ".summer-lsp.toml"),
 }
 ```
 
@@ -106,21 +106,21 @@ require'lspconfig'.spring_lsp.setup{
 ```elisp
 (add-to-list 'lsp-language-id-configuration '(toml-mode . "toml"))
 (lsp-register-client
- (make-lsp-client :new-connection (lsp-stdio-connection "/path/to/spring-lsp")
+ (make-lsp-client :new-connection (lsp-stdio-connection "/path/to/summer-lsp")
                   :major-modes '(toml-mode rust-mode)
-                  :server-id 'spring-lsp))
+                  :server-id 'summer-lsp))
 ```
 
 ## Configuration
 
-Create a `.spring-lsp.toml` file in your project root:
+Create a `.summer-lsp.toml` file in your project root:
 
 ```toml
 [completion]
 trigger_characters = ["[", ".", "$", "{", "#", "("]
 
 [schema]
-url = "https://spring-rs.github.io/config-schema.json"
+url = "https://summer-rs.github.io/config-schema.json"
 
 [diagnostics]
 disabled = ["deprecated-config"]
@@ -132,8 +132,83 @@ verbose = false
 
 ## Usage
 
+### Local Configuration Schema Generation
+
+For projects using summer-rs, you can generate a local configuration schema for enhanced LSP support:
+
+#### Quick Start
+
+1. **Define your configuration**:
+```rust
+use spring::config::Configurable;
+use spring::submit_config_schema;
+use serde::Deserialize;
+
+#[derive(Debug, Configurable, Deserialize)]
+#[config_prefix = "my-service"]
+pub struct MyServiceConfig {
+    /// Service endpoint URL
+    pub endpoint: String,
+    /// Connection timeout in seconds
+    #[serde(default = "default_timeout")]
+    pub timeout: u64,
+}
+
+fn default_timeout() -> u64 { 30 }
+
+// Register the schema
+submit_config_schema!("my-service", MyServiceConfig);
+```
+
+2. **Add build script**:
+```rust
+// build.rs
+use spring::config::write_merged_schema_to_file;
+use std::env;
+
+fn main() {
+    // 生成到 target 目录
+    let out_dir = env::var("OUT_DIR").unwrap();
+    let schema_path = format!("{}/summer-lsp.schema.json", out_dir);
+    write_merged_schema_to_file(&schema_path)
+        .expect("Failed to write schema file");
+    
+    // 当配置文件变化时重新生成
+    println!("cargo:rerun-if-changed=src/config.rs");
+}
+```
+
+3. **Build your project**:
+```bash
+cargo build  # Schema 自动生成到 target 目录
+```
+
+The generated schema will be automatically discovered by summer-lsp, providing:
+- ✅ Smart completion for your custom configurations
+- ✅ Type validation and error checking
+- ✅ Hover documentation from your doc comments
+- ✅ Support for all serde attributes
+
+#### Multi-Crate Workspace Support
+
+In a Cargo workspace with multiple crates, summer-lsp automatically:
+- 🔍 Discovers all schema files from different crates
+- 🔄 Merges them into a single unified schema
+- ✨ Provides completion for all crate configurations
+
+Example workspace structure:
+```
+my-workspace/
+├── service-a/  # Generates schema for service-a configs
+├── service-b/  # Generates schema for service-b configs
+└── config/
+    └── app.toml  # Can use configs from both crates
+```
+
+For detailed instructions, see [SCHEMA_GENERATION_GUIDE.md](SCHEMA_GENERATION_GUIDE.md).
+
 ### TOML Configuration Files
-spring-lsp automatically provides intelligent support for `config/app.toml` and related configuration files:
+summer-lsp automatically provides intelligent support for `config/app.toml` and related configuration files:
 
 ```toml
 # Smart completion for configuration sections
@@ -152,7 +227,7 @@ pool_size = 10    # Range validation
 ```
 
 ### Rust Code Analysis
-spring-lsp analyzes your Rust code for spring-rs specific patterns:
+summer-lsp analyzes your Rust code for summer-rs specific patterns:
 
 ```rust
 // Service macro with dependency injection
@@ -183,7 +258,7 @@ async fn cleanup_job() {
 
 ## Performance
 
-spring-lsp is designed for high performance:
+summer-lsp is designed for high performance:
 
 - **Startup time**: < 2 seconds
 - **Completion response**: < 100ms
@@ -207,7 +282,7 @@ spring-lsp is designed for high performance:
 
 ## Architecture
 
-spring-lsp follows a modular architecture:
+summer-lsp follows a modular architecture:
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -236,8 +311,8 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guid
 
 ### Development Setup
 ```bash
-git clone https://github.com/spring-rs/spring-lsp
-cd spring-lsp
+git clone https://github.com/summer-rs/summer-lsp
+cd summer-lsp
 
 # 运行测试
 cargo test
@@ -264,7 +339,7 @@ cargo test --release performance
 ## Documentation
 
 - [VSCode Extension Guide](vscode/README.md) - VSCode extension usage
-- [API Documentation](https://docs.rs/spring-lsp) - Rust API docs
+- [API Documentation](https://docs.rs/summer-lsp) - Rust API docs
 - [Contributing Guide](CONTRIBUTING.md) - Development guidelines
 
 ## Changelog
@@ -282,11 +357,11 @@ at your option.
 
 ## Acknowledgments
 
-- [spring-rs](https://github.com/spring-rs/spring-rs) - The amazing Rust application framework
+- [summer-rs](https://github.com/summer-rs/summer-rs) - The amazing Rust application framework
 - [taplo](https://github.com/tamasfe/taplo) - TOML parsing and analysis
 - [lsp-server](https://github.com/rust-lang/rust-analyzer/tree/master/lib/lsp-server) - LSP protocol implementation
 - [rust-analyzer](https://github.com/rust-lang/rust-analyzer) - Inspiration for LSP architecture
 
 ---
 
-**spring-lsp** - Intelligent IDE support for spring-rs applications
+**summer-lsp** - Intelligent IDE support for summer-rs applications

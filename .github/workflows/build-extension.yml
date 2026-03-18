@@ -36,20 +36,20 @@ jobs:
         include:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
-            artifact: spring-lsp-linux-x64
+            artifact: summer-lsp-linux-x64
           # macOS Intel (x86_64) - 在 ARM64 Mac 上交叉编译
           - os: macos-14
             target: x86_64-apple-darwin
-            artifact: spring-lsp-darwin-x64
+            artifact: summer-lsp-darwin-x64
             cross_compile: true
           # macOS Apple Silicon (ARM64)
           - os: macos-14
             target: aarch64-apple-darwin
-            artifact: spring-lsp-darwin-arm64
+            artifact: summer-lsp-darwin-arm64
             cross_compile: false
           - os: windows-latest
             target: x86_64-pc-windows-msvc
-            artifact: spring-lsp-win32-x64.exe
+            artifact: summer-lsp-win32-x64.exe
 
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30  # 添加超时限制，避免无限等待
@@ -85,9 +85,9 @@ jobs:
         run: |
           mkdir -p artifact
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            cp target/${{ matrix.target }}/release/spring-lsp.exe artifact/${{ matrix.artifact }}
+            cp target/${{ matrix.target }}/release/summer-lsp.exe artifact/${{ matrix.artifact }}
           else
-            cp target/${{ matrix.target }}/release/spring-lsp artifact/${{ matrix.artifact }}
+            cp target/${{ matrix.target }}/release/summer-lsp artifact/${{ matrix.artifact }}
             chmod +x artifact/${{ matrix.artifact }}
           fi
       
@@ -135,7 +135,7 @@ jobs:
           cd ..
           rm -rf bin-temp
           # 设置执行权限
-          chmod +x bin/spring-lsp-* || true
+          chmod +x bin/summer-lsp-* || true
           # 显示文件列表
           echo "📦 Server binaries:"
           ls -lh bin/
@@ -193,13 +193,13 @@ jobs:
           generate_release_notes: true
           name: Release ${{ steps.version.outputs.version }}
           body: |
-            ## Spring LSP VSCode Extension v${{ steps.version.outputs.version }}
+            ## Summer LSP VSCode Extension v${{ steps.version.outputs.version }}
             
             ### Installation
             
             Download the `.vsix` file and install:
             ```bash
-            code --install-extension spring-rs-${{ steps.version.outputs.version }}.vsix
+            code --install-extension summer-rs-${{ steps.version.outputs.version }}.vsix
             ```
             
             Or install from VSCode Marketplace (coming soon).
@@ -218,7 +218,7 @@ jobs:
             - macOS ARM64 (Apple Silicon)
             - Windows x64
             
-            See [CHANGELOG.md](https://github.com/spring-rs/spring-lsp/blob/main/vscode/CHANGELOG.md) for details.
+            See [CHANGELOG.md](https://github.com/summer-rs/summer-lsp/blob/main/vscode/CHANGELOG.md) for details.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       

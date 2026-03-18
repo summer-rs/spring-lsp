@@ -1,6 +1,6 @@
 # VSCode 扩展调试指南
 
-本指南详细说明如何调试 Spring LSP 的 VSCode 扩展。
+本指南详细说明如何调试 Summer LSP 的 VSCode 扩展。
 
 ## 目录
 
@@ -46,7 +46,7 @@
 ### 1. 安装依赖
 
 ```bash
-cd spring-lsp/vscode
+cd summer-lsp/vscode
 npm install
 ```
 
@@ -63,7 +63,7 @@ npm run watch
 ### 3. 启动调试
 
 在 VSCode 中：
-1. 打开 `spring-lsp/vscode` 目录
+1. 打开 `summer-lsp/vscode` 目录
 2. 按 `F5` 或点击 "Run and Debug" 面板的绿色播放按钮
 3. 选择 "Run Extension" 配置
 4. 新的 VSCode 窗口（Extension Development Host）会打开
@@ -71,8 +71,8 @@ npm run watch
 ### 4. 测试扩展
 
 在新打开的窗口中：
-1. 打开一个 spring-rs 项目
-2. 查看 "Spring RS" 侧边栏
+1. 打开一个 summer-rs 项目
+2. 查看 "Summer RS" 侧边栏
 3. 测试各种功能（应用管理、配置补全等）
 
 ## 调试配置说明
@@ -174,7 +174,7 @@ npm run watch
 
 1. **打开扩展项目**
    ```bash
-   cd spring-lsp/vscode
+   cd summer-lsp/vscode
    code .
    ```
 
@@ -240,14 +240,14 @@ npm run watch
 1. 在 `src/extension.ts` 的 `activate()` 函数开头设置断点
    ```typescript
    export async function activate(context: vscode.ExtensionContext): Promise<void> {
-     console.log('Spring LSP extension is now activating...');  // 在这里设置断点
+     console.log('Summer LSP extension is now activating...');  // 在这里设置断点
      // ...
    }
    ```
 
 2. 按 `F5` 启动调试
 
-3. 在新窗口中打开一个 spring-rs 项目
+3. 在新窗口中打开一个 summer-rs 项目
 
 4. 断点应该被触发
 
@@ -258,7 +258,7 @@ npm run watch
 
 ### 场景 2: 调试应用检测
 
-**目标**: 确保扩展能正确检测 spring-rs 应用
+**目标**: 确保扩展能正确检测 summer-rs 应用
 
 **步骤**:
 1. 在 `src/controllers/LocalAppManager.ts` 的 `scanWorkspace()` 方法设置断点
@@ -281,7 +281,7 @@ npm run watch
 **检查点**:
 - `Cargo.toml` 文件是否被正确找到
 - 依赖解析是否正确
-- 应用是否被正确识别为 spring-rs 应用
+- 应用是否被正确识别为 summer-rs 应用
 
 ### 场景 3: 调试命令执行
 
@@ -290,7 +290,7 @@ npm run watch
 **步骤**:
 1. 在 `src/controllers/LocalAppController.ts` 的 `runApp()` 方法设置断点
    ```typescript
-   public async runApp(app: SpringApp, debug: boolean = false, profile?: string) {
+   public async runApp(app: SummerApp, debug: boolean = false, profile?: string) {
      if (app.state !== AppState.INACTIVE) {  // 在这里设置断点
        // ...
      }
@@ -300,7 +300,7 @@ npm run watch
 
 2. 启动调试
 
-3. 在新窗口的 "Spring RS" 侧边栏中点击应用的 "Run" 按钮
+3. 在新窗口的 "Summer RS" 侧边栏中点击应用的 "Run" 按钮
 
 4. 断点被触发
 
@@ -339,10 +339,10 @@ npm run watch
 - 在 `settings.json` 中启用 LSP 追踪：
   ```json
   {
-    "spring-rs.trace.server": "verbose"
+    "summer-rs.trace.server": "verbose"
   }
   ```
-- 查看 "Output" 面板的 "Spring LSP (Language Server)" 通道
+- 查看 "Output" 面板的 "Summer LSP (Language Server)" 通道
 
 ### 场景 5: 调试视图刷新
 
@@ -351,7 +351,7 @@ npm run watch
 **步骤**:
 1. 在 `src/views/ComponentsTreeDataProvider.ts` 设置断点
    ```typescript
-   public async refresh(app: SpringApp): Promise<void> {
+   public async refresh(app: SummerApp): Promise<void> {
      console.log(`Refreshing components for app: ${app.name}`);  // 在这里设置断点
      // ...
    }
@@ -375,7 +375,7 @@ npm run watch
 **步骤**:
 1. 在 `src/controllers/LocalAppManager.ts` 的 `parseCargoToml()` 方法设置断点
    ```typescript
-   private async parseCargoToml(file: vscode.Uri): Promise<SpringApp | null> {
+   private async parseCargoToml(file: vscode.Uri): Promise<SummerApp | null> {
      try {
        const content = await vscode.workspace.fs.readFile(file);  // 在这里设置断点
        // ...
@@ -415,14 +415,14 @@ console.error('Failed to start app:', error);
 创建输出通道：
 
 ```typescript
-const outputChannel = vscode.window.createOutputChannel('Spring LSP');
+const outputChannel = vscode.window.createOutputChannel('Summer LSP');
 outputChannel.appendLine('Extension activated');
 outputChannel.show();
 ```
 
 查看输出：
 - "View" -> "Output"
-- 选择 "Spring LSP" 通道
+- 选择 "Summer LSP" 通道
 
 ### 3. 使用条件断点
 
@@ -505,7 +505,7 @@ this.apps.values().filter(a => a.state === 'running')
 如果需要同时调试扩展和语言服务器：
 
 1. 启动扩展调试（F5）
-2. 在扩展宿主窗口中，打开 spring-rs 项目
+2. 在扩展宿主窗口中，打开 summer-rs 项目
 3. 在主 VSCode 窗口中，切换到 Rust 项目目录
 4. 使用 "Attach to LSP Server" 配置附加到语言服务器进程
 
@@ -541,7 +541,7 @@ this.apps.values().filter(a => a.state === 'running')
 
 **解决方法**:
 1. 检查 `package.json` 中的 `activationEvents`
-2. 确保测试项目包含 `Cargo.toml` 或 `.spring-lsp.toml`
+2. 确保测试项目包含 `Cargo.toml` 或 `.summer-lsp.toml`
 3. 手动触发激活：在命令面板执行扩展的命令
 
 ### Q4: 语言服务器未启动
@@ -551,10 +551,10 @@ this.apps.values().filter(a => a.state === 'running')
 - 服务器二进制文件不存在
 
 **解决方法**:
-1. 检查 `spring-rs.serverPath` 配置
+1. 检查 `summer-rs.serverPath` 配置
 2. 确保语言服务器已编译：
    ```bash
-   cd spring-lsp
+   cd summer-lsp
    cargo build --release
    ```
 3. 查看 "Output" 面板的错误信息

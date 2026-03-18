@@ -19,7 +19,7 @@ export enum ViewMode {
  * 各个视图的模式配置键
  */
 export const VIEW_MODE_KEYS = {
-  components: 'spring-lsp.componentsViewMode',
-  routes: 'spring-lsp.routesViewMode',
-  configurations: 'spring-lsp.configurationsViewMode',
+  components: 'summer-lsp.componentsViewMode',
+  routes: 'summer-lsp.routesViewMode',
+  configurations: 'summer-lsp.configurationsViewMode',
 } as const;

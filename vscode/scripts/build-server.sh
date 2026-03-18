@@ -5,7 +5,7 @@
 
 set -e
 
-echo "🔨 Building Spring LSP server for all platforms..."
+echo "🔨 Building Summer LSP server for all platforms..."
 echo ""
 echo "⚠️  注意：交叉编译需要安装工具链，可能会失败。"
 echo "   推荐方案："
@@ -84,21 +84,21 @@ for target in "${TARGETS[@]}"; do
     # 复制到 bin 目录
     case "$target" in
       *linux*)
-        cp "target/$target/release/spring-lsp" "vscode/bin/spring-lsp-linux-x64"
-        echo "  ✅ Copied to vscode/bin/spring-lsp-linux-x64"
+        cp "target/$target/release/summer-lsp" "vscode/bin/summer-lsp-linux-x64"
+        echo "  ✅ Copied to vscode/bin/summer-lsp-linux-x64"
         ;;
       *darwin*)
         if [[ "$target" == *"aarch64"* ]]; then
-          cp "target/$target/release/spring-lsp" "vscode/bin/spring-lsp-darwin-arm64"
-          echo "  ✅ Copied to vscode/bin/spring-lsp-darwin-arm64"
+          cp "target/$target/release/summer-lsp" "vscode/bin/summer-lsp-darwin-arm64"
+          echo "  ✅ Copied to vscode/bin/summer-lsp-darwin-arm64"
         else
-          cp "target/$target/release/spring-lsp" "vscode/bin/spring-lsp-darwin-x64"
-          echo "  ✅ Copied to vscode/bin/spring-lsp-darwin-x64"
+          cp "target/$target/release/summer-lsp" "vscode/bin/summer-lsp-darwin-x64"
+          echo "  ✅ Copied to vscode/bin/summer-lsp-darwin-x64"
         fi
         ;;
       *windows*)
-        cp "target/$target/release/spring-lsp.exe" "vscode/bin/spring-lsp-win32-x64.exe"
-        echo "  ✅ Copied to vscode/bin/spring-lsp-win32-x64.exe"
+        cp "target/$target/release/summer-lsp.exe" "vscode/bin/summer-lsp-win32-x64.exe"
+        echo "  ✅ Copied to vscode/bin/summer-lsp-win32-x64.exe"
         ;;
     esac
   else

@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as toml from '@iarna/toml';
 import { spawn, ChildProcess } from 'child_process';
-import { SpringApp, AppState } from '../models';
+import { SummerApp, AppState } from '../models';
 import { LocalAppManager } from './LocalAppManager';
 
 /**
@@ -61,7 +61,7 @@ export class LocalAppController implements vscode.Disposable {
   /**
    * 获取应用列表
    */
-  public getAppList(): SpringApp[] {
+  public getAppList(): SummerApp[] {
     return this.manager.getAppList();
   }
 
@@ -73,7 +73,7 @@ export class LocalAppController implements vscode.Disposable {
    * @param profile 要使用的 Profile（可选）
    */
   public async runApp(
-    app: SpringApp,
+    app: SummerApp,
     debug: boolean = false,
     profile?: string
   ): Promise<void> {
@@ -96,12 +96,12 @@ export class LocalAppController implements vscode.Disposable {
       const args = debug ? ['run'] : ['run', '--release'];
       
       // 创建终端用于显示输出
-      const terminalName = `Spring RS: ${app.name}`;
+      const terminalName = `Summer RS: ${app.name}`;
       const writeEmitter = new vscode.EventEmitter<string>();
       const pty: vscode.Pseudoterminal = {
         onDidWrite: writeEmitter.event,
         open: () => {
-          writeEmitter.fire(`\x1b[1;32m[Spring RS]\x1b[0m Starting ${app.name}...\r\n`);
+          writeEmitter.fire(`\x1b[1;32m[Summer RS]\x1b[0m Starting ${app.name}...\r\n`);
           writeEmitter.fire(`\x1b[1;34m[Command]\x1b[0m cargo ${args.join(' ')}\r\n`);
           writeEmitter.fire(`\x1b[1;34m[Directory]\x1b[0m ${app.path}\r\n\r\n`);
         },
@@ -231,7 +231,7 @@ export class LocalAppController implements vscode.Disposable {
   /**
    * 从输出中检测端口
    */
-  private detectPortFromOutput(app: SpringApp, output: string): void {
+  private detectPortFromOutput(app: SummerApp, output: string): void {
     // 匹配常见的端口输出格式
     const patterns = [
       /listening on .*:(\d+)/i,
@@ -301,7 +301,7 @@ export class LocalAppController implements vscode.Disposable {
    * @param debug 是否以调试模式运行（默认 false）
    */
   public async runAppWithProfile(
-    app: SpringApp,
+    app: SummerApp,
     debug: boolean = false
   ): Promise<void> {
     // 检测可用的 Profiles
@@ -319,7 +319,7 @@ export class LocalAppController implements vscode.Disposable {
     const selectedProfiles = await vscode.window.showQuickPick(profiles, {
       canPickMany: true,
       title: 'Select Active Profiles',
-      placeHolder: 'Will set SPRING_ENV environment variable',
+      placeHolder: 'Will set SUMMER_ENV environment variable',
     });
 
     if (selectedProfiles !== undefined) {
@@ -333,7 +333,7 @@ export class LocalAppController implements vscode.Disposable {
    * 
    * @param app 要停止的应用
    */
-  public async stopApp(app: SpringApp): Promise<void> {
+  public async stopApp(app: SummerApp): Promise<void> {
     if (app.state === AppState.INACTIVE) {
       return;
     }
@@ -407,7 +407,7 @@ export class LocalAppController implements vscode.Disposable {
    * 
    * @param app 要打开的应用
    */
-  public async openApp(app: SpringApp): Promise<void> {
+  public async openApp(app: SummerApp): Promise<void> {
     if (app.state !== AppState.RUNNING) {
       vscode.window.showWarningMessage('App is not running');
       return;
@@ -426,7 +426,7 @@ export class LocalAppController implements vscode.Disposable {
       }
 
       // 构建 URL
-      const config = vscode.workspace.getConfiguration('spring-rs');
+      const config = vscode.workspace.getConfiguration('summer-rs');
       const urlTemplate = config.get<string>(
         'openUrl',
         'http://localhost:{port}{contextPath}'
@@ -540,7 +540,7 @@ export class LocalAppController implements vscode.Disposable {
    * @returns 调试配置，如果创建失败返回 null
    */
   private async createDebugConfiguration(
-    app: SpringApp,
+    app: SummerApp,
     debug: boolean,
     profile?: string
   ): Promise<vscode.DebugConfiguration | null> {
@@ -584,7 +584,7 @@ export class LocalAppController implements vscode.Disposable {
     if (profile) {
       enhanced.env = {
         ...enhanced.env,
-        SPRING_ENV: profile,
+        SUMMER_ENV: profile,
       };
     }
 
@@ -598,7 +598,7 @@ export class LocalAppController implements vscode.Disposable {
    * @returns 配置对象，如果不存在返回 undefined
    */
   private async findExistingLaunchConfig(
-    app: SpringApp
+    app: SummerApp
   ): Promise<vscode.DebugConfiguration | undefined> {
     const launchConfig = vscode.workspace.getConfiguration(
       'launch',
@@ -622,17 +622,17 @@ export class LocalAppController implements vscode.Disposable {
    * @returns 环境变量对象
    */
   private buildEnv(
-    app: SpringApp,
+    app: SummerApp,
     profile?: string
   ): Record<string, string> {
     const env: Record<string, string> = {};
 
     if (profile) {
-      env.SPRING_ENV = profile;
+      env.SUMMER_ENV = profile;
     }
 
     // 从配置读取额外的环境变量
-    const config = vscode.workspace.getConfiguration('spring-rs');
+    const config = vscode.workspace.getConfiguration('summer-rs');
     const envVars = config.get<Record<string, string>>('env', {});
     Object.assign(env, envVars);
 
@@ -645,7 +645,7 @@ export class LocalAppController implements vscode.Disposable {
    * @param app 应用
    * @returns Profile 名称列表
    */
-  private async detectProfiles(app: SpringApp): Promise<string[]> {
+  private async detectProfiles(app: SummerApp): Promise<string[]> {
     const configDir = path.join(app.path, 'config');
     const profilePattern = /^app-(.*)\.toml$/;
     const profiles: string[] = [];
@@ -675,7 +675,7 @@ export class LocalAppController implements vscode.Disposable {
    * @param app 应用
    * @returns 端口号，如果检测失败返回 undefined
    */
-  private async detectPort(app: SpringApp): Promise<number | undefined> {
+  private async detectPort(app: SummerApp): Promise<number | undefined> {
     const configPath = path.join(app.path, 'config', 'app.toml');
 
     try {
@@ -712,7 +712,7 @@ export class LocalAppController implements vscode.Disposable {
    * @param app 应用
    * @param state 新状态
    */
-  private setState(app: SpringApp, state: AppState): void {
+  private setState(app: SummerApp, state: AppState): void {
     app.state = state;
     this.manager.fireDidChangeApps(app);
   }

@@ -1,19 +1,19 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as toml from '@iarna/toml';
-import { SpringApp, AppState } from '../models';
+import { SummerApp, AppState } from '../models';
 import { debounce } from '../utils/debounce';
 
 /**
  * 本地应用管理器
  * 
- * 负责检测和管理工作空间中的 Spring RS 应用
+ * 负责检测和管理工作空间中的 Summer RS 应用
  */
 export class LocalAppManager implements vscode.Disposable {
   /**
    * 应用列表（key 为应用路径）
    */
-  private apps: Map<string, SpringApp> = new Map();
+  private apps: Map<string, SummerApp> = new Map();
 
   /**
    * 文件系统监听器
@@ -28,14 +28,14 @@ export class LocalAppManager implements vscode.Disposable {
   /**
    * 应用列表变化事件发射器
    */
-  private readonly _onDidChangeApps = new vscode.EventEmitter<SpringApp | undefined>();
+  private readonly _onDidChangeApps = new vscode.EventEmitter<SummerApp | undefined>();
 
   /**
    * 应用列表变化事件
    * 
    * 当应用列表发生变化时触发，用于通知视图刷新
    */
-  public readonly onDidChangeApps: vscode.Event<SpringApp | undefined> =
+  public readonly onDidChangeApps: vscode.Event<SummerApp | undefined> =
     this._onDidChangeApps.event;
 
   /**
@@ -62,7 +62,7 @@ export class LocalAppManager implements vscode.Disposable {
    * 
    * @returns 应用列表，按名称排序
    */
-  public getAppList(): SpringApp[] {
+  public getAppList(): SummerApp[] {
     return Array.from(this.apps.values()).sort((a, b) =>
       a.name.toLowerCase().localeCompare(b.name.toLowerCase())
     );
@@ -74,7 +74,7 @@ export class LocalAppManager implements vscode.Disposable {
    * @param path 应用路径
    * @returns 应用实例，如果不存在返回 undefined
    */
-  public getAppByPath(path: string): SpringApp | undefined {
+  public getAppByPath(path: string): SummerApp | undefined {
     return this.apps.get(path);
   }
 
@@ -84,7 +84,7 @@ export class LocalAppManager implements vscode.Disposable {
    * @param session 调试会话
    * @returns 应用实例，如果不存在返回 undefined
    */
-  public getAppBySession(session: vscode.DebugSession): SpringApp | undefined {
+  public getAppBySession(session: vscode.DebugSession): SummerApp | undefined {
     return this.getAppList().find(
       (app) =>
         app.activeSessionName === session.name ||
@@ -98,7 +98,7 @@ export class LocalAppManager implements vscode.Disposable {
    * @param pid 进程 ID
    * @returns 应用实例，如果不存在返回 undefined
    */
-  public getAppByPid(pid: number): SpringApp | undefined {
+  public getAppByPid(pid: number): SummerApp | undefined {
     return this.getAppList().find((app) => app.pid === pid);
   }
 
@@ -107,7 +107,7 @@ export class LocalAppManager implements vscode.Disposable {
    * 
    * @param element 变化的应用，如果为 undefined 表示整个列表变化
    */
-  public fireDidChangeApps(element: SpringApp | undefined): void {
+  public fireDidChangeApps(element: SummerApp | undefined): void {
     this._onDidChangeApps.fire(element);
   }
 
@@ -140,9 +140,9 @@ export class LocalAppManager implements vscode.Disposable {
   }
 
   /**
-   * 扫描工作空间查找 Spring RS 应用
+   * 扫描工作空间查找 Summer RS 应用
    * 
-   * 查找所有 Cargo.toml 文件并解析，识别 Spring RS 应用
+   * 查找所有 Cargo.toml 文件并解析，识别 Summer RS 应用
    */
   private async scanWorkspace(): Promise<void> {
     try {
@@ -154,13 +154,13 @@ export class LocalAppManager implements vscode.Disposable {
       );
 
       // 创建新的应用映射
-      const newApps = new Map<string, SpringApp>();
+      const newApps = new Map<string, SummerApp>();
 
       // 解析每个 Cargo.toml 文件
       for (const file of cargoFiles) {
         const app = await this.parseCargoToml(file);
         
-        if (app && this.isSpringRsApp(app)) {
+        if (app && this.isSummerRsApp(app)) {
           // 保留现有应用的运行时状态
           const existing = this.apps.get(app.path);
           if (existing) {
@@ -185,7 +185,7 @@ export class LocalAppManager implements vscode.Disposable {
     } catch (error) {
       console.error('Failed to scan workspace:', error);
       vscode.window.showErrorMessage(
-        `Failed to scan workspace for Spring RS apps: ${error}`
+        `Failed to scan workspace for Summer RS apps: ${error}`
       );
     }
   }
@@ -194,9 +194,9 @@ export class LocalAppManager implements vscode.Disposable {
    * 解析 Cargo.toml 文件
    * 
    * @param file Cargo.toml 文件的 URI
-   * @returns SpringApp 实例，如果解析失败或不是有效的应用返回 null
+   * @returns SummerApp 实例，如果解析失败或不是有效的应用返回 null
    */
-  private async parseCargoToml(file: vscode.Uri): Promise<SpringApp | null> {
+  private async parseCargoToml(file: vscode.Uri): Promise<SummerApp | null> {
     try {
       // 读取文件内容
       const content = await vscode.workspace.fs.readFile(file);
@@ -223,8 +223,8 @@ export class LocalAppManager implements vscode.Disposable {
         return null;
       }
 
-      // 创建 SpringApp 实例
-      return new SpringApp(dirPath, packageName, version, dependencies, AppState.INACTIVE);
+      // 创建 SummerApp 实例
+      return new SummerApp(dirPath, packageName, version, dependencies, AppState.INACTIVE);
     } catch (error) {
       console.error(`Failed to parse ${file.fsPath}:`, error);
       return null;
@@ -290,15 +290,15 @@ export class LocalAppManager implements vscode.Disposable {
   }
 
   /**
-   * 检查应用是否是 Spring RS 应用
+   * 检查应用是否是 Summer RS 应用
    * 
    * 通过检查依赖来判断
    * 
-   * @param app SpringApp 实例
-   * @returns 如果是 Spring RS 应用返回 true
+   * @param app SummerApp 实例
+   * @returns 如果是 Summer RS 应用返回 true
    */
-  private isSpringRsApp(app: SpringApp): boolean {
-    return app.isSpringRsApp();
+  private isSummerRsApp(app: SummerApp): boolean {
+    return app.isSummerRsApp();
   }
 
   /**

@@ -4,7 +4,7 @@
 
 set -e
 
-echo "📦 Packaging Spring LSP extension..."
+echo "📦 Packaging Summer LSP extension..."
 
 # 进入 vscode 目录
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

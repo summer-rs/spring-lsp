@@ -171,20 +171,20 @@ fn test_job_macro_fix_rate() {
 }
 
 #[test]
-fn test_spring_macro_variants() {
-    let service = SpringMacro::DeriveService(ServiceMacro {
+fn test_summer_macro_variants() {
+    let service = SummerMacro::DeriveService(ServiceMacro {
         struct_name: "MyService".to_string(),
         fields: vec![],
         range: test_range(),
     });
 
-    let inject = SpringMacro::Inject(InjectMacro {
+    let inject = SummerMacro::Inject(InjectMacro {
         inject_type: InjectType::Component,
         component_name: None,
         range: test_range(),
     });
 
-    let route = SpringMacro::Route(RouteMacro {
+    let route = SummerMacro::Route(RouteMacro {
         path: "/test".to_string(),
         methods: vec![HttpMethod::Get],
         middlewares: vec![],
@@ -193,39 +193,39 @@ fn test_spring_macro_variants() {
         is_openapi: false,
     });
 
-    let auto_config = SpringMacro::AutoConfig(AutoConfigMacro {
+    let auto_config = SummerMacro::AutoConfig(AutoConfigMacro {
         configurator_type: "WebConfigurator".to_string(),
         range: test_range(),
     });
 
-    let job = SpringMacro::Job(JobMacro::Cron {
+    let job = SummerMacro::Job(JobMacro::Cron {
         expression: "0 0 * * * *".to_string(),
         range: test_range(),
     });
 
     // 验证所有变体都可以创建
     match service {
-        SpringMacro::DeriveService(_) => {}
+        SummerMacro::DeriveService(_) => {}
         _ => panic!("Expected DeriveService variant"),
     }
 
     match inject {
-        SpringMacro::Inject(_) => {}
+        SummerMacro::Inject(_) => {}
         _ => panic!("Expected Inject variant"),
     }
 
     match route {
-        SpringMacro::Route(_) => {}
+        SummerMacro::Route(_) => {}
         _ => panic!("Expected Route variant"),
     }
 
     match auto_config {
-        SpringMacro::AutoConfig(_) => {}
+        SummerMacro::AutoConfig(_) => {}
         _ => panic!("Expected AutoConfig variant"),
     }
 
     match job {
-        SpringMacro::Job(_) => {}
+        SummerMacro::Job(_) => {}
         _ => panic!("Expected Job variant"),
     }
 }
@@ -434,7 +434,7 @@ fn test_extract_macros_with_derive() {
 
     // 验证识别的宏类型
     match &extracted_doc.macros[0] {
-        SpringMacro::DeriveService(service) => {
+        SummerMacro::DeriveService(service) => {
             assert_eq!(service.struct_name, "MyService");
             assert_eq!(service.fields.len(), 1);
             assert_eq!(service.fields[0].name, "db");
@@ -512,7 +512,7 @@ fn test_recognize_service_macro() {
     assert_eq!(result.macros.len(), 1);
 
     match &result.macros[0] {
-        SpringMacro::DeriveService(service) => {
+        SummerMacro::DeriveService(service) => {
             assert_eq!(service.struct_name, "UserService");
             assert_eq!(service.fields.len(), 2);
 
@@ -555,7 +555,7 @@ fn test_recognize_get_route_macro() {
     assert_eq!(result.macros.len(), 1);
 
     match &result.macros[0] {
-        SpringMacro::Route(route) => {
+        SummerMacro::Route(route) => {
             assert_eq!(route.path, "/users/{id}");
             assert_eq!(route.methods.len(), 1);
             assert_eq!(route.methods[0], HttpMethod::Get);
@@ -583,7 +583,7 @@ fn test_recognize_post_route_macro() {
     assert_eq!(result.macros.len(), 1);
 
     match &result.macros[0] {
-        SpringMacro::Route(route) => {
+        SummerMacro::Route(route) => {
             assert_eq!(route.path, "/users");
             assert_eq!(route.methods.len(), 1);
             assert_eq!(route.methods[0], HttpMethod::Post);
@@ -611,7 +611,7 @@ fn test_recognize_multiple_http_methods() {
     assert_eq!(result.macros.len(), 1);
 
     match &result.macros[0] {
-        SpringMacro::Route(route) => {
+        SummerMacro::Route(route) => {
             assert_eq!(route.path, "/api/resource");
             assert_eq!(route.methods.len(), 2);
             assert!(route.methods.contains(&HttpMethod::Get));
@@ -641,7 +641,7 @@ fn test_recognize_auto_config_macro() {
     assert_eq!(result.macros.len(), 1);
 
     match &result.macros[0] {
-        SpringMacro::AutoConfig(auto_config) => {
+        SummerMacro::AutoConfig(auto_config) => {
             assert_eq!(auto_config.configurator_type, "WebConfigurator");
         }
         _ => panic!("Expected AutoConfig macro"),
@@ -666,7 +666,7 @@ fn test_recognize_cron_job_macro() {
     assert_eq!(result.macros.len(), 1);
 
     match &result.macros[0] {
-        SpringMacro::Job(JobMacro::Cron { expression, .. }) => {
+        SummerMacro::Job(JobMacro::Cron { expression, .. }) => {
             assert_eq!(expression, "0 0 * * * *");
         }
         _ => panic!("Expected Cron job macro"),
@@ -691,7 +691,7 @@ fn test_recognize_fix_delay_job_macro() {
     assert_eq!(result.macros.len(), 1);
 
     match &result.macros[0] {
-        SpringMacro::Job(JobMacro::FixDelay { seconds, .. }) => {
+        SummerMacro::Job(JobMacro::FixDelay { seconds, .. }) => {
             assert_eq!(*seconds, 5);
         }
         _ => panic!("Expected FixDelay job macro"),
@@ -716,7 +716,7 @@ fn test_recognize_fix_rate_job_macro() {
     assert_eq!(result.macros.len(), 1);
 
     match &result.macros[0] {
-        SpringMacro::Job(JobMacro::FixRate { seconds, .. }) => {
+        SummerMacro::Job(JobMacro::FixRate { seconds, .. }) => {
             assert_eq!(*seconds, 10);
         }
         _ => panic!("Expected FixRate job macro"),
@@ -764,9 +764,9 @@ fn test_recognize_multiple_macros_in_file() {
 
     for macro_item in &result.macros {
         match macro_item {
-            SpringMacro::DeriveService(_) => service_count += 1,
-            SpringMacro::Route(_) => route_count += 1,
-            SpringMacro::Job(_) => job_count += 1,
+            SummerMacro::DeriveService(_) => service_count += 1,
+            SummerMacro::Route(_) => route_count += 1,
+            SummerMacro::Job(_) => job_count += 1,
             _ => {}
         }
     }
@@ -806,7 +806,7 @@ fn test_expand_service_macro() {
     };
 
     let analyzer = MacroAnalyzer::new();
-    let expanded = analyzer.expand_macro(&SpringMacro::DeriveService(service));
+    let expanded = analyzer.expand_macro(&SummerMacro::DeriveService(service));
 
     // 验证展开的代码包含关键元素
     assert!(expanded.contains("UserService"));
@@ -846,7 +846,7 @@ fn test_expand_service_macro_with_named_component() {
     };
 
     let analyzer = MacroAnalyzer::new();
-    let expanded = analyzer.expand_macro(&SpringMacro::DeriveService(service));
+    let expanded = analyzer.expand_macro(&SummerMacro::DeriveService(service));
 
     // 验证展开的代码包含命名组件
     assert!(expanded.contains("MultiDbService"));
@@ -869,7 +869,7 @@ fn test_expand_service_macro_without_inject() {
     };
 
     let analyzer = MacroAnalyzer::new();
-    let expanded = analyzer.expand_macro(&SpringMacro::DeriveService(service));
+    let expanded = analyzer.expand_macro(&SummerMacro::DeriveService(service));
 
     // 验证展开的代码包含默认初始化
     assert!(expanded.contains("SimpleService"));
@@ -886,7 +886,7 @@ fn test_expand_inject_macro_component() {
     };
 
     let analyzer = MacroAnalyzer::new();
-    let expanded = analyzer.expand_macro(&SpringMacro::Inject(inject));
+    let expanded = analyzer.expand_macro(&SummerMacro::Inject(inject));
 
     // 验证展开的代码包含注入说明
     assert!(expanded.contains("Inject 属性展开"));
@@ -903,7 +903,7 @@ fn test_expand_inject_macro_component_with_name() {
     };
 
     let analyzer = MacroAnalyzer::new();
-    let expanded = analyzer.expand_macro(&SpringMacro::Inject(inject));
+    let expanded = analyzer.expand_macro(&SummerMacro::Inject(inject));
 
     // 验证展开的代码包含组件名称
     assert!(expanded.contains("组件名称: \"my_component\""));
@@ -919,7 +919,7 @@ fn test_expand_inject_macro_config() {
     };
 
     let analyzer = MacroAnalyzer::new();
-    let expanded = analyzer.expand_macro(&SpringMacro::Inject(inject));
+    let expanded = analyzer.expand_macro(&SummerMacro::Inject(inject));
 
     // 验证展开的代码包含配置注入说明
     assert!(expanded.contains("注入类型: 配置"));
@@ -934,7 +934,7 @@ fn test_expand_auto_config_macro() {
     };
 
     let analyzer = MacroAnalyzer::new();
-    let expanded = analyzer.expand_macro(&SpringMacro::AutoConfig(auto_config));
+    let expanded = analyzer.expand_macro(&SummerMacro::AutoConfig(auto_config));
 
     // 验证展开的代码包含配置器信息
     assert!(expanded.contains("AutoConfig 宏展开"));
@@ -955,7 +955,7 @@ fn test_expand_route_macro_get() {
     };
 
     let analyzer = MacroAnalyzer::new();
-    let expanded = analyzer.expand_macro(&SpringMacro::Route(route));
+    let expanded = analyzer.expand_macro(&SummerMacro::Route(route));
 
     // 验证展开的代码包含路由信息
     assert!(expanded.contains("路由宏展开"));
@@ -977,7 +977,7 @@ fn test_expand_route_macro_multiple_methods() {
     };
 
     let analyzer = MacroAnalyzer::new();
-    let expanded = analyzer.expand_macro(&SpringMacro::Route(route));
+    let expanded = analyzer.expand_macro(&SummerMacro::Route(route));
 
     // 验证展开的代码包含多个方法
     assert!(expanded.contains("HTTP 方法: GET, POST"));
@@ -996,7 +996,7 @@ fn test_expand_route_macro_with_middlewares() {
     };
 
     let analyzer = MacroAnalyzer::new();
-    let expanded = analyzer.expand_macro(&SpringMacro::Route(route));
+    let expanded = analyzer.expand_macro(&SummerMacro::Route(route));
 
     // 验证展开的代码包含中间件信息
     assert!(expanded.contains("中间件: AuthMiddleware, LogMiddleware"));
@@ -1013,7 +1013,7 @@ fn test_expand_cron_job_macro() {
     };
 
     let analyzer = MacroAnalyzer::new();
-    let expanded = analyzer.expand_macro(&SpringMacro::Job(job));
+    let expanded = analyzer.expand_macro(&SummerMacro::Job(job));
 
     // 验证展开的代码包含 Cron 任务信息
     assert!(expanded.contains("任务调度宏展开"));
@@ -1030,7 +1030,7 @@ fn test_expand_fix_delay_job_macro() {
     };
 
     let analyzer = MacroAnalyzer::new();
-    let expanded = analyzer.expand_macro(&SpringMacro::Job(job));
+    let expanded = analyzer.expand_macro(&SummerMacro::Job(job));
 
     // 验证展开的代码包含 FixDelay 任务信息
     assert!(expanded.contains("任务类型: FixDelay"));
@@ -1047,7 +1047,7 @@ fn test_expand_fix_rate_job_macro() {
     };
 
     let analyzer = MacroAnalyzer::new();
-    let expanded = analyzer.expand_macro(&SpringMacro::Job(job));
+    let expanded = analyzer.expand_macro(&SummerMacro::Job(job));
 
     // 验证展开的代码包含 FixRate 任务信息
     assert!(expanded.contains("任务类型: FixRate"));
@@ -1061,7 +1061,7 @@ fn test_expand_macro_produces_valid_syntax() {
     // 测试所有宏展开都生成语法正确的代码（至少是有效的注释）
     let analyzer = MacroAnalyzer::new();
 
-    let service = SpringMacro::DeriveService(ServiceMacro {
+    let service = SummerMacro::DeriveService(ServiceMacro {
         struct_name: "TestService".to_string(),
         fields: vec![],
         range: test_range(),
@@ -1085,7 +1085,7 @@ fn test_expand_empty_service() {
     };
 
     let analyzer = MacroAnalyzer::new();
-    let expanded = analyzer.expand_macro(&SpringMacro::DeriveService(service));
+    let expanded = analyzer.expand_macro(&SummerMacro::DeriveService(service));
 
     // 验证空服务也能正确展开
     assert!(expanded.contains("EmptyService"));
@@ -1099,21 +1099,21 @@ fn test_expand_all_macro_types() {
 
     // 测试所有宏类型都能展开
     let macros = vec![
-        SpringMacro::DeriveService(ServiceMacro {
+        SummerMacro::DeriveService(ServiceMacro {
             struct_name: "TestService".to_string(),
             fields: vec![],
             range: test_range(),
         }),
-        SpringMacro::Inject(InjectMacro {
+        SummerMacro::Inject(InjectMacro {
             inject_type: InjectType::Component,
             component_name: None,
             range: test_range(),
         }),
-        SpringMacro::AutoConfig(AutoConfigMacro {
+        SummerMacro::AutoConfig(AutoConfigMacro {
             configurator_type: "TestConfigurator".to_string(),
             range: test_range(),
         }),
-        SpringMacro::Route(RouteMacro {
+        SummerMacro::Route(RouteMacro {
             path: "/test".to_string(),
             methods: vec![HttpMethod::Get],
             middlewares: vec![],
@@ -1121,7 +1121,7 @@ fn test_expand_all_macro_types() {
             range: test_range(),
             is_openapi: false,
         }),
-        SpringMacro::Job(JobMacro::Cron {
+        SummerMacro::Job(JobMacro::Cron {
             expression: "0 0 * * * *".to_string(),
             range: test_range(),
         }),
@@ -1189,19 +1189,19 @@ fn test_expand_macro_comprehensive_example() {
 
         // 根据宏类型验证特定内容
         match macro_item {
-            SpringMacro::DeriveService(service) => {
+            SummerMacro::DeriveService(service) => {
                 assert!(expanded.contains(&service.struct_name));
                 assert!(expanded.contains("impl"));
                 assert!(expanded.contains("pub fn build"));
             }
-            SpringMacro::Route(route) => {
+            SummerMacro::Route(route) => {
                 assert!(expanded.contains(&route.path));
                 assert!(expanded.contains(&route.handler_name));
             }
-            SpringMacro::AutoConfig(auto_config) => {
+            SummerMacro::AutoConfig(auto_config) => {
                 assert!(expanded.contains(&auto_config.configurator_type));
             }
-            SpringMacro::Job(_) => {
+            SummerMacro::Job(_) => {
                 assert!(expanded.contains("任务调度宏展开"));
             }
             _ => {}
@@ -1228,7 +1228,7 @@ fn test_expand_macro_readability() {
         range: test_range(),
     };
 
-    let expanded = analyzer.expand_macro(&SpringMacro::DeriveService(service));
+    let expanded = analyzer.expand_macro(&SummerMacro::DeriveService(service));
 
     // 验证代码包含清晰的注释
     assert!(expanded.contains("// 原始定义"));
@@ -1280,7 +1280,7 @@ fn test_recognize_all_http_method_macros() {
         .macros
         .iter()
         .filter_map(|m| match m {
-            SpringMacro::Route(route) => Some(route.methods[0].clone()),
+            SummerMacro::Route(route) => Some(route.methods[0].clone()),
             _ => None,
         })
         .collect();
@@ -1313,7 +1313,7 @@ fn test_service_without_inject() {
     assert_eq!(result.macros.len(), 1);
 
     match &result.macros[0] {
-        SpringMacro::DeriveService(service) => {
+        SummerMacro::DeriveService(service) => {
             assert_eq!(service.struct_name, "SimpleService");
             assert_eq!(service.fields.len(), 2);
 
@@ -1347,7 +1347,7 @@ fn test_inject_with_component_name() {
     assert_eq!(result.macros.len(), 1);
 
     match &result.macros[0] {
-        SpringMacro::DeriveService(service) => {
+        SummerMacro::DeriveService(service) => {
             assert_eq!(service.fields.len(), 2);
 
             // 验证第一个字段的组件名称
@@ -1398,7 +1398,7 @@ fn test_hover_service_macro() {
         range: test_range(),
     };
 
-    let hover = analyzer.hover_macro(&SpringMacro::DeriveService(service));
+    let hover = analyzer.hover_macro(&SummerMacro::DeriveService(service));
 
     // 验证悬停提示包含关键信息
     assert!(hover.contains("# Service 派生宏"));
@@ -1430,7 +1430,7 @@ fn test_hover_service_macro_with_named_component() {
         range: test_range(),
     };
 
-    let hover = analyzer.hover_macro(&SpringMacro::DeriveService(service));
+    let hover = analyzer.hover_macro(&SummerMacro::DeriveService(service));
 
     // 验证悬停提示包含组件名称
     assert!(hover.contains("MultiDbService"));
@@ -1447,7 +1447,7 @@ fn test_hover_service_macro_empty_fields() {
         range: test_range(),
     };
 
-    let hover = analyzer.hover_macro(&SpringMacro::DeriveService(service));
+    let hover = analyzer.hover_macro(&SummerMacro::DeriveService(service));
 
     // 验证空服务也能生成悬停提示
     assert!(hover.contains("# Service 派生宏"));
@@ -1464,7 +1464,7 @@ fn test_hover_inject_macro_component() {
         range: test_range(),
     };
 
-    let hover = analyzer.hover_macro(&SpringMacro::Inject(inject));
+    let hover = analyzer.hover_macro(&SummerMacro::Inject(inject));
 
     // 验证悬停提示包含注入信息
     assert!(hover.contains("# Inject 属性宏"));
@@ -1484,7 +1484,7 @@ fn test_hover_inject_macro_component_with_name() {
         range: test_range(),
     };
 
-    let hover = analyzer.hover_macro(&SpringMacro::Inject(inject));
+    let hover = analyzer.hover_macro(&SummerMacro::Inject(inject));
 
     // 验证悬停提示包含组件名称
     assert!(hover.contains("组件名称"));
@@ -1502,7 +1502,7 @@ fn test_hover_inject_macro_config() {
         range: test_range(),
     };
 
-    let hover = analyzer.hover_macro(&SpringMacro::Inject(inject));
+    let hover = analyzer.hover_macro(&SummerMacro::Inject(inject));
 
     // 验证悬停提示包含配置注入信息
     assert!(hover.contains("# Inject 属性宏"));
@@ -1520,7 +1520,7 @@ fn test_hover_auto_config_macro() {
         range: test_range(),
     };
 
-    let hover = analyzer.hover_macro(&SpringMacro::AutoConfig(auto_config));
+    let hover = analyzer.hover_macro(&SummerMacro::AutoConfig(auto_config));
 
     // 验证悬停提示包含配置器信息
     assert!(hover.contains("# AutoConfig 属性宏"));
@@ -1540,7 +1540,7 @@ fn test_hover_route_macro() {
         range: test_range(),
     };
 
-    let hover = analyzer.hover_macro(&SpringMacro::Route(route));
+    let hover = analyzer.hover_macro(&SummerMacro::Route(route));
 
     // 验证悬停提示包含路由信息
     assert!(hover.contains("# 路由宏"));
@@ -1564,7 +1564,7 @@ fn test_hover_route_macro_multiple_methods() {
         is_openapi: false,
     };
 
-    let hover = analyzer.hover_macro(&SpringMacro::Route(route));
+    let hover = analyzer.hover_macro(&SummerMacro::Route(route));
 
     // 验证悬停提示包含多个方法
     assert!(hover.contains("`GET`"));
@@ -1583,7 +1583,7 @@ fn test_hover_route_macro_with_middlewares() {
         is_openapi: false,
     };
 
-    let hover = analyzer.hover_macro(&SpringMacro::Route(route));
+    let hover = analyzer.hover_macro(&SummerMacro::Route(route));
 
     // 验证悬停提示包含中间件信息
     assert!(hover.contains("中间件"));
@@ -1599,7 +1599,7 @@ fn test_hover_cron_job_macro() {
         range: test_range(),
     };
 
-    let hover = analyzer.hover_macro(&SpringMacro::Job(job));
+    let hover = analyzer.hover_macro(&SummerMacro::Job(job));
 
     // 验证悬停提示包含 Cron 任务信息
     assert!(hover.contains("# 任务调度宏"));
@@ -1617,7 +1617,7 @@ fn test_hover_fix_delay_job_macro() {
         range: test_range(),
     };
 
-    let hover = analyzer.hover_macro(&SpringMacro::Job(job));
+    let hover = analyzer.hover_macro(&SummerMacro::Job(job));
 
     // 验证悬停提示包含 FixDelay 任务信息
     assert!(hover.contains("# 任务调度宏"));
@@ -1634,7 +1634,7 @@ fn test_hover_fix_rate_job_macro() {
         range: test_range(),
     };
 
-    let hover = analyzer.hover_macro(&SpringMacro::Job(job));
+    let hover = analyzer.hover_macro(&SummerMacro::Job(job));
 
     // 验证悬停提示包含 FixRate 任务信息
     assert!(hover.contains("# 任务调度宏"));
@@ -1649,21 +1649,21 @@ fn test_hover_all_macro_types() {
 
     // 测试所有宏类型都能生成悬停提示
     let macros = vec![
-        SpringMacro::DeriveService(ServiceMacro {
+        SummerMacro::DeriveService(ServiceMacro {
             struct_name: "TestService".to_string(),
             fields: vec![],
             range: test_range(),
         }),
-        SpringMacro::Inject(InjectMacro {
+        SummerMacro::Inject(InjectMacro {
             inject_type: InjectType::Component,
             component_name: None,
             range: test_range(),
         }),
-        SpringMacro::AutoConfig(AutoConfigMacro {
+        SummerMacro::AutoConfig(AutoConfigMacro {
             configurator_type: "TestConfigurator".to_string(),
             range: test_range(),
         }),
-        SpringMacro::Route(RouteMacro {
+        SummerMacro::Route(RouteMacro {
             path: "/test".to_string(),
             methods: vec![HttpMethod::Get],
             middlewares: vec![],
@@ -1671,7 +1671,7 @@ fn test_hover_all_macro_types() {
             range: test_range(),
             is_openapi: false,
         }),
-        SpringMacro::Job(JobMacro::Cron {
+        SummerMacro::Job(JobMacro::Cron {
             expression: "0 0 * * * *".to_string(),
             range: test_range(),
         }),
@@ -1708,7 +1708,7 @@ fn test_hover_markdown_format() {
         range: test_range(),
     };
 
-    let hover = analyzer.hover_macro(&SpringMacro::DeriveService(service));
+    let hover = analyzer.hover_macro(&SummerMacro::DeriveService(service));
 
     // 验证 Markdown 格式
     assert!(hover.contains("# ")); // 标题
@@ -1760,11 +1760,11 @@ fn test_hover_comprehensive_example() {
 
         // 根据宏类型验证特定内容
         match macro_item {
-            SpringMacro::DeriveService(service) => {
+            SummerMacro::DeriveService(service) => {
                 assert!(hover.contains(&service.struct_name));
                 assert!(hover.contains("注入字段"));
             }
-            SpringMacro::Route(route) => {
+            SummerMacro::Route(route) => {
                 assert!(hover.contains(&route.path));
                 assert!(hover.contains("HTTP 方法"));
             }
@@ -1784,7 +1784,7 @@ fn test_hover_readability() {
         range: test_range(),
     };
 
-    let hover = analyzer.hover_macro(&SpringMacro::Inject(inject));
+    let hover = analyzer.hover_macro(&SummerMacro::Inject(inject));
 
     // 验证悬停提示包含清晰的说明
     assert!(hover.contains("标记字段从应用上下文中自动注入依赖"));
@@ -1844,7 +1844,7 @@ fn test_hover_service_with_mixed_fields() {
         range: test_range(),
     };
 
-    let hover = analyzer.hover_macro(&SpringMacro::DeriveService(service));
+    let hover = analyzer.hover_macro(&SummerMacro::DeriveService(service));
 
     // 验证所有字段都在悬停提示中
     assert!(hover.contains("db"));
@@ -1877,7 +1877,7 @@ fn test_validate_service_macro_valid() {
         range: test_range(),
     };
 
-    let diagnostics = analyzer.validate_macro(&SpringMacro::DeriveService(service));
+    let diagnostics = analyzer.validate_macro(&SummerMacro::DeriveService(service));
 
     // 有效的 Service 宏不应该产生诊断
     assert_eq!(diagnostics.len(), 0);
@@ -1900,7 +1900,7 @@ fn test_validate_service_macro_empty_component_name() {
         range: test_range(),
     };
 
-    let diagnostics = analyzer.validate_macro(&SpringMacro::DeriveService(service));
+    let diagnostics = analyzer.validate_macro(&SummerMacro::DeriveService(service));
 
     // 应该产生错误诊断
     assert_eq!(diagnostics.len(), 1);
@@ -1920,7 +1920,7 @@ fn test_validate_inject_macro_config_with_name() {
         range: test_range(),
     };
 
-    let diagnostics = analyzer.validate_macro(&SpringMacro::Inject(inject));
+    let diagnostics = analyzer.validate_macro(&SummerMacro::Inject(inject));
 
     // 应该产生错误诊断
     assert_eq!(diagnostics.len(), 1);
@@ -1942,7 +1942,7 @@ fn test_validate_inject_macro_component_valid() {
         range: test_range(),
     };
 
-    let diagnostics = analyzer.validate_macro(&SpringMacro::Inject(inject));
+    let diagnostics = analyzer.validate_macro(&SummerMacro::Inject(inject));
 
     // 有效的 Component 注入不应该产生诊断
     assert_eq!(diagnostics.len(), 0);
@@ -1957,7 +1957,7 @@ fn test_validate_inject_macro_config_valid() {
         range: test_range(),
     };
 
-    let diagnostics = analyzer.validate_macro(&SpringMacro::Inject(inject));
+    let diagnostics = analyzer.validate_macro(&SummerMacro::Inject(inject));
 
     // 有效的 Config 注入不应该产生诊断
     assert_eq!(diagnostics.len(), 0);
@@ -1971,7 +1971,7 @@ fn test_validate_auto_config_macro_empty_type() {
         range: test_range(),
     };
 
-    let diagnostics = analyzer.validate_macro(&SpringMacro::AutoConfig(auto_config));
+    let diagnostics = analyzer.validate_macro(&SummerMacro::AutoConfig(auto_config));
 
     // 应该产生错误诊断
     assert_eq!(diagnostics.len(), 1);
@@ -1990,7 +1990,7 @@ fn test_validate_auto_config_macro_valid() {
         range: test_range(),
     };
 
-    let diagnostics = analyzer.validate_macro(&SpringMacro::AutoConfig(auto_config));
+    let diagnostics = analyzer.validate_macro(&SummerMacro::AutoConfig(auto_config));
 
     // 有效的 AutoConfig 宏不应该产生诊断
     assert_eq!(diagnostics.len(), 0);
@@ -2008,7 +2008,7 @@ fn test_validate_route_macro_empty_path() {
         is_openapi: false,
     };
 
-    let diagnostics = analyzer.validate_macro(&SpringMacro::Route(route));
+    let diagnostics = analyzer.validate_macro(&SummerMacro::Route(route));
 
     // 应该产生错误诊断
     assert!(!diagnostics.is_empty());
@@ -2029,7 +2029,7 @@ fn test_validate_route_macro_path_without_slash() {
         is_openapi: false,
     };
 
-    let diagnostics = analyzer.validate_macro(&SpringMacro::Route(route));
+    let diagnostics = analyzer.validate_macro(&SummerMacro::Route(route));
 
     // 应该产生错误诊断
     assert!(!diagnostics.is_empty());
@@ -2050,7 +2050,7 @@ fn test_validate_route_macro_no_methods() {
         is_openapi: false,
     };
 
-    let diagnostics = analyzer.validate_macro(&SpringMacro::Route(route));
+    let diagnostics = analyzer.validate_macro(&SummerMacro::Route(route));
 
     // 应该产生错误诊断
     assert!(!diagnostics.is_empty());
@@ -2071,7 +2071,7 @@ fn test_validate_route_macro_empty_handler_name() {
         range: test_range(),
     };
 
-    let diagnostics = analyzer.validate_macro(&SpringMacro::Route(route));
+    let diagnostics = analyzer.validate_macro(&SummerMacro::Route(route));
 
     // 应该产生错误诊断
     assert!(!diagnostics.is_empty());
@@ -2092,7 +2092,7 @@ fn test_validate_route_macro_valid() {
         range: test_range(),
     };
 
-    let diagnostics = analyzer.validate_macro(&SpringMacro::Route(route));
+    let diagnostics = analyzer.validate_macro(&SummerMacro::Route(route));
 
     // 有效的路由宏不应该产生诊断
     assert_eq!(diagnostics.len(), 0);
@@ -2110,7 +2110,7 @@ fn test_validate_route_macro_nested_braces() {
         range: test_range(),
     };
 
-    let diagnostics = analyzer.validate_macro(&SpringMacro::Route(route));
+    let diagnostics = analyzer.validate_macro(&SummerMacro::Route(route));
 
     // 应该产生错误诊断
     assert!(!diagnostics.is_empty());
@@ -2129,7 +2129,7 @@ fn test_validate_route_macro_unmatched_closing_brace() {
         range: test_range(),
     };
 
-    let diagnostics = analyzer.validate_macro(&SpringMacro::Route(route));
+    let diagnostics = analyzer.validate_macro(&SummerMacro::Route(route));
 
     // 应该产生错误诊断
     assert!(!diagnostics.is_empty());
@@ -2148,7 +2148,7 @@ fn test_validate_route_macro_unclosed_brace() {
         is_openapi: false,
     };
 
-    let diagnostics = analyzer.validate_macro(&SpringMacro::Route(route));
+    let diagnostics = analyzer.validate_macro(&SummerMacro::Route(route));
 
     // 应该产生错误诊断
     assert!(!diagnostics.is_empty());
@@ -2167,7 +2167,7 @@ fn test_validate_route_macro_empty_param_name() {
         range: test_range(),
     };
 
-    let diagnostics = analyzer.validate_macro(&SpringMacro::Route(route));
+    let diagnostics = analyzer.validate_macro(&SummerMacro::Route(route));
 
     // 应该产生错误诊断
     assert!(!diagnostics.is_empty());
@@ -2188,7 +2188,7 @@ fn test_validate_route_macro_invalid_param_name() {
         range: test_range(),
     };
 
-    let diagnostics = analyzer.validate_macro(&SpringMacro::Route(route));
+    let diagnostics = analyzer.validate_macro(&SummerMacro::Route(route));
 
     // 应该产生错误诊断
     assert!(!diagnostics.is_empty());
@@ -2209,7 +2209,7 @@ fn test_validate_route_macro_valid_param_names() {
         range: test_range(),
     };
 
-    let diagnostics = analyzer.validate_macro(&SpringMacro::Route(route));
+    let diagnostics = analyzer.validate_macro(&SummerMacro::Route(route));
 
     // 有效的参数名称不应该产生诊断
     assert_eq!(diagnostics.len(), 0);
@@ -2223,7 +2223,7 @@ fn test_validate_cron_job_empty_expression() {
         range: test_range(),
     };
 
-    let diagnostics = analyzer.validate_macro(&SpringMacro::Job(job));
+    let diagnostics = analyzer.validate_macro(&SummerMacro::Job(job));
 
     // 应该产生错误诊断
     assert!(!diagnostics.is_empty());
@@ -2240,7 +2240,7 @@ fn test_validate_cron_job_invalid_parts() {
         range: test_range(),
     };
 
-    let diagnostics = analyzer.validate_macro(&SpringMacro::Job(job));
+    let diagnostics = analyzer.validate_macro(&SummerMacro::Job(job));
 
     // 应该产生错误诊断
     assert!(!diagnostics.is_empty());
@@ -2257,7 +2257,7 @@ fn test_validate_cron_job_valid() {
         range: test_range(),
     };
 
-    let diagnostics = analyzer.validate_macro(&SpringMacro::Job(job));
+    let diagnostics = analyzer.validate_macro(&SummerMacro::Job(job));
 
     // 有效的 cron 表达式不应该产生诊断
     assert_eq!(diagnostics.len(), 0);
@@ -2271,7 +2271,7 @@ fn test_validate_fix_delay_job_zero_seconds() {
         range: test_range(),
     };
 
-    let diagnostics = analyzer.validate_macro(&SpringMacro::Job(job));
+    let diagnostics = analyzer.validate_macro(&SummerMacro::Job(job));
 
     // 应该产生警告诊断
     assert!(!diagnostics.is_empty());
@@ -2290,7 +2290,7 @@ fn test_validate_fix_delay_job_valid() {
         range: test_range(),
     };
 
-    let diagnostics = analyzer.validate_macro(&SpringMacro::Job(job));
+    let diagnostics = analyzer.validate_macro(&SummerMacro::Job(job));
 
     // 有效的 FixDelay 任务不应该产生诊断
     assert_eq!(diagnostics.len(), 0);
@@ -2304,7 +2304,7 @@ fn test_validate_fix_rate_job_zero_seconds() {
         range: test_range(),
     };
 
-    let diagnostics = analyzer.validate_macro(&SpringMacro::Job(job));
+    let diagnostics = analyzer.validate_macro(&SummerMacro::Job(job));
 
     // 应该产生错误诊断
     assert!(!diagnostics.is_empty());
@@ -2323,7 +2323,7 @@ fn test_validate_fix_rate_job_valid() {
         range: test_range(),
     };
 
-    let diagnostics = analyzer.validate_macro(&SpringMacro::Job(job));
+    let diagnostics = analyzer.validate_macro(&SummerMacro::Job(job));
 
     // 有效的 FixRate 任务不应该产生诊断
     assert_eq!(diagnostics.len(), 0);
@@ -2335,21 +2335,21 @@ fn test_validate_all_macro_types() {
 
     // 测试所有宏类型的验证功能
     let macros = vec![
-        SpringMacro::DeriveService(ServiceMacro {
+        SummerMacro::DeriveService(ServiceMacro {
             struct_name: "TestService".to_string(),
             fields: vec![],
             range: test_range(),
         }),
-        SpringMacro::Inject(InjectMacro {
+        SummerMacro::Inject(InjectMacro {
             inject_type: InjectType::Component,
             component_name: None,
             range: test_range(),
         }),
-        SpringMacro::AutoConfig(AutoConfigMacro {
+        SummerMacro::AutoConfig(AutoConfigMacro {
             configurator_type: "TestConfigurator".to_string(),
             range: test_range(),
         }),
-        SpringMacro::Route(RouteMacro {
+        SummerMacro::Route(RouteMacro {
             path: "/test".to_string(),
             methods: vec![HttpMethod::Get],
             middlewares: vec![],
@@ -2357,7 +2357,7 @@ fn test_validate_all_macro_types() {
             range: test_range(),
             is_openapi: false,
         }),
-        SpringMacro::Job(JobMacro::Cron {
+        SummerMacro::Job(JobMacro::Cron {
             expression: "0 0 * * * *".to_string(),
             range: test_range(),
         }),
@@ -2430,7 +2430,7 @@ fn test_validate_multiple_errors() {
         range: test_range(),
     };
 
-    let diagnostics = analyzer.validate_macro(&SpringMacro::Route(route));
+    let diagnostics = analyzer.validate_macro(&SummerMacro::Route(route));
 
     // 应该产生多个错误诊断
     assert!(diagnostics.len() >= 3);
@@ -2445,7 +2445,7 @@ fn test_validate_diagnostic_structure() {
         range: test_range(),
     };
 
-    let diagnostics = analyzer.validate_macro(&SpringMacro::AutoConfig(auto_config));
+    let diagnostics = analyzer.validate_macro(&SummerMacro::AutoConfig(auto_config));
 
     assert_eq!(diagnostics.len(), 1);
 
@@ -2457,7 +2457,7 @@ fn test_validate_diagnostic_structure() {
         Some(lsp_types::DiagnosticSeverity::ERROR)
     );
     assert!(diagnostic.code.is_some());
-    assert_eq!(diagnostic.source, Some("spring-lsp".to_string()));
+    assert_eq!(diagnostic.source, Some("summer-lsp".to_string()));
     assert!(!diagnostic.message.is_empty());
 }
 
@@ -2484,8 +2484,8 @@ fn test_validate_error_codes() {
         is_openapi: false,
     };
 
-    let diagnostics1 = analyzer.validate_macro(&SpringMacro::Route(route1));
-    let diagnostics2 = analyzer.validate_macro(&SpringMacro::Route(route2));
+    let diagnostics1 = analyzer.validate_macro(&SummerMacro::Route(route1));
+    let diagnostics2 = analyzer.validate_macro(&SummerMacro::Route(route2));
 
     // 不同的错误应该有不同的错误代码
     assert!(!diagnostics1.is_empty());

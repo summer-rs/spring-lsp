@@ -2,7 +2,7 @@
 
 ## 概述
 
-spring-lsp 是为 spring-rs 框架提供 IDE 支持的语言服务器协议（LSP）实现。采用分层架构设计，代码按功能模块清晰组织，易于维护和扩展。
+summer-lsp 是为 summer-rs 框架提供 IDE 支持的语言服务器协议（LSP）实现。采用分层架构设计，代码按功能模块清晰组织，易于维护和扩展。
 
 ## 设计原则
 
@@ -15,7 +15,7 @@ spring-lsp 是为 spring-rs 框架提供 IDE 支持的语言服务器协议（LS
 ## 模块组织
 
 ```
-spring-lsp/src/
+summer-lsp/src/
 ├── protocol/              # LSP 协议层
 │   ├── server.rs          # LSP 服务器核心（消息循环、状态管理）
 │   ├── handlers/          # 请求处理器
@@ -105,7 +105,7 @@ pub struct LspServer {
 ```
 
 #### handlers/custom.rs
-处理 spring-rs 特定的自定义请求：
+处理 summer-rs 特定的自定义请求：
 - `spring/components` - 获取组件列表
 - `spring/routes` - 获取路由列表
 - `spring/jobs` - 获取任务列表
@@ -166,7 +166,7 @@ impl TomlAnalyzer {
 
 #### rust/macro_analyzer.rs
 - 使用 syn 解析 Rust 代码
-- 识别 spring-rs 宏：
+- 识别 summer-rs 宏：
   - `#[derive(Service)]` - 组件定义
   - `#[get]`, `#[post]`, `#[put]`, `#[delete]` - 路由定义
   - `#[cron]`, `#[fix_delay]`, `#[fix_rate]` - 任务定义
@@ -278,7 +278,7 @@ impl DependencyInjectionValidator {
 
 ### 3. 扫描器层 (Scanner Layer)
 
-**职责：** 扫描项目中的各种 spring-rs 元素
+**职责：** 扫描项目中的各种 summer-rs 元素
 
 **主要组件：**
 
@@ -625,56 +625,56 @@ utils/
 
 ```rust
 // 协议层
-use spring_lsp::server::LspServer;
+use summer_lsp::server::LspServer;
 
 // 分析层
-use spring_lsp::completion::CompletionEngine;
-use spring_lsp::diagnostic::DiagnosticEngine;
-use spring_lsp::toml_analyzer::TomlAnalyzer;
-use spring_lsp::macro_analyzer::MacroAnalyzer;
+use summer_lsp::completion::CompletionEngine;
+use summer_lsp::diagnostic::DiagnosticEngine;
+use summer_lsp::toml_analyzer::TomlAnalyzer;
+use summer_lsp::macro_analyzer::MacroAnalyzer;
 
 // 扫描器层
-use spring_lsp::component_scanner::ComponentScanner;
-use spring_lsp::route_scanner::RouteScanner;
+use summer_lsp::component_scanner::ComponentScanner;
+use summer_lsp::route_scanner::RouteScanner;
 
 // 核心层
-use spring_lsp::document::DocumentManager;
-use spring_lsp::schema::SchemaProvider;
+use summer_lsp::document::DocumentManager;
+use summer_lsp::schema::SchemaProvider;
 
 // 工具层
-use spring_lsp::error::{Error, Result};
-use spring_lsp::logging::init_logging;
+use summer_lsp::error::{Error, Result};
+use summer_lsp::logging::init_logging;
 
 // 路由相关
-use spring_lsp::route::{Route, RouteIndex, HttpMethod};
+use summer_lsp::route::{Route, RouteIndex, HttpMethod};
 ```
 
 ### 新路径（推荐）
 
 ```rust
 // 协议层
-use spring_lsp::protocol::LspServer;
+use summer_lsp::protocol::LspServer;
 
 // 分析层
-use spring_lsp::analysis::CompletionEngine;
-use spring_lsp::analysis::DiagnosticEngine;
-use spring_lsp::analysis::toml::toml_analyzer::TomlAnalyzer;
-use spring_lsp::analysis::rust::macro_analyzer::MacroAnalyzer;
+use summer_lsp::analysis::CompletionEngine;
+use summer_lsp::analysis::DiagnosticEngine;
+use summer_lsp::analysis::toml::toml_analyzer::TomlAnalyzer;
+use summer_lsp::analysis::rust::macro_analyzer::MacroAnalyzer;
 
 // 扫描器层
-use spring_lsp::scanner::ComponentScanner;
-use spring_lsp::scanner::RouteScanner;
+use summer_lsp::scanner::ComponentScanner;
+use summer_lsp::scanner::RouteScanner;
 
 // 核心层
-use spring_lsp::core::DocumentManager;
-use spring_lsp::core::SchemaProvider;
+use summer_lsp::core::DocumentManager;
+use summer_lsp::core::SchemaProvider;
 
 // 工具层
-use spring_lsp::utils::{Error, Result};
-use spring_lsp::utils::init_logging;
+use summer_lsp::utils::{Error, Result};
+use summer_lsp::utils::init_logging;
 
 // 路由相关
-use spring_lsp::scanner::route::{Route, RouteIndex, HttpMethod};
+use summer_lsp::scanner::route::{Route, RouteIndex, HttpMethod};
 ```
 
 ### 迁移建议
@@ -687,7 +687,7 @@ use spring_lsp::scanner::route::{Route, RouteIndex, HttpMethod};
 
 ### 添加新的扫描器
 
-**场景：** 需要扫描新的 spring-rs 元素（例如中间件）
+**场景：** 需要扫描新的 summer-rs 元素（例如中间件）
 
 **步骤：**
 
@@ -899,7 +899,7 @@ mod tests {
 
 ```rust
 // tests/integration_test.rs
-use spring_lsp::protocol::LspServer;
+use summer_lsp::protocol::LspServer;
 use lsp_types::*;
 
 #[tokio::test]
@@ -1156,8 +1156,8 @@ if duration.as_millis() > 100 {
 - [ ] 实现 Extract Variable/Function
 - [ ] 实现 Inline Variable/Function
 
-#### 2. 更多 spring-rs 支持
-- [ ] 支持更多 spring-rs 宏
+#### 2. 更多 summer-rs 支持
+- [ ] 支持更多 summer-rs 宏
 - [ ] 支持中间件分析
 - [ ] 支持拦截器分析
 - [ ] 支持事件监听器分析
@@ -1219,7 +1219,7 @@ if duration.as_millis() > 100 {
 
 未来可以考虑将这些类型移到 core 或 utils 层。
 
-### Q: 如何添加新的 spring-rs 宏支持？
+### Q: 如何添加新的 summer-rs 宏支持？
 
 **A:** 
 1. 在 `analysis/rust/macro_analyzer.rs` 中添加宏识别逻辑
@@ -1232,8 +1232,8 @@ if duration.as_millis() > 100 {
 **A:**
 1. 设置日志级别：`SPRING_LSP_LOG_LEVEL=debug`
 2. 启用详细日志：`SPRING_LSP_VERBOSE=1`
-3. 指定日志文件：`SPRING_LSP_LOG_FILE=/tmp/spring-lsp.log`
-4. 在 VSCode 中查看 LSP 日志：View -> Output -> Spring LSP
+3. 指定日志文件：`SPRING_LSP_LOG_FILE=/tmp/summer-lsp.log`
+4. 在 VSCode 中查看 LSP 日志：View -> Output -> Summer LSP
 
 ### Q: 性能问题如何排查？
 
@@ -1249,8 +1249,8 @@ if duration.as_millis() > 100 {
 
 ```bash
 # 克隆仓库
-git clone https://github.com/spring-rs/spring-lsp.git
-cd spring-lsp
+git clone https://github.com/summer-rs/summer-lsp.git
+cd summer-lsp
 
 # 安装依赖（Rust 工具链）
 rustup update stable
@@ -1376,7 +1376,7 @@ Closes #123
 - [rust-analyzer](https://github.com/rust-lang/rust-analyzer) - Rust LSP 实现参考
 - [taplo](https://taplo.tamasfe.dev/) - TOML 工具包
 - [syn](https://docs.rs/syn/) - Rust 语法解析库
-- [spring-rs](https://spring-rs.github.io/) - spring-rs 框架文档
+- [summer-rs](https://summer-rs.github.io/) - summer-rs 框架文档
 
 ### 社区
 
@@ -1392,4 +1392,4 @@ Closes #123
 
 **最后更新：** 2024-02-07  
 **版本：** 0.1.0  
-**维护者：** spring-rs contributors
+**维护者：** summer-rs contributors

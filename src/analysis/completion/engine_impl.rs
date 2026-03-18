@@ -5,7 +5,7 @@ use lsp_types::{
     Position, Range,
 };
 
-use crate::analysis::rust::macro_analyzer::SpringMacro;
+use crate::analysis::rust::macro_analyzer::SummerMacro;
 use crate::analysis::toml::toml_analyzer::{TomlAnalyzer, TomlDocument};
 use crate::core::schema::SchemaProvider;
 
@@ -61,7 +61,7 @@ impl CompletionEngine {
         context: CompletionContext,
         position: Position,
         toml_doc: Option<&TomlDocument>,
-        macro_info: Option<&SpringMacro>,
+        macro_info: Option<&SummerMacro>,
     ) -> Vec<CompletionItem> {
         match context {
             CompletionContext::Toml => {
@@ -135,8 +135,25 @@ impl CompletionEngine {
 
         // 3. 检查是否在配置节内
         if let Some(section) = self.find_section_at_position(doc, position) {
-            // TODO: 实现基于 JSON Schema 的枚举值补全
-            // 目前只提供配置项补全
+            // 3.1 检查是否在属性值位置，需要补全枚举值
+            if let Some(property_name) = self.find_property_at_position(section, position) {
+                // 获取属性的 Schema 信息
+                let schema_provider = self.toml_analyzer.schema_provider();
+                if let Some(plugin_schema) = schema_provider.get_plugin(&section.prefix) {
+                    if let Some(property_schema) = plugin_schema.properties.get(&property_name) {
+                        // 检查是否有枚举值
+                        if let crate::schema::TypeInfo::String {
+                            enum_values: Some(enum_vals),
+                            ..
+                        } = &property_schema.type_info
+                        {
+                            return self.complete_enum_values(enum_vals);
+                        }
+                    }
+                }
+            }
+
+            // 3.2 否则提供配置项补全
             return self.complete_config_properties(section);
         }
 
@@ -274,28 +291,10 @@ impl CompletionEngine {
     ) -> Vec<CompletionItem> {
         let prefix = &section.prefix;
 
-        // 从 Schema 中获取该插件的所有属性
+        // 从 Schema Provider 中获取插件信息
         let schema_provider = self.toml_analyzer.schema_provider();
-
-        // 检查插件是否存在
-        if !schema_provider.has_plugin(prefix) {
-            return Vec::new();
-        }
-
-        // 获取插件的 Schema
-        let plugin_schema = match schema_provider.get_plugin_schema(prefix) {
+        let plugin_schema = match schema_provider.get_plugin(prefix) {
             Some(schema) => schema,
-            None => return Vec::new(),
-        };
-
-        // 解析 properties
-        let properties = match plugin_schema.get("properties") {
-            Some(props) => props,
-            None => return Vec::new(),
-        };
-
-        let props_obj = match properties.as_object() {
-            Some(obj) => obj,
             None => return Vec::new(),
         };
 
@@ -306,41 +305,42 @@ impl CompletionEngine {
         // 为每个未使用的属性创建补全项
         let mut completions = Vec::new();
 
-        for (key, value) in props_obj {
+        for (key, property_schema) in &plugin_schema.properties {
             // 跳过已存在的属性
             if existing_keys.contains(key) {
                 continue;
             }
 
-            // 提取属性信息
-            let description = value
-                .get("description")
-                .and_then(|d| d.as_str())
-                .unwrap_or("");
-
-            let type_name = value
-                .get("type")
-                .and_then(|t| t.as_str())
-                .unwrap_or("unknown");
-
-            let default_value = value
-                .get("default")
-                .map(|d| self.json_value_to_toml_string(d))
-                .unwrap_or_else(|| self.type_to_default_value(type_name));
+            // 使用新的辅助方法生成类型提示和默认值
+            let type_hint = self.type_info_to_hint(&property_schema.type_info);
+            let default_value = if let Some(default) = &property_schema.default {
+                self.value_to_string(default)
+            } else {
+                self.type_info_to_default(&property_schema.type_info)
+            };
 
             // 构建插入文本：key = value  # type
-            let insert_text = format!("{} = {}  # {}", key, default_value, type_name);
+            let insert_text = format!("{} = {}  # {}", key, default_value, type_hint);
 
             // 构建文档
-            let mut doc_parts = vec![format!("**类型**: `{}`", type_name)];
-            if !description.is_empty() {
-                doc_parts.insert(0, description.to_string());
+            let mut doc_parts = Vec::new();
+
+            if !property_schema.description.is_empty() {
+                doc_parts.push(property_schema.description.clone());
             }
-            if let Some(default) = value.get("default") {
-                doc_parts.push(format!(
-                    "**默认值**: `{}`",
-                    self.json_value_to_toml_string(default)
-                ));
+
+            doc_parts.push(format!("**类型**: `{}`", type_hint));
+
+            if let Some(default) = &property_schema.default {
+                doc_parts.push(format!("**默认值**: `{}`", self.value_to_string(default)));
+            }
+
+            if property_schema.required {
+                doc_parts.push("**必需**: 是".to_string());
+            }
+
+            if let Some(deprecated_msg) = &property_schema.deprecated {
+                doc_parts.push(format!("**已废弃**: {}", deprecated_msg));
             }
 
             let documentation = Documentation::MarkupContent(MarkupContent {
@@ -351,10 +351,11 @@ impl CompletionEngine {
             completions.push(CompletionItem {
                 label: key.clone(),
                 kind: Some(CompletionItemKind::PROPERTY),
-                detail: Some(format!("{}: {}", key, type_name)),
+                detail: Some(format!("{}: {}", key, type_hint)),
                 documentation: Some(documentation),
                 insert_text: Some(insert_text),
                 insert_text_format: Some(lsp_types::InsertTextFormat::PLAIN_TEXT),
+                deprecated: property_schema.deprecated.is_some().then_some(true),
                 ..Default::default()
             });
         }
@@ -363,6 +364,7 @@ impl CompletionEngine {
     }
 
     /// 将 JSON 值转换为 TOML 字符串
+    #[allow(dead_code)]
     fn json_value_to_toml_string(&self, value: &serde_json::Value) -> String {
         match value {
             serde_json::Value::String(s) => format!("\"{}\"", s),
@@ -375,6 +377,7 @@ impl CompletionEngine {
     }
 
     /// 根据类型名称返回默认值
+    #[allow(dead_code)]
     fn type_to_default_value(&self, type_name: &str) -> String {
         match type_name {
             "string" => "\"\"".to_string(),
@@ -517,16 +520,16 @@ impl CompletionEngine {
     /// 返回补全项列表
     pub fn complete_macro(
         &self,
-        macro_info: &SpringMacro,
+        macro_info: &SummerMacro,
         _cursor_position: Option<&str>,
     ) -> Vec<CompletionItem> {
         match macro_info {
-            SpringMacro::DeriveService(_) => self.complete_service_macro(),
-            SpringMacro::Component(_) => self.complete_component_macro(),
-            SpringMacro::Inject(_) => self.complete_inject_macro(),
-            SpringMacro::AutoConfig(_) => self.complete_auto_config_macro(),
-            SpringMacro::Route(_) => self.complete_route_macro(),
-            SpringMacro::Job(_) => self.complete_job_macro(),
+            SummerMacro::DeriveService(_) => self.complete_service_macro(),
+            SummerMacro::Component(_) => self.complete_component_macro(),
+            SummerMacro::Inject(_) => self.complete_inject_macro(),
+            SummerMacro::AutoConfig(_) => self.complete_auto_config_macro(),
+            SummerMacro::Route(_) => self.complete_route_macro(),
+            SummerMacro::Job(_) => self.complete_job_macro(),
         }
     }
 

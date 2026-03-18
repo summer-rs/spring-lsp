@@ -8,7 +8,7 @@
 //! ## 使用示例
 //!
 //! ```rust,no_run
-//! use spring_lsp::status::ServerStatus;
+//! use summer_lsp::status::ServerStatus;
 //!
 //! let status = ServerStatus::new();
 //! status.increment_document_count();

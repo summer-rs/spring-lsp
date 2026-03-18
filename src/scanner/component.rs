@@ -4,7 +4,7 @@
 //! - 带有 #[derive(Service)] 的结构体
 //! - 带有 #[component] 的函数
 
-use crate::analysis::rust::macro_analyzer::{MacroAnalyzer, SpringMacro};
+use crate::analysis::rust::macro_analyzer::{MacroAnalyzer, SummerMacro};
 use crate::protocol::types::{LocationResponse, PositionResponse, RangeResponse};
 use lsp_types::Url;
 use serde::{Deserialize, Serialize};
@@ -42,7 +42,7 @@ impl ComponentScanner {
 
         let mut components = Vec::new();
 
-        // 检查是否直接是一个 spring-rs 项目（有 src 目录）
+        // 检查是否直接是一个 summer-rs 项目（有 src 目录）
         let src_path = project_path.join("src");
 
         if src_path.exists() && src_path.is_dir() {
@@ -50,8 +50,8 @@ impl ComponentScanner {
             tracing::info!("Found src directory, scanning single project");
             components.extend(self.scan_single_project(project_path)?);
         } else {
-            // 可能是 workspace 根目录，递归查找所有 spring-rs 项目
-            tracing::info!("No src directory found, searching for spring-rs projects in workspace");
+            // 可能是 workspace 根目录，递归查找所有 summer-rs 项目
+            tracing::info!("No src directory found, searching for summer-rs projects in workspace");
             components.extend(self.scan_workspace(project_path)?);
         }
 
@@ -142,10 +142,10 @@ impl ComponentScanner {
             };
 
             // 提取组件信息
-            for spring_macro in &rust_doc.macros {
-                match spring_macro {
+            for summer_macro in &rust_doc.macros {
+                match summer_macro {
                     // 处理 #[derive(Service)] 宏
-                    SpringMacro::DeriveService(service_macro) => {
+                    SummerMacro::DeriveService(service_macro) => {
                         tracing::info!(
                             "Found Service component: {} in {:?}",
                             service_macro.struct_name,
@@ -155,7 +155,7 @@ impl ComponentScanner {
                         components.push(ComponentInfoResponse {
                             name: service_macro.struct_name.clone(),
                             type_name: service_macro.struct_name.clone(),
-                            scope: ComponentScope::Singleton, // spring-rs 默认是单例
+                            scope: ComponentScope::Singleton, // summer-rs 默认是单例
                             source: ComponentSource::Service,
                             dependencies: service_macro
                                 .fields
@@ -181,7 +181,7 @@ impl ComponentScanner {
                         });
                     }
                     // 处理 #[component] 宏
-                    SpringMacro::Component(component_macro) => {
+                    SummerMacro::Component(component_macro) => {
                         tracing::info!(
                             "Found Component function: {} -> {} in {:?}",
                             component_macro.function_name,
@@ -192,7 +192,7 @@ impl ComponentScanner {
                         components.push(ComponentInfoResponse {
                             name: component_macro.component_type.clone(),
                             type_name: component_macro.component_type.clone(),
-                            scope: ComponentScope::Singleton, // spring-rs 默认是单例
+                            scope: ComponentScope::Singleton, // summer-rs 默认是单例
                             source: ComponentSource::Component,
                             dependencies: component_macro
                                 .dependencies
@@ -229,7 +229,7 @@ impl ComponentScanner {
         Ok(components)
     }
 
-    /// 扫描 workspace 中的所有 spring-rs 项目
+    /// 扫描 workspace 中的所有 summer-rs 项目
     fn scan_workspace(
         &self,
         workspace_path: &Path,
@@ -253,12 +253,12 @@ impl ComponentScanner {
                 continue;
             }
 
-            // 检查是否是 spring-rs 项目
-            if !self.is_spring_rs_project(cargo_toml_path) {
+            // 检查是否是 summer-rs 项目
+            if !self.is_summer_rs_project(cargo_toml_path) {
                 continue;
             }
 
-            tracing::info!("Found spring-rs project: {:?}", project_dir);
+            tracing::info!("Found summer-rs project: {:?}", project_dir);
             project_count += 1;
 
             // 扫描这个项目
@@ -273,24 +273,24 @@ impl ComponentScanner {
             }
         }
 
-        tracing::info!("Scanned {} spring-rs projects in workspace", project_count);
+        tracing::info!("Scanned {} summer-rs projects in workspace", project_count);
         Ok(all_components)
     }
 
-    /// 检查是否是 spring-rs 项目
-    fn is_spring_rs_project(&self, cargo_toml_path: &Path) -> bool {
+    /// 检查是否是 summer-rs 项目
+    fn is_summer_rs_project(&self, cargo_toml_path: &Path) -> bool {
         // 读取 Cargo.toml
         let content = match fs::read_to_string(cargo_toml_path) {
             Ok(content) => content,
             Err(_) => return false,
         };
 
-        // 简单检查是否包含 spring 依赖
-        content.contains("spring")
-            && (content.contains("spring-web")
-                || content.contains("spring-sqlx")
-                || content.contains("spring-redis")
-                || content.contains("\"spring\""))
+        // 简单检查是否包含 summer 依赖
+        content.contains("summer")
+            && (content.contains("summer-web")
+                || content.contains("summer-sqlx")
+                || content.contains("summer-redis")
+                || content.contains("\"summer\""))
     }
 }
 
@@ -338,7 +338,7 @@ pub struct ComponentInfoResponse {
     pub location: LocationResponse,
 }
 
-/// spring/components 请求参数
+/// summer/components 请求参数
 #[derive(Debug, Deserialize)]
 pub struct ComponentsRequest {
     /// 应用路径
@@ -346,7 +346,7 @@ pub struct ComponentsRequest {
     pub app_path: String,
 }
 
-/// spring/components 响应
+/// summer/components 响应
 #[derive(Debug, Serialize)]
 pub struct ComponentsResponse {
     /// 组件列表

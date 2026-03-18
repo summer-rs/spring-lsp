@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
-import { SpringApp } from '../models';
+import { SummerApp } from '../models';
 import { LanguageClientManager } from '../languageClient';
 
 /**
  * Plugin 接口（从语言服务器返回）
  * 
- * 表示一个 Spring RS 插件
+ * 表示一个 Summer RS 插件
  */
 export interface Plugin {
   /**
@@ -69,7 +69,7 @@ export class PluginsTreeDataProvider
   /**
    * 当前选中的应用
    */
-  private currentApp: SpringApp | undefined;
+  private currentApp: SummerApp | undefined;
 
   /**
    * 语言客户端管理器
@@ -114,7 +114,7 @@ export class PluginsTreeDataProvider
     try {
       const response = await this.clientManager.sendRequest<{
         plugins: Plugin[];
-      }>('spring/plugins', {
+      }>('summer/plugins', {
         appPath: appPath,
       });
 
@@ -133,7 +133,7 @@ export class PluginsTreeDataProvider
    * 
    * @param app 要刷新的应用（可选）
    */
-  public async refresh(app?: SpringApp): Promise<void> {
+  public async refresh(app?: SummerApp): Promise<void> {
     if (!app) {
       this.clearRuntime();
       return;
@@ -153,7 +153,7 @@ export class PluginsTreeDataProvider
   /**
    * 刷新运行时信息
    */
-  private async refreshRuntime(app: SpringApp): Promise<void> {
+  private async refreshRuntime(app: SummerApp): Promise<void> {
     if (!app.port) {
       return;
     }
@@ -233,7 +233,7 @@ export class PluginTreeItem extends vscode.TreeItem {
     this.plugin = plugin;
 
     // 设置上下文值（用于菜单显示）
-    this.contextValue = 'spring:plugin';
+    this.contextValue = 'summer:plugin';
 
     // 设置工具提示
     this.tooltip = this.buildTooltip();
@@ -247,7 +247,7 @@ export class PluginTreeItem extends vscode.TreeItem {
     // 设置命令（点击时导航到定义）
     if (plugin.location && plugin.location.uri && plugin.location.range) {
       this.command = {
-        command: 'spring.plugin.navigate',
+        command: 'summer.plugin.navigate',
         title: 'Go to Definition',
         arguments: [plugin.location]
       };

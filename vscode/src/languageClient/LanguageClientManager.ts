@@ -11,7 +11,7 @@ import {
 /**
  * 语言客户端管理器
  * 
- * 负责启动、管理和与 spring-rs 语言服务器通信
+ * 负责启动、管理和与 summer-rs 语言服务器通信
  */
 export class LanguageClientManager implements vscode.Disposable {
   /**
@@ -53,7 +53,7 @@ export class LanguageClientManager implements vscode.Disposable {
         return;
       }
 
-      this.outputChannel.appendLine(`Found Spring LSP server at: ${serverPath}`);
+      this.outputChannel.appendLine(`Found Summer LSP server at: ${serverPath}`);
 
       // 配置服务器选项
       const serverOptions: ServerOptions = {
@@ -65,7 +65,7 @@ export class LanguageClientManager implements vscode.Disposable {
       // 配置客户端选项
       const clientOptions: LanguageClientOptions = {
         documentSelector: [
-          { scheme: 'file', language: 'toml', pattern: '**/.spring-lsp.toml' },
+          { scheme: 'file', language: 'toml', pattern: '**/.summer-lsp.toml' },
           { scheme: 'file', language: 'toml', pattern: '**/config/app*.toml' },
           { scheme: 'file', language: 'rust' },
         ],
@@ -75,13 +75,13 @@ export class LanguageClientManager implements vscode.Disposable {
           ),
         },
         // 不指定 outputChannel，让 LSP 客户端自动创建
-        // 这样会创建一个名为 "Spring RS" 的输出通道用于语言服务器日志
+        // 这样会创建一个名为 "Summer RS" 的输出通道用于语言服务器日志
       };
 
       // 创建语言客户端
       this.client = new LanguageClient(
-        'spring-rs',
-        'Spring RS',
+        'summer-rs',
+        'Summer RS',
         serverOptions,
         clientOptions
       );
@@ -89,22 +89,22 @@ export class LanguageClientManager implements vscode.Disposable {
       // 启动客户端
       await this.client.start();
 
-      this.outputChannel.appendLine('Spring LSP server started successfully');
+      this.outputChannel.appendLine('Summer LSP server started successfully');
     } catch (error) {
-      this.outputChannel.appendLine(`Failed to start Spring LSP server: ${error}`);
+      this.outputChannel.appendLine(`Failed to start Summer LSP server: ${error}`);
       vscode.window.showErrorMessage(
-        `Failed to start Spring LSP server: ${error}`,
+        `Failed to start Summer LSP server: ${error}`,
         'Open Settings',
         'View Documentation'
       ).then(selection => {
         if (selection === 'Open Settings') {
           vscode.commands.executeCommand(
             'workbench.action.openSettings',
-            'spring-rs.serverPath'
+            'summer-rs.serverPath'
           );
         } else if (selection === 'View Documentation') {
           vscode.env.openExternal(
-            vscode.Uri.parse('https://spring-rs.github.io/')
+            vscode.Uri.parse('https://summer-rs.github.io/')
           );
         }
       });
@@ -116,10 +116,10 @@ export class LanguageClientManager implements vscode.Disposable {
    */
   public async stop(): Promise<void> {
     if (this.client) {
-      this.outputChannel.appendLine('Stopping Spring LSP server...');
+      this.outputChannel.appendLine('Stopping Summer LSP server...');
       await this.client.stop();
       this.client = undefined;
-      this.outputChannel.appendLine('Spring LSP server stopped');
+      this.outputChannel.appendLine('Summer LSP server stopped');
     }
   }
 
@@ -196,7 +196,7 @@ export class LanguageClientManager implements vscode.Disposable {
    */
   private async findServerExecutable(): Promise<string | undefined> {
     // 1. 检查配置中指定的路径
-    const config = vscode.workspace.getConfiguration('spring-rs');
+    const config = vscode.workspace.getConfiguration('summer-rs');
     const configPath = config.get<string>('serverPath');
 
     if (configPath) {
@@ -226,8 +226,8 @@ export class LanguageClientManager implements vscode.Disposable {
       return binaryPath;
     }
 
-    // 3. 检查系统 PATH（使用通用名称 spring-lsp）
-    const pathResult = await this.findInPath('spring-lsp');
+    // 3. 检查系统 PATH（使用通用名称 summer-lsp）
+    const pathResult = await this.findInPath('summer-lsp');
     if (pathResult) {
       return pathResult;
     }
@@ -245,14 +245,14 @@ export class LanguageClientManager implements vscode.Disposable {
     const arch = process.arch;
 
     if (platform === 'win32') {
-      return 'spring-lsp-win32-x64.exe';
+      return 'summer-lsp-win32-x64.exe';
     } else if (platform === 'darwin') {
       return arch === 'arm64' 
-        ? 'spring-lsp-darwin-arm64' 
-        : 'spring-lsp-darwin-x64';
+        ? 'summer-lsp-darwin-arm64' 
+        : 'summer-lsp-darwin-x64';
     } else {
       // Linux 和其他 Unix 系统
-      return 'spring-lsp-linux-x64';
+      return 'summer-lsp-linux-x64';
     }
   }
 
@@ -286,7 +286,7 @@ export class LanguageClientManager implements vscode.Disposable {
    * 显示服务器未找到错误
    */
   private showServerNotFoundError(): void {
-    const message = 'Spring LSP server not found. Please install it or configure the path.';
+    const message = 'Summer LSP server not found. Please install it or configure the path.';
     
     vscode.window.showErrorMessage(
       message,
@@ -297,22 +297,22 @@ export class LanguageClientManager implements vscode.Disposable {
       if (selection === 'Open Settings') {
         vscode.commands.executeCommand(
           'workbench.action.openSettings',
-          'spring-rs.serverPath'
+          'summer-rs.serverPath'
         );
       } else if (selection === 'View Documentation') {
         vscode.env.openExternal(
-          vscode.Uri.parse('https://spring-rs.github.io/')
+          vscode.Uri.parse('https://summer-rs.github.io/')
         );
       } else if (selection === 'Install Guide') {
         vscode.env.openExternal(
-          vscode.Uri.parse('https://spring-rs.github.io/')
+          vscode.Uri.parse('https://summer-rs.github.io/')
         );
       }
     });
 
     this.outputChannel.appendLine(message);
     this.outputChannel.appendLine('Search paths:');
-    this.outputChannel.appendLine(`  1. Configuration: spring-rs.serverPath`);
+    this.outputChannel.appendLine(`  1. Configuration: summer-rs.serverPath`);
     this.outputChannel.appendLine(`  2. Extension directory: ${this.context.extensionPath}/bin/`);
     this.outputChannel.appendLine(`  3. System PATH`);
   }

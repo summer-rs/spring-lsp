@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { SpringApp } from '../models';
+import { SummerApp } from '../models';
 import { LanguageClientManager } from '../languageClient';
 import { Route, RoutesResponse, DataSource } from '../types';
 import { ViewMode, VIEW_MODE_KEYS } from '../types/viewMode';
@@ -20,7 +20,7 @@ export class RoutesTreeDataProviderEnhanced
 
   private staticRoutes: Route[] = [];
   private runtimeRoutes: Route[] = [];
-  private currentApp: SpringApp | undefined;
+  private currentApp: SummerApp | undefined;
   private viewMode: ViewMode = ViewMode.List;
 
   constructor(
@@ -134,7 +134,7 @@ export class RoutesTreeDataProviderEnhanced
   private async refreshStaticByPath(appPath: string): Promise<void> {
     try {
       const response = await this.clientManager.sendRequest<RoutesResponse>(
-        'spring/routes',
+        'summer/routes',
         { appPath }
       );
 
@@ -148,7 +148,7 @@ export class RoutesTreeDataProviderEnhanced
     }
   }
 
-  public async refresh(app?: SpringApp): Promise<void> {
+  public async refresh(app?: SummerApp): Promise<void> {
     if (!app) {
       this.clearRuntime();
       return;
@@ -162,7 +162,7 @@ export class RoutesTreeDataProviderEnhanced
     }
   }
 
-  private async refreshRuntime(app: SpringApp): Promise<void> {
+  private async refreshRuntime(app: SummerApp): Promise<void> {
     if (!app.port) {
       return;
     }
@@ -275,7 +275,7 @@ class MethodGroupNode extends vscode.TreeItem {
     super(method, vscode.TreeItemCollapsibleState.Expanded);
 
     this.description = `${routes.length} route${routes.length > 1 ? 's' : ''}`;
-    this.contextValue = 'spring:method-group';
+    this.contextValue = 'summer:method-group';
     
     // 设置图标和颜色
     const iconMap: Record<string, { icon: string; color: string }> = {
@@ -304,14 +304,14 @@ class RouteTreeNode extends vscode.TreeItem {
   ) {
     super(route.path, vscode.TreeItemCollapsibleState.None);
 
-    this.contextValue = `spring:route-${source}`;
+    this.contextValue = `summer:route-${source}`;
     this.description = route.handler || '';
     this.tooltip = this.buildTooltip();
     this.iconPath = this.getIcon();
 
     if (route.location) {
       this.command = {
-        command: 'spring.route.navigate',
+        command: 'summer.route.navigate',
         title: 'Go to Handler',
         arguments: [route.location],
       };

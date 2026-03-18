@@ -1,19 +1,19 @@
 {
-  "name": "spring-rs",
-  "displayName": "Spring RS",
-  "description": "Language Server Protocol support and application management for spring-rs framework",
-  "version": "0.2.0",
+  "name": "summer-rs",
+  "displayName": "Summer RS",
+  "description": "Language Server Protocol support and application management for summer-rs framework",
+  "version": "0.5.0",
   "publisher": "holmofy",
   "license": "MIT OR Apache-2.0",
   "icon": "resources/logo.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/spring-rs/spring-lsp"
+    "url": "https://github.com/summer-rs/summer-lsp"
   },
   "bugs": {
-    "url": "https://github.com/spring-rs/spring-lsp/issues"
+    "url": "https://github.com/summer-rs/summer-lsp/issues"
   },
-  "homepage": "https://spring-rs.github.io/spring-lsp",
+  "homepage": "https://summer-rs.github.io/summer-lsp",
   "engines": {
     "vscode": "^1.75.0"
   },
@@ -23,8 +23,8 @@
     "Other"
   ],
   "keywords": [
-    "spring-rs",
-    "spring",
+    "summer-rs",
+    "summer",
     "rust",
     "toml",
     "language-server",
@@ -32,7 +32,7 @@
     "framework"
   ],
   "activationEvents": [
-    "workspaceContains:**/.spring-lsp.toml",
+    "workspaceContains:**/.summer-lsp.toml",
     "workspaceContains:**/config/app.toml",
     "workspaceContains:**/config/app-*.toml",
     "workspaceContains:**/Cargo.toml",
@@ -44,417 +44,417 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "spring-rs",
-          "title": "Spring RS",
+          "id": "summer-rs",
+          "title": "Summer RS",
           "icon": "resources/logo-sidebar.svg"
         }
       ]
     },
     "views": {
-      "spring-rs": [
+      "summer-rs": [
         {
-          "id": "spring.apps",
+          "id": "summer.apps",
           "name": "Apps",
-          "contextualTitle": "Spring RS Apps"
+          "contextualTitle": "Summer RS Apps"
         },
         {
-          "id": "spring.configurations",
+          "id": "summer.configurations",
           "name": "Configurations",
-          "contextualTitle": "Spring RS Configurations"
+          "contextualTitle": "Summer RS Configurations"
         },
         {
-          "id": "spring.components",
+          "id": "summer.components",
           "name": "Components",
-          "contextualTitle": "Spring RS Components"
+          "contextualTitle": "Summer RS Components"
         },
         {
-          "id": "spring.routes",
+          "id": "summer.routes",
           "name": "Routes",
-          "contextualTitle": "Spring RS Routes"
+          "contextualTitle": "Summer RS Routes"
         },
         {
-          "id": "spring.jobs",
+          "id": "summer.jobs",
           "name": "Jobs",
-          "contextualTitle": "Spring RS Jobs"
+          "contextualTitle": "Summer RS Jobs"
         },
         {
-          "id": "spring.plugins",
+          "id": "summer.plugins",
           "name": "Plugins",
-          "contextualTitle": "Spring RS Plugins"
+          "contextualTitle": "Summer RS Plugins"
         }
       ]
     },
     "commands": [
       {
-        "command": "spring-rs.refresh",
+        "command": "summer-rs.refresh",
         "title": "Refresh Apps",
-        "category": "Spring RS",
+        "category": "Summer RS",
         "icon": "$(refresh)"
       },
       {
-        "command": "spring-rs.app.run",
+        "command": "summer-rs.app.run",
         "title": "Run",
-        "category": "Spring RS",
+        "category": "Summer RS",
         "icon": "$(play)"
       },
       {
-        "command": "spring-rs.app.debug",
+        "command": "summer-rs.app.debug",
         "title": "Debug",
-        "category": "Spring RS",
+        "category": "Summer RS",
         "icon": "$(debug-alt-small)"
       },
       {
-        "command": "spring-rs.app.stop",
+        "command": "summer-rs.app.stop",
         "title": "Stop",
-        "category": "Spring RS",
+        "category": "Summer RS",
         "icon": "$(debug-stop)"
       },
       {
-        "command": "spring-rs.app.open",
+        "command": "summer-rs.app.open",
         "title": "Open in Browser",
-        "category": "Spring RS",
+        "category": "Summer RS",
         "icon": "$(globe)"
       },
       {
-        "command": "spring-rs.app.runWithProfile",
+        "command": "summer-rs.app.runWithProfile",
         "title": "Run with Profile...",
-        "category": "Spring RS"
+        "category": "Summer RS"
       },
       {
-        "command": "spring-rs.app.debugWithProfile",
+        "command": "summer-rs.app.debugWithProfile",
         "title": "Debug with Profile...",
-        "category": "Spring RS"
+        "category": "Summer RS"
       },
       {
-        "command": "spring-rs.app.runMultiple",
+        "command": "summer-rs.app.runMultiple",
         "title": "Run Multiple Apps...",
-        "category": "Spring RS",
+        "category": "Summer RS",
         "icon": "$(run-all)"
       },
       {
-        "command": "spring-rs.app.stopMultiple",
+        "command": "summer-rs.app.stopMultiple",
         "title": "Stop Multiple Apps...",
-        "category": "Spring RS",
+        "category": "Summer RS",
         "icon": "$(stop-circle)"
       },
       {
-        "command": "spring.component.navigate",
+        "command": "summer.component.navigate",
         "title": "Go to Definition",
-        "category": "Spring RS",
+        "category": "Summer RS",
         "icon": "$(go-to-file)"
       },
       {
-        "command": "spring.component.showDependencies",
+        "command": "summer.component.showDependencies",
         "title": "Show Dependencies",
-        "category": "Spring RS",
+        "category": "Summer RS",
         "icon": "$(type-hierarchy-sub)"
       },
       {
-        "command": "spring.route.navigate",
+        "command": "summer.route.navigate",
         "title": "Go to Handler",
-        "category": "Spring RS",
+        "category": "Summer RS",
         "icon": "$(go-to-file)"
       },
       {
-        "command": "spring.route.open",
+        "command": "summer.route.open",
         "title": "Open in Browser",
-        "category": "Spring RS",
+        "category": "Summer RS",
         "icon": "$(globe)"
       },
       {
-        "command": "spring.job.navigate",
+        "command": "summer.job.navigate",
         "title": "Go to Definition",
-        "category": "Spring RS",
+        "category": "Summer RS",
         "icon": "$(go-to-file)"
       },
       {
-        "command": "spring.plugin.navigate",
+        "command": "summer.plugin.navigate",
         "title": "Go to Definition",
-        "category": "Spring RS",
+        "category": "Summer RS",
         "icon": "$(go-to-file)"
       },
       {
-        "command": "spring-rs.showWelcome",
+        "command": "summer-rs.showWelcome",
         "title": "Show Welcome Page",
-        "category": "Spring RS"
+        "category": "Summer RS"
       },
       {
-        "command": "spring-rs.openDocumentation",
+        "command": "summer-rs.openDocumentation",
         "title": "Open Documentation",
-        "category": "Spring RS",
+        "category": "Summer RS",
         "icon": "$(book)"
       },
       {
-        "command": "spring.configuration.refresh",
+        "command": "summer.configuration.refresh",
         "title": "Refresh Configurations",
-        "category": "Spring RS",
+        "category": "Summer RS",
         "icon": "$(refresh)"
       },
       {
-        "command": "spring.configuration.navigate",
+        "command": "summer.configuration.navigate",
         "title": "Go to Definition",
-        "category": "Spring RS",
+        "category": "Summer RS",
         "icon": "$(go-to-file)"
       },
       {
-        "command": "spring.configuration.copyExample",
+        "command": "summer.configuration.copyExample",
         "title": "Copy Config Example",
-        "category": "Spring RS",
+        "category": "Summer RS",
         "icon": "$(copy)"
       },
       {
-        "command": "spring.components.selectViewMode",
+        "command": "summer.components.selectViewMode",
         "title": "Select View Mode...",
-        "category": "Spring RS",
+        "category": "Summer RS",
         "icon": "$(list-selection)"
       },
       {
-        "command": "spring.components.toggleViewMode",
+        "command": "summer.components.toggleViewMode",
         "title": "Switch to Tree View",
-        "category": "Spring RS",
+        "category": "Summer RS",
         "icon": "$(list-tree)"
       },
       {
-        "command": "spring.components.switchToListView",
+        "command": "summer.components.switchToListView",
         "title": "Switch to List View",
-        "category": "Spring RS",
+        "category": "Summer RS",
         "icon": "$(list-flat)"
       },
       {
-        "command": "spring.routes.selectViewMode",
+        "command": "summer.routes.selectViewMode",
         "title": "Select View Mode...",
-        "category": "Spring RS",
+        "category": "Summer RS",
         "icon": "$(list-selection)"
       },
       {
-        "command": "spring.routes.toggleViewMode",
+        "command": "summer.routes.toggleViewMode",
         "title": "Switch to Tree View",
-        "category": "Spring RS",
+        "category": "Summer RS",
         "icon": "$(list-tree)"
       },
       {
-        "command": "spring.routes.switchToListView",
+        "command": "summer.routes.switchToListView",
         "title": "Switch to List View",
-        "category": "Spring RS",
+        "category": "Summer RS",
         "icon": "$(list-flat)"
       },
       {
-        "command": "spring.configurations.selectViewMode",
+        "command": "summer.configurations.selectViewMode",
         "title": "Select View Mode...",
-        "category": "Spring RS",
+        "category": "Summer RS",
         "icon": "$(list-selection)"
       },
       {
-        "command": "spring.configurations.toggleViewMode",
+        "command": "summer.configurations.toggleViewMode",
         "title": "Switch to Tree View",
-        "category": "Spring RS",
+        "category": "Summer RS",
         "icon": "$(list-tree)"
       },
       {
-        "command": "spring.configurations.switchToListView",
+        "command": "summer.configurations.switchToListView",
         "title": "Switch to List View",
-        "category": "Spring RS",
+        "category": "Summer RS",
         "icon": "$(list-flat)"
       }
     ],
     "menus": {
       "view/title": [
         {
-          "command": "spring-rs.refresh",
-          "when": "view == spring.apps",
+          "command": "summer-rs.refresh",
+          "when": "view == summer.apps",
           "group": "navigation@5"
         },
         {
-          "command": "spring-rs.app.runMultiple",
-          "when": "view == spring.apps",
+          "command": "summer-rs.app.runMultiple",
+          "when": "view == summer.apps",
           "group": "navigation@2"
         },
         {
-          "command": "spring-rs.app.stopMultiple",
-          "when": "view == spring.apps",
+          "command": "summer-rs.app.stopMultiple",
+          "when": "view == summer.apps",
           "group": "navigation@3"
         },
         {
-          "command": "spring.configuration.refresh",
-          "when": "view == spring.configurations",
+          "command": "summer.configuration.refresh",
+          "when": "view == summer.configurations",
           "group": "navigation@5"
         },
         {
-          "command": "spring.components.toggleViewMode",
-          "when": "view == spring.components && config.spring-lsp.componentsViewMode == list",
+          "command": "summer.components.toggleViewMode",
+          "when": "view == summer.components && config.summer-lsp.componentsViewMode == list",
           "group": "navigation@1"
         },
         {
-          "command": "spring.components.switchToListView",
-          "when": "view == spring.components && config.spring-lsp.componentsViewMode == tree",
+          "command": "summer.components.switchToListView",
+          "when": "view == summer.components && config.summer-lsp.componentsViewMode == tree",
           "group": "navigation@1"
         },
         {
-          "command": "spring.routes.toggleViewMode",
-          "when": "view == spring.routes && config.spring-lsp.routesViewMode == list",
+          "command": "summer.routes.toggleViewMode",
+          "when": "view == summer.routes && config.summer-lsp.routesViewMode == list",
           "group": "navigation@1"
         },
         {
-          "command": "spring.routes.switchToListView",
-          "when": "view == spring.routes && config.spring-lsp.routesViewMode == tree",
+          "command": "summer.routes.switchToListView",
+          "when": "view == summer.routes && config.summer-lsp.routesViewMode == tree",
           "group": "navigation@1"
         },
         {
-          "command": "spring.configurations.toggleViewMode",
-          "when": "view == spring.configurations && config.spring-lsp.configurationsViewMode == list",
+          "command": "summer.configurations.toggleViewMode",
+          "when": "view == summer.configurations && config.summer-lsp.configurationsViewMode == list",
           "group": "navigation@1"
         },
         {
-          "command": "spring.configurations.switchToListView",
-          "when": "view == spring.configurations && config.spring-lsp.configurationsViewMode == tree",
+          "command": "summer.configurations.switchToListView",
+          "when": "view == summer.configurations && config.summer-lsp.configurationsViewMode == tree",
           "group": "navigation@1"
         }
       ],
       "view/item/context": [
         {
-          "command": "spring-rs.app.run",
-          "when": "view == spring.apps && viewItem == SpringApp_inactive",
+          "command": "summer-rs.app.run",
+          "when": "view == summer.apps && viewItem == SummerApp_inactive",
           "group": "inline@5"
         },
         {
-          "command": "spring-rs.app.debug",
-          "when": "view == spring.apps && viewItem == SpringApp_inactive",
+          "command": "summer-rs.app.debug",
+          "when": "view == summer.apps && viewItem == SummerApp_inactive",
           "group": "inline@6"
         },
         {
-          "command": "spring-rs.app.stop",
-          "when": "view == spring.apps && viewItem == SpringApp_running",
+          "command": "summer-rs.app.stop",
+          "when": "view == summer.apps && viewItem == SummerApp_running",
           "group": "inline@8"
         },
         {
-          "command": "spring-rs.app.open",
-          "when": "view == spring.apps && viewItem == SpringApp_running",
+          "command": "summer-rs.app.open",
+          "when": "view == summer.apps && viewItem == SummerApp_running",
           "group": "inline@a"
         },
         {
-          "command": "spring-rs.app.runWithProfile",
-          "when": "view == spring.apps && viewItem == SpringApp_inactive",
+          "command": "summer-rs.app.runWithProfile",
+          "when": "view == summer.apps && viewItem == SummerApp_inactive",
           "group": "action@7"
         },
         {
-          "command": "spring-rs.app.debugWithProfile",
-          "when": "view == spring.apps && viewItem == SpringApp_inactive",
+          "command": "summer-rs.app.debugWithProfile",
+          "when": "view == summer.apps && viewItem == SummerApp_inactive",
           "group": "action@8"
         },
         {
-          "command": "spring.component.navigate",
-          "when": "view == spring.components && viewItem =~ /spring:component/",
+          "command": "summer.component.navigate",
+          "when": "view == summer.components && viewItem =~ /summer:component/",
           "group": "inline@5"
         },
         {
-          "command": "spring.component.showDependencies",
-          "when": "view == spring.components && viewItem =~ /spring:component/",
+          "command": "summer.component.showDependencies",
+          "when": "view == summer.components && viewItem =~ /summer:component/",
           "group": "action@5"
         },
         {
-          "command": "spring.route.navigate",
-          "when": "view == spring.routes && viewItem == spring:route",
+          "command": "summer.route.navigate",
+          "when": "view == summer.routes && viewItem == summer:route",
           "group": "inline@5"
         },
         {
-          "command": "spring.route.open",
-          "when": "view == spring.routes && viewItem =~ /spring:route.*\\+GET/",
+          "command": "summer.route.open",
+          "when": "view == summer.routes && viewItem =~ /summer:route.*\\+GET/",
           "group": "inline@6"
         },
         {
-          "command": "spring.job.navigate",
-          "when": "view == spring.jobs && viewItem == spring:job",
+          "command": "summer.job.navigate",
+          "when": "view == summer.jobs && viewItem == summer:job",
           "group": "inline@5"
         },
         {
-          "command": "spring.plugin.navigate",
-          "when": "view == spring.plugins && viewItem == spring:plugin",
+          "command": "summer.plugin.navigate",
+          "when": "view == summer.plugins && viewItem == summer:plugin",
           "group": "inline@5"
         },
         {
-          "command": "spring.configuration.navigate",
-          "when": "view == spring.configurations && viewItem == spring:configStruct",
+          "command": "summer.configuration.navigate",
+          "when": "view == summer.configurations && viewItem == summer:configStruct",
           "group": "inline@5"
         },
         {
-          "command": "spring.configuration.copyExample",
-          "when": "view == spring.configurations && viewItem == spring:configStruct",
+          "command": "summer.configuration.copyExample",
+          "when": "view == summer.configurations && viewItem == summer:configStruct",
           "group": "action@5"
         }
       ],
       "commandPalette": [
         {
-          "command": "spring-rs.app.run",
+          "command": "summer-rs.app.run",
           "when": "false"
         },
         {
-          "command": "spring-rs.app.debug",
+          "command": "summer-rs.app.debug",
           "when": "false"
         },
         {
-          "command": "spring-rs.app.stop",
+          "command": "summer-rs.app.stop",
           "when": "false"
         },
         {
-          "command": "spring-rs.app.open",
+          "command": "summer-rs.app.open",
           "when": "false"
         },
         {
-          "command": "spring-rs.app.runWithProfile",
+          "command": "summer-rs.app.runWithProfile",
           "when": "false"
         },
         {
-          "command": "spring-rs.app.debugWithProfile",
+          "command": "summer-rs.app.debugWithProfile",
           "when": "false"
         },
         {
-          "command": "spring.component.navigate",
+          "command": "summer.component.navigate",
           "when": "false"
         },
         {
-          "command": "spring.component.showDependencies",
+          "command": "summer.component.showDependencies",
           "when": "false"
         },
         {
-          "command": "spring.route.navigate",
+          "command": "summer.route.navigate",
           "when": "false"
         },
         {
-          "command": "spring.route.open",
+          "command": "summer.route.open",
           "when": "false"
         },
         {
-          "command": "spring.job.navigate",
+          "command": "summer.job.navigate",
           "when": "false"
         },
         {
-          "command": "spring.plugin.navigate",
+          "command": "summer.plugin.navigate",
           "when": "false"
         },
         {
-          "command": "spring.configuration.refresh",
+          "command": "summer.configuration.refresh",
           "when": "false"
         },
         {
-          "command": "spring.configuration.navigate",
+          "command": "summer.configuration.navigate",
           "when": "false"
         },
         {
-          "command": "spring.configuration.copyExample",
+          "command": "summer.configuration.copyExample",
           "when": "false"
         }
       ]
     },
     "configuration": {
       "type": "object",
-      "title": "Spring RS",
+      "title": "Summer RS",
       "properties": {
-        "spring-rs.serverPath": {
+        "summer-rs.serverPath": {
           "type": "string",
           "default": "",
-          "description": "Path to spring-lsp executable (leave empty to use bundled version or system PATH)"
+          "description": "Path to summer-lsp executable (leave empty to use bundled version or system PATH)"
         },
-        "spring-rs.openWith": {
+        "summer-rs.openWith": {
           "type": "string",
           "enum": [
             "integrated",
@@ -463,12 +463,12 @@
           "default": "integrated",
           "description": "Which browser to use when opening apps"
         },
-        "spring-rs.openUrl": {
+        "summer-rs.openUrl": {
           "type": "string",
           "default": "http://localhost:{port}{contextPath}",
           "description": "URL template for opening apps. Use {port} and {contextPath} as placeholders"
         },
-        "spring-rs.enableGutter": {
+        "summer-rs.enableGutter": {
           "type": "string",
           "enum": [
             "on",
@@ -477,7 +477,7 @@
           "default": "on",
           "description": "Show gutter icons in editors for components, routes, and jobs"
         },
-        "spring-rs.env": {
+        "summer-rs.env": {
           "type": "object",
           "default": {},
           "description": "Environment variables to set when running apps",
@@ -485,7 +485,7 @@
             "type": "string"
           }
         },
-        "spring-rs.trace.server": {
+        "summer-rs.trace.server": {
           "type": "string",
           "enum": [
             "off",
@@ -495,7 +495,7 @@
           "default": "off",
           "description": "Traces the communication between VS Code and the language server"
         },
-        "spring-lsp.componentsViewMode": {
+        "summer-lsp.componentsViewMode": {
           "type": "string",
           "enum": [
             "list",
@@ -508,7 +508,7 @@
           ],
           "description": "View mode for Components view"
         },
-        "spring-lsp.routesViewMode": {
+        "summer-lsp.routesViewMode": {
           "type": "string",
           "enum": [
             "list",
@@ -521,7 +521,7 @@
           ],
           "description": "View mode for Routes view"
         },
-        "spring-lsp.configurationsViewMode": {
+        "summer-lsp.configurationsViewMode": {
           "type": "string",
           "enum": [
             "list",
@@ -543,7 +543,7 @@
           ".toml"
         ],
         "filenames": [
-          ".spring-lsp.toml"
+          ".summer-lsp.toml"
         ]
       }
     ]

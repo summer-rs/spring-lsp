@@ -54,7 +54,7 @@ export class ComponentTreeItem extends vscode.TreeItem {
 
         // 点击时跳转到定义
         this.command = {
-            command: 'spring.component.navigate',
+            command: 'summer.component.navigate',
             title: 'Go to Definition',
             arguments: [this.component]
         };
@@ -131,7 +131,7 @@ export class DependencyTreeItem extends vscode.TreeItem {
 
         if (component) {
             this.command = {
-                command: 'spring.component.navigate',
+                command: 'summer.component.navigate',
                 title: 'Go to Definition',
                 arguments: [component]
             };
@@ -184,7 +184,7 @@ export class ComponentsDataProvider implements vscode.TreeDataProvider<vscode.Tr
 
         try {
             const response = await this.languageClient.sendRequest<{ components: Component[] }>(
-                'spring/components',
+                'summer/components',
                 { appPath: workspacePath }
             );
 

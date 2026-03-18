@@ -60,7 +60,7 @@ export class JobTreeItem extends vscode.TreeItem {
 
         // 点击时跳转到定义
         this.command = {
-            command: 'spring.job.navigate',
+            command: 'summer.job.navigate',
             title: 'Go to Definition',
             arguments: [this.job]
         };
@@ -157,7 +157,7 @@ export class JobsDataProvider implements vscode.TreeDataProvider<vscode.TreeItem
 
         try {
             const response = await this.languageClient.sendRequest<{ jobs: Job[] }>(
-                'spring/jobs',
+                'summer/jobs',
                 { appPath: workspacePath }
             );
 

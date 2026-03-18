@@ -34,7 +34,7 @@ export class GutterDecorationManager {
     // 监听配置变化
     this.disposables.push(
       vscode.workspace.onDidChangeConfiguration((e) => {
-        if (e.affectsConfiguration('spring-rs.enableGutter')) {
+        if (e.affectsConfiguration('summer-rs.enableGutter')) {
           this.updateConfiguration();
         }
       })
@@ -92,7 +92,7 @@ export class GutterDecorationManager {
    * 更新配置
    */
   private updateConfiguration(): void {
-    const config = vscode.workspace.getConfiguration('spring-rs');
+    const config = vscode.workspace.getConfiguration('summer-rs');
     const gutterOption = config.get<string>('enableGutter', 'on');
     const wasEnabled = this.enabled;
     this.enabled = gutterOption === 'on';
@@ -200,7 +200,7 @@ export class GutterDecorationManager {
         componentClassDecorations.push({
           range,
           hoverMessage: new vscode.MarkdownString(
-            `**Spring Component**\n\n${structName ? `Struct: \`${structName}\`` : 'This struct is registered as a component'}\n\n🔵 _Service derive macro_\n\nClick to see quick actions`
+            `**Summer Component**\n\n${structName ? `Struct: \`${structName}\`` : 'This struct is registered as a component'}\n\n🔵 _Service derive macro_\n\nClick to see quick actions`
           ),
         });
       }
@@ -212,7 +212,7 @@ export class GutterDecorationManager {
         componentFunctionDecorations.push({
           range,
           hoverMessage: new vscode.MarkdownString(
-            `**Spring Component**\n\n${functionName ? `Function: \`${functionName}\`` : 'This function is registered as a component'}\n\n🟣 _Component function macro_\n\nClick to see quick actions`
+            `**Summer Component**\n\n${functionName ? `Function: \`${functionName}\`` : 'This function is registered as a component'}\n\n🟣 _Component function macro_\n\nClick to see quick actions`
           ),
         });
       }
@@ -487,7 +487,7 @@ export class GutterDecorationManager {
   public registerCommands(): void {
     // 注册快速操作命令
     this.disposables.push(
-      vscode.commands.registerCommand('spring-rs.gutter.showActions', async () => {
+      vscode.commands.registerCommand('summer-rs.gutter.showActions', async () => {
         const editor = vscode.window.activeTextEditor;
         if (!editor) {
           return;

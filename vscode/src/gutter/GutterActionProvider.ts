@@ -198,13 +198,13 @@ export class GutterActionProvider {
 
       case 'showDependencies':
         // 显示依赖关系（通过 Components 视图）
-        await vscode.commands.executeCommand('spring.component.showDependencies', { name });
+        await vscode.commands.executeCommand('summer.component.showDependencies', { name });
         break;
 
       case 'openInBrowser':
         // 在浏览器中打开路由
         if (extra && extra.path) {
-          await vscode.commands.executeCommand('spring.route.open', { path: extra.path });
+          await vscode.commands.executeCommand('summer.route.open', { path: extra.path });
         }
         break;
 
@@ -218,7 +218,7 @@ export class GutterActionProvider {
       case 'copyConfigExample':
         // 复制配置示例 - 新增
         if (extra && extra.structName) {
-          await vscode.commands.executeCommand('spring.configuration.copyExample', {
+          await vscode.commands.executeCommand('summer.configuration.copyExample', {
             name: extra.structName,
             prefix: extra.configPrefix || extra.structName.toLowerCase()
           });
@@ -227,7 +227,7 @@ export class GutterActionProvider {
 
       case 'showInConfigView':
         // 在配置视图中显示 - 新增
-        await vscode.commands.executeCommand('spring.configuration.refresh');
+        await vscode.commands.executeCommand('summer.configuration.refresh');
         vscode.window.showInformationMessage('Configurations view refreshed');
         break;
 

@@ -3,7 +3,7 @@
 use super::*;
 use crate::macro_analyzer::{
     AutoConfigMacro, HttpMethod, InjectMacro, InjectType, JobMacro, RouteMacro, ServiceMacro,
-    SpringMacro,
+    SummerMacro,
 };
 use crate::schema::SchemaProvider;
 use crate::toml_analyzer::TomlAnalyzer;
@@ -44,7 +44,7 @@ fn test_complete_service_macro() {
         range: test_range(),
     };
 
-    let completions = engine.complete_macro(&SpringMacro::DeriveService(service_macro), None);
+    let completions = engine.complete_macro(&SummerMacro::DeriveService(service_macro), None);
 
     // 应该提供 3 个补全项：inject(component), inject(component = "name"), inject(config)
     assert_eq!(completions.len(), 3);
@@ -96,7 +96,7 @@ fn test_complete_inject_macro() {
         range: test_range(),
     };
 
-    let completions = engine.complete_macro(&SpringMacro::Inject(inject_macro), None);
+    let completions = engine.complete_macro(&SummerMacro::Inject(inject_macro), None);
 
     // 应该提供 2 个补全项：component, config
     assert_eq!(completions.len(), 2);
@@ -124,7 +124,7 @@ fn test_complete_auto_config_macro() {
         range: test_range(),
     };
 
-    let completions = engine.complete_macro(&SpringMacro::AutoConfig(auto_config_macro), None);
+    let completions = engine.complete_macro(&SummerMacro::AutoConfig(auto_config_macro), None);
 
     // 应该提供 3 个配置器类型补全
     assert_eq!(completions.len(), 3);
@@ -158,7 +158,7 @@ fn test_complete_route_macro() {
         is_openapi: false,
     };
 
-    let completions = engine.complete_macro(&SpringMacro::Route(route_macro), None);
+    let completions = engine.complete_macro(&SummerMacro::Route(route_macro), None);
 
     // 应该提供 HTTP 方法和路径参数补全
     assert!(completions.len() >= 7); // 至少 7 个 HTTP 方法
@@ -204,7 +204,7 @@ fn test_complete_job_macro_cron() {
         range: test_range(),
     };
 
-    let completions = engine.complete_macro(&SpringMacro::Job(job_macro), None);
+    let completions = engine.complete_macro(&SummerMacro::Job(job_macro), None);
 
     // 应该提供 cron 表达式和延迟/频率值补全
     assert!(completions.len() >= 6);
@@ -239,7 +239,7 @@ fn test_complete_job_macro_fix_delay() {
         range: test_range(),
     };
 
-    let completions = engine.complete_macro(&SpringMacro::Job(job_macro), None);
+    let completions = engine.complete_macro(&SummerMacro::Job(job_macro), None);
 
     // 应该提供延迟值补全
     assert!(completions.len() >= 3);
@@ -261,7 +261,7 @@ fn test_complete_job_macro_fix_rate() {
         range: test_range(),
     };
 
-    let completions = engine.complete_macro(&SpringMacro::Job(job_macro), None);
+    let completions = engine.complete_macro(&SummerMacro::Job(job_macro), None);
 
     // 应该提供频率值补全
     assert!(completions.len() >= 3);
@@ -281,21 +281,21 @@ fn test_completion_items_have_documentation() {
 
     // 测试所有宏类型的补全项都有文档
     let test_cases = vec![
-        SpringMacro::DeriveService(ServiceMacro {
+        SummerMacro::DeriveService(ServiceMacro {
             struct_name: "Test".to_string(),
             fields: vec![],
             range: test_range(),
         }),
-        SpringMacro::Inject(InjectMacro {
+        SummerMacro::Inject(InjectMacro {
             inject_type: InjectType::Component,
             component_name: None,
             range: test_range(),
         }),
-        SpringMacro::AutoConfig(AutoConfigMacro {
+        SummerMacro::AutoConfig(AutoConfigMacro {
             configurator_type: "".to_string(),
             range: test_range(),
         }),
-        SpringMacro::Route(RouteMacro {
+        SummerMacro::Route(RouteMacro {
             path: "/test".to_string(),
             methods: vec![HttpMethod::Get],
             middlewares: vec![],
@@ -303,7 +303,7 @@ fn test_completion_items_have_documentation() {
             range: test_range(),
             is_openapi: false,
         }),
-        SpringMacro::Job(JobMacro::Cron {
+        SummerMacro::Job(JobMacro::Cron {
             expression: "".to_string(),
             range: test_range(),
         }),
@@ -339,7 +339,7 @@ fn test_completion_items_have_correct_kind() {
 
     // Service 宏的补全项应该是 PROPERTY 类型
     let service_completions = engine.complete_macro(
-        &SpringMacro::DeriveService(ServiceMacro {
+        &SummerMacro::DeriveService(ServiceMacro {
             struct_name: "Test".to_string(),
             fields: vec![],
             range: test_range(),
@@ -356,7 +356,7 @@ fn test_completion_items_have_correct_kind() {
 
     // Inject 宏的补全项应该是 KEYWORD 类型
     let inject_completions = engine.complete_macro(
-        &SpringMacro::Inject(InjectMacro {
+        &SummerMacro::Inject(InjectMacro {
             inject_type: InjectType::Component,
             component_name: None,
             range: test_range(),
@@ -373,7 +373,7 @@ fn test_completion_items_have_correct_kind() {
 
     // AutoConfig 宏的补全项应该是 CLASS 类型
     let auto_config_completions = engine.complete_macro(
-        &SpringMacro::AutoConfig(AutoConfigMacro {
+        &SummerMacro::AutoConfig(AutoConfigMacro {
             configurator_type: "".to_string(),
             range: test_range(),
         }),
@@ -435,7 +435,7 @@ fn test_complete_with_macro_context() {
         CompletionContext::Macro,
         position,
         None,
-        Some(&SpringMacro::DeriveService(service_macro)),
+        Some(&SummerMacro::DeriveService(service_macro)),
     );
 
     // 应该返回 Service 宏的补全项
@@ -498,7 +498,7 @@ fn test_complete_dispatches_to_correct_handler() {
     // 测试不同的宏类型都能正确分发
     let test_cases = vec![
         (
-            SpringMacro::DeriveService(ServiceMacro {
+            SummerMacro::DeriveService(ServiceMacro {
                 struct_name: "Test".to_string(),
                 fields: vec![],
                 range: test_range(),
@@ -506,7 +506,7 @@ fn test_complete_dispatches_to_correct_handler() {
             3, // Service 宏应该返回 3 个补全项
         ),
         (
-            SpringMacro::Inject(InjectMacro {
+            SummerMacro::Inject(InjectMacro {
                 inject_type: InjectType::Component,
                 component_name: None,
                 range: test_range(),
@@ -514,7 +514,7 @@ fn test_complete_dispatches_to_correct_handler() {
             2, // Inject 宏应该返回 2 个补全项
         ),
         (
-            SpringMacro::AutoConfig(AutoConfigMacro {
+            SummerMacro::AutoConfig(AutoConfigMacro {
                 configurator_type: "".to_string(),
                 range: test_range(),
             }),
@@ -1037,7 +1037,6 @@ mod property_tests {
         ) {
             // 创建一个包含多个插件的 Schema
             let mut schema = crate::schema::ConfigSchema {
-                schema_type: "object".to_string(),
                 plugins: HashMap::new(),
             };
 
@@ -1101,7 +1100,6 @@ mod property_tests {
             }
 
             let mut schema = crate::schema::ConfigSchema {
-                schema_type: "object".to_string(),
                 plugins: HashMap::new(),
             };
             schema.plugins.insert(
@@ -1276,7 +1274,7 @@ mod property_tests {
             }
 
             let mut schema = crate::schema::ConfigSchema {
-                schema_type: "object".to_string(),
+
                 plugins: HashMap::new(),
             };
             schema.plugins.insert(
@@ -1354,7 +1352,7 @@ mod property_tests {
             }
 
             let mut schema = crate::schema::ConfigSchema {
-                schema_type: "object".to_string(),
+
                 plugins: HashMap::new(),
             };
             schema.plugins.insert(
@@ -1654,7 +1652,7 @@ fn test_macro_parameter_insertion_completeness() {
         range: test_range(),
     };
 
-    let completions = engine.complete_macro(&SpringMacro::DeriveService(service_macro), None);
+    let completions = engine.complete_macro(&SummerMacro::DeriveService(service_macro), None);
 
     // 验证带名称的组件注入使用 snippet 格式
     let named_inject = completions
@@ -1689,7 +1687,7 @@ fn test_route_macro_path_parameter_snippet() {
         is_openapi: false,
     };
 
-    let completions = engine.complete_macro(&SpringMacro::Route(route_macro), None);
+    let completions = engine.complete_macro(&SummerMacro::Route(route_macro), None);
 
     // 查找路径参数补全
     let path_param = completions

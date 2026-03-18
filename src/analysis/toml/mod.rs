@@ -4,4 +4,6 @@
 
 pub mod toml_analyzer;
 
-pub use toml_analyzer::TomlAnalyzer;
+pub use toml_analyzer::{
+    ConfigProperty, ConfigSection, ConfigValue, EnvVarReference, TomlAnalyzer, TomlDocument,
+};

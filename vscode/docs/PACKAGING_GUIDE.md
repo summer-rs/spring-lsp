@@ -2,10 +2,10 @@
 
 ## 概述
 
-Spring LSP 扩展支持两种使用方式：
+Summer LSP 扩展支持两种使用方式：
 
 1. **捆绑模式**（推荐）- 语言服务器二进制文件打包在扩展中
-2. **独立安装模式** - 用户需要单独安装 spring-lsp
+2. **独立安装模式** - 用户需要单独安装 summer-lsp
 
 ## 方案对比
 
@@ -35,13 +35,13 @@ Spring LSP 扩展支持两种使用方式：
 ### 1. 项目结构
 
 ```
-spring-lsp/
+summer-lsp/
 ├── vscode/
 │   ├── bin/                    # 语言服务器二进制文件（打包时添加）
-│   │   ├── spring-lsp-linux-x64
-│   │   ├── spring-lsp-darwin-x64
-│   │   ├── spring-lsp-darwin-arm64
-│   │   └── spring-lsp-win32-x64.exe
+│   │   ├── summer-lsp-linux-x64
+│   │   ├── summer-lsp-darwin-x64
+│   │   ├── summer-lsp-darwin-arm64
+│   │   └── summer-lsp-win32-x64.exe
 │   ├── src/
 │   ├── scripts/
 │   │   ├── build-server.sh     # 构建语言服务器
@@ -63,7 +63,7 @@ spring-lsp/
 
 set -e
 
-echo "🔨 Building Spring LSP server for all platforms..."
+echo "🔨 Building Summer LSP server for all platforms..."
 
 # 进入语言服务器目录
 cd ..
@@ -92,17 +92,17 @@ for target in "${TARGETS[@]}"; do
   # 复制到 bin 目录
   case "$target" in
     *linux*)
-      cp "target/$target/release/spring-lsp" "vscode/bin/spring-lsp-linux-x64"
+      cp "target/$target/release/summer-lsp" "vscode/bin/summer-lsp-linux-x64"
       ;;
     *darwin*)
       if [[ "$target" == *"aarch64"* ]]; then
-        cp "target/$target/release/spring-lsp" "vscode/bin/spring-lsp-darwin-arm64"
+        cp "target/$target/release/summer-lsp" "vscode/bin/summer-lsp-darwin-arm64"
       else
-        cp "target/$target/release/spring-lsp" "vscode/bin/spring-lsp-darwin-x64"
+        cp "target/$target/release/summer-lsp" "vscode/bin/summer-lsp-darwin-x64"
       fi
       ;;
     *windows*)
-      cp "target/$target/release/spring-lsp.exe" "vscode/bin/spring-lsp-win32-x64.exe"
+      cp "target/$target/release/summer-lsp.exe" "vscode/bin/summer-lsp-win32-x64.exe"
       ;;
   esac
 done
@@ -121,7 +121,7 @@ ls -lh vscode/bin/
 
 set -e
 
-echo "📦 Packaging Spring LSP extension..."
+echo "📦 Packaging Summer LSP extension..."
 
 # 1. 构建语言服务器（如果需要）
 if [ ! -d "bin" ] || [ -z "$(ls -A bin)" ]; then
@@ -156,16 +156,16 @@ set -e
 
 VERSION=${1:-latest}
 
-echo "📥 Downloading Spring LSP server binaries (version: $VERSION)..."
+echo "📥 Downloading Summer LSP server binaries (version: $VERSION)..."
 
 # 创建 bin 目录
 mkdir -p bin
 
 # GitHub Release URL
 if [ "$VERSION" = "latest" ]; then
-  RELEASE_URL="https://api.github.com/repos/spring-rs/spring-lsp/releases/latest"
+  RELEASE_URL="https://api.github.com/repos/summer-rs/summer-lsp/releases/latest"
 else
-  RELEASE_URL="https://api.github.com/repos/spring-rs/spring-lsp/releases/tags/$VERSION"
+  RELEASE_URL="https://api.github.com/repos/summer-rs/summer-lsp/releases/tags/$VERSION"
 fi
 
 # 获取下载链接
@@ -180,7 +180,7 @@ for asset in $ASSETS; do
 done
 
 # 设置执行权限
-chmod +x bin/spring-lsp-*
+chmod +x bin/summer-lsp-*
 
 echo "✅ Download complete!"
 ls -lh bin/
@@ -246,7 +246,7 @@ scripts/**
 ```typescript
 private async findServerExecutable(): Promise<string | undefined> {
   // 1. 检查配置中指定的路径
-  const config = vscode.workspace.getConfiguration('spring-rs');
+  const config = vscode.workspace.getConfiguration('summer-rs');
   const configPath = config.get<string>('serverPath');
 
   if (configPath) {
@@ -277,7 +277,7 @@ private async findServerExecutable(): Promise<string | undefined> {
   }
 
   // 3. 检查系统 PATH
-  const pathResult = await this.findInPath('spring-lsp');
+  const pathResult = await this.findInPath('summer-lsp');
   if (pathResult) {
     return pathResult;
   }
@@ -293,13 +293,13 @@ private getPlatformBinaryName(): string {
   const arch = process.arch;
 
   if (platform === 'win32') {
-    return 'spring-lsp-win32-x64.exe';
+    return 'summer-lsp-win32-x64.exe';
   } else if (platform === 'darwin') {
     return arch === 'arm64' 
-      ? 'spring-lsp-darwin-arm64' 
-      : 'spring-lsp-darwin-x64';
+      ? 'summer-lsp-darwin-arm64' 
+      : 'summer-lsp-darwin-x64';
   } else {
-    return 'spring-lsp-linux-x64';
+    return 'summer-lsp-linux-x64';
   }
 }
 ```
@@ -309,7 +309,7 @@ private getPlatformBinaryName(): string {
 ### 开发环境打包
 
 ```bash
-cd spring-lsp/vscode
+cd summer-lsp/vscode
 
 # 方法 1: 完整构建（推荐）
 npm run package
@@ -343,16 +343,16 @@ jobs:
         include:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
-            artifact: spring-lsp-linux-x64
+            artifact: summer-lsp-linux-x64
           - os: macos-latest
             target: x86_64-apple-darwin
-            artifact: spring-lsp-darwin-x64
+            artifact: summer-lsp-darwin-x64
           - os: macos-latest
             target: aarch64-apple-darwin
-            artifact: spring-lsp-darwin-arm64
+            artifact: summer-lsp-darwin-arm64
           - os: windows-latest
             target: x86_64-pc-windows-msvc
-            artifact: spring-lsp-win32-x64.exe
+            artifact: summer-lsp-win32-x64.exe
 
     runs-on: ${{ matrix.os }}
 
@@ -372,7 +372,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.artifact }}
-          path: target/${{ matrix.target }}/release/spring-lsp*
+          path: target/${{ matrix.target }}/release/summer-lsp*
 
   package-extension:
     needs: build-server
@@ -409,7 +409,7 @@ jobs:
       - name: Upload VSIX
         uses: actions/upload-artifact@v3
         with:
-          name: spring-rs-extension
+          name: summer-rs-extension
           path: vscode/*.vsix
       
       - name: Create Release
@@ -423,7 +423,7 @@ jobs:
 ### 捆绑模式（推荐）
 
 用户只需：
-1. 在 VSCode Marketplace 搜索 "Spring RS"
+1. 在 VSCode Marketplace 搜索 "Summer RS"
 2. 点击安装
 3. 立即使用 ✅
 
@@ -434,12 +434,12 @@ jobs:
 1. 安装扩展
 2. 安装语言服务器：
    ```bash
-   cargo install spring-lsp
+   cargo install summer-lsp
    ```
 3. 配置路径（可选）：
    ```json
    {
-     "spring-rs.serverPath": "/path/to/spring-lsp"
+     "summer-rs.serverPath": "/path/to/summer-lsp"
    }
    ```
 
@@ -479,16 +479,16 @@ version = "0.1.0"
 npm run package
 
 # 2. 安装 VSIX
-code --install-extension spring-rs-0.1.0.vsix
+code --install-extension summer-rs-0.1.0.vsix
 
 # 3. 重启 VSCode
 
-# 4. 打开一个 spring-rs 项目
+# 4. 打开一个 summer-rs 项目
 
 # 5. 检查 Output 面板
-# View → Output → 选择 "Spring LSP"
+# View → Output → 选择 "Summer LSP"
 # 应该看到：
-# Found Spring LSP server at: /path/to/extension/bin/spring-lsp-xxx
+# Found Summer LSP server at: /path/to/extension/bin/summer-lsp-xxx
 ```
 
 ### 测试独立安装
@@ -498,11 +498,11 @@ code --install-extension spring-rs-0.1.0.vsix
 cargo install --path .
 
 # 2. 验证安装
-spring-lsp --version
+summer-lsp --version
 
 # 3. 安装扩展（不包含服务器）
 npm run package:quick
-code --install-extension spring-rs-0.1.0.vsix
+code --install-extension summer-rs-0.1.0.vsix
 
 # 4. 重启 VSCode
 
@@ -521,7 +521,7 @@ code --install-extension spring-rs-0.1.0.vsix
 3. 手动配置路径：
    ```json
    {
-     "spring-rs.serverPath": "/path/to/spring-lsp"
+     "summer-rs.serverPath": "/path/to/summer-lsp"
    }
    ```
 
@@ -531,7 +531,7 @@ code --install-extension spring-rs-0.1.0.vsix
 
 **解决方案**:
 ```bash
-chmod +x ~/.vscode/extensions/spring-rs.spring-rs-*/bin/spring-lsp-*
+chmod +x ~/.vscode/extensions/summer-rs.summer-rs-*/bin/summer-lsp-*
 ```
 
 ### 平台不匹配
@@ -546,8 +546,8 @@ chmod +x ~/.vscode/extensions/spring-rs.spring-rs-*/bin/spring-lsp-*
 
 ```json
 {
-  "spring-rs.serverPath": "/path/to/dev/spring-lsp/target/release/spring-lsp",
-  "spring-rs.trace.server": "verbose"
+  "summer-rs.serverPath": "/path/to/dev/summer-lsp/target/release/summer-lsp",
+  "summer-rs.trace.server": "verbose"
 }
 ```
 

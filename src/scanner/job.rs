@@ -2,7 +2,7 @@
 //!
 //! 扫描项目中的所有定时任务定义（带有 #[cron], #[fix_delay], #[fix_rate] 的函数）
 
-use crate::analysis::rust::macro_analyzer::{JobMacro, MacroAnalyzer, SpringMacro};
+use crate::analysis::rust::macro_analyzer::{JobMacro, MacroAnalyzer, SummerMacro};
 use crate::protocol::types::{LocationResponse, PositionResponse, RangeResponse};
 use lsp_types::Url;
 use serde::{Deserialize, Serialize};
@@ -87,8 +87,8 @@ impl JobScanner {
             };
 
             // 提取任务信息
-            for spring_macro in &rust_doc.macros {
-                if let SpringMacro::Job(job_macro) = spring_macro {
+            for summer_macro in &rust_doc.macros {
+                if let SummerMacro::Job(job_macro) = summer_macro {
                     let (job_type, schedule) = match job_macro {
                         JobMacro::Cron { expression, .. } => (JobType::Cron, expression.clone()),
                         JobMacro::FixDelay { seconds, .. } => {
@@ -162,7 +162,7 @@ pub struct JobInfoResponse {
     pub location: LocationResponse,
 }
 
-/// spring/jobs 请求参数
+/// summer/jobs 请求参数
 #[derive(Debug, Deserialize)]
 pub struct JobsRequest {
     /// 应用路径
@@ -170,7 +170,7 @@ pub struct JobsRequest {
     pub app_path: String,
 }
 
-/// spring/jobs 响应
+/// summer/jobs 响应
 #[derive(Debug, Serialize)]
 pub struct JobsResponse {
     /// 任务列表

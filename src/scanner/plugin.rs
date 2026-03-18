@@ -133,7 +133,7 @@ pub struct PluginInfoResponse {
     pub location: LocationResponse,
 }
 
-/// spring/plugins 请求参数
+/// summer/plugins 请求参数
 #[derive(Debug, Deserialize)]
 pub struct PluginsRequest {
     /// 应用路径
@@ -141,7 +141,7 @@ pub struct PluginsRequest {
     pub app_path: String,
 }
 
-/// spring/plugins 响应
+/// summer/plugins 响应
 #[derive(Debug, Serialize)]
 pub struct PluginsResponse {
     /// 插件列表

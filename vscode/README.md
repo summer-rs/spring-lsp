@@ -1,16 +1,16 @@
-# Spring RS
+# Summer RS
 
-[![Version](https://img.shields.io/visual-studio-marketplace/v/holmofy.spring-rs)](https://marketplace.visualstudio.com/items?itemName=holmofy.spring-rs)
-[![Installs](https://img.shields.io/visual-studio-marketplace/i/holmofy.spring-rs)](https://marketplace.visualstudio.com/items?itemName=holmofy.spring-rs)
-[![Rating](https://img.shields.io/visual-studio-marketplace/r/holmofy.spring-rs)](https://marketplace.visualstudio.com/items?itemName=holmofy.spring-rs)
+[![Version](https://img.shields.io/visual-studio-marketplace/v/holmofy.summer-rs)](https://marketplace.visualstudio.com/items?itemName=holmofy.summer-rs)
+[![Installs](https://img.shields.io/visual-studio-marketplace/i/holmofy.summer-rs)](https://marketplace.visualstudio.com/items?itemName=holmofy.summer-rs)
+[![Rating](https://img.shields.io/visual-studio-marketplace/r/holmofy.summer-rs)](https://marketplace.visualstudio.com/items?itemName=holmofy.summer-rs)
 
-Language Server Protocol support and application management for the [spring-rs](https://spring-rs.github.io/) framework.
+Language Server Protocol support and application management for the [summer-rs](https://summer-rs.github.io/) framework.
 
 ## Features
 
 ### 🚀 Application Management
 
-- **Auto-detect** spring-rs applications in your workspace
+- **Auto-detect** summer-rs applications in your workspace
 - **Run/Debug** applications with one click
 - **Profile support** - easily switch between development, production, and custom profiles
 - **Port detection** - automatically detect and display application ports
@@ -37,7 +37,7 @@ Visualize component dependencies with an interactive graph powered by D3.js:
 ### 🎯 Smart TOML Configuration Support
 
 - **Intelligent completion** for `config/app.toml` files
-- **Schema validation** based on spring-rs configuration metadata
+- **Schema validation** based on summer-rs configuration metadata
 - **Environment variable** interpolation support (`${VAR:default}`)
 - **Jump to definition** from configuration to Rust code
 
@@ -54,18 +54,18 @@ Visualize component dependencies with an interactive graph powered by D3.js:
 
 - Visual Studio Code 1.75.0 or higher
 - Rust toolchain (rustc, cargo)
-- [spring-lsp](https://github.com/spring-rs/spring-lsp) language server (optional, bundled with extension)
+- [summer-lsp](https://github.com/summer-rs/summer-lsp) language server (optional, bundled with extension)
 
 ### From VS Code Marketplace
 
 1. Open VS Code
 2. Go to Extensions (Ctrl+Shift+X / Cmd+Shift+X)
-3. Search for "Spring RS"
+3. Search for "Summer RS"
 4. Click Install
 
 ### From VSIX
 
-1. Download the latest `.vsix` file from [Releases](https://github.com/spring-rs/spring-lsp/releases)
+1. Download the latest `.vsix` file from [Releases](https://github.com/summer-rs/summer-lsp/releases)
 2. Open VS Code
 3. Go to Extensions
 4. Click "..." menu → "Install from VSIX..."
@@ -73,19 +73,19 @@ Visualize component dependencies with an interactive graph powered by D3.js:
 
 ## Getting Started
 
-### 1. Create a spring-rs Project
+### 1. Create a summer-rs Project
 
 ```bash
-cargo new my-spring-app
-cd my-spring-app
+cargo new my-summer-app
+cd my-summer-app
 ```
 
-Add spring-rs to your `Cargo.toml`:
+Add summer-rs to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-spring = "0.1"
-spring-web = "0.1"
+summer = "0.1"
+summer-web = "0.1"
 tokio = { version = "1", features = ["full"] }
 ```
 
@@ -102,13 +102,13 @@ port = 8080
 ### 3. Write Your Application
 
 ```rust
-use spring::App;
-use spring_web::{get, WebPlugin};
-use spring_web::axum::response::IntoResponse;
+use summer::App;
+use summer_web::{get, WebPlugin};
+use summer_web::axum::response::IntoResponse;
 
 #[get("/")]
 async fn hello() -> impl IntoResponse {
-    "Hello, Spring RS!"
+    "Hello, Summer RS!"
 }
 
 #[tokio::main]
@@ -123,8 +123,8 @@ async fn main() {
 ### 4. Use the Extension
 
 1. Open your project in VS Code
-2. The extension will automatically detect your spring-rs application
-3. Click the Spring RS icon in the Activity Bar
+2. The extension will automatically detect your summer-rs application
+3. Click the Summer RS icon in the Activity Bar
 4. Click the ▶️ (Run) button next to your app
 5. Once running, explore Components, Routes, and other views
 
@@ -134,23 +134,23 @@ async fn main() {
 
 This extension contributes the following settings:
 
-- `spring-rs.serverPath`: Path to spring-lsp executable (leave empty to use bundled version)
-- `spring-rs.openWith`: Browser to use when opening apps (`integrated` or `external`)
-- `spring-rs.openUrl`: URL template for opening apps (default: `http://localhost:{port}{contextPath}`)
-- `spring-rs.enableGutter`: Show gutter icons in editors (`on` or `off`)
-- `spring-rs.env`: Environment variables to set when running apps
-- `spring-rs.trace.server`: Trace LSP communication (`off`, `messages`, or `verbose`)
+- `summer-rs.serverPath`: Path to summer-lsp executable (leave empty to use bundled version)
+- `summer-rs.openWith`: Browser to use when opening apps (`integrated` or `external`)
+- `summer-rs.openUrl`: URL template for opening apps (default: `http://localhost:{port}{contextPath}`)
+- `summer-rs.enableGutter`: Show gutter icons in editors (`on` or `off`)
+- `summer-rs.env`: Environment variables to set when running apps
+- `summer-rs.trace.server`: Trace LSP communication (`off`, `messages`, or `verbose`)
 
 ### Example Configuration
 
 ```json
 {
-  "spring-rs.openWith": "external",
-  "spring-rs.env": {
+  "summer-rs.openWith": "external",
+  "summer-rs.env": {
     "RUST_LOG": "debug",
     "DATABASE_URL": "postgres://localhost/mydb"
   },
-  "spring-rs.trace.server": "messages"
+  "summer-rs.trace.server": "messages"
 }
 ```
 
@@ -209,7 +209,7 @@ Once an application is running:
 **Custom URL Template:**
 ```json
 {
-  "spring-rs.openUrl": "https://myapp.local:{port}{contextPath}"
+  "summer-rs.openUrl": "https://myapp.local:{port}{contextPath}"
 }
 ```
 
@@ -219,7 +219,7 @@ Once an application is running:
 |---------|----------|-------------|
 | Refresh Apps | - | Refresh the application list |
 | Show Welcome | - | Show the welcome page |
-| Open Documentation | - | Open spring-rs documentation |
+| Open Documentation | - | Open summer-rs documentation |
 
 You can customize shortcuts in VS Code's Keyboard Shortcuts editor.
 
@@ -230,39 +230,39 @@ You can customize shortcuts in VS Code's Keyboard Shortcuts editor.
 **Problem:** Extension shows "Language server failed to start"
 
 **Solutions:**
-1. Check if `spring-lsp` is installed:
+1. Check if `summer-lsp` is installed:
    ```bash
-   spring-lsp --version
+   summer-lsp --version
    ```
 
 2. Specify the path manually:
    ```json
    {
-     "spring-rs.serverPath": "/path/to/spring-lsp"
+     "summer-rs.serverPath": "/path/to/summer-lsp"
    }
    ```
 
 3. Install from source:
    ```bash
-   cargo install spring-lsp
+   cargo install summer-lsp
    ```
 
 ### Application Not Detected
 
-**Problem:** Your spring-rs app doesn't appear in the Apps view
+**Problem:** Your summer-rs app doesn't appear in the Apps view
 
 **Solutions:**
-1. Ensure `Cargo.toml` includes spring-rs dependencies:
+1. Ensure `Cargo.toml` includes summer-rs dependencies:
    ```toml
    [dependencies]
-   spring = "0.1"
+   summer = "0.1"
    ```
 
 2. Ensure your crate is a binary (has `src/main.rs` or `[[bin]]` section)
 
 3. Click the refresh button in the Apps view
 
-4. Check the Output panel (View → Output → Spring RS) for errors
+4. Check the Output panel (View → Output → Summer RS) for errors
 
 ### Port Detection Issues
 
@@ -296,18 +296,18 @@ You can customize shortcuts in VS Code's Keyboard Shortcuts editor.
 - Code snippets are not yet available
 - Multi-workspace support is limited
 
-See the [issue tracker](https://github.com/spring-rs/spring-lsp/issues) for a complete list.
+See the [issue tracker](https://github.com/summer-rs/summer-lsp/issues) for a complete list.
 
 ## Contributing
 
-Contributions are welcome! Please see [CONTRIBUTING.md](https://github.com/spring-rs/spring-lsp/blob/main/CONTRIBUTING.md) for details.
+Contributions are welcome! Please see [CONTRIBUTING.md](https://github.com/summer-rs/summer-lsp/blob/main/CONTRIBUTING.md) for details.
 
 ### Development Setup
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/spring-rs/spring-lsp.git
-   cd spring-lsp/vscode
+   git clone https://github.com/summer-rs/summer-lsp.git
+   cd summer-lsp/vscode
    ```
 
 2. Install dependencies:
@@ -341,9 +341,9 @@ For detailed debugging instructions, see [DEBUG_EXTENSION.md](DEBUG_EXTENSION.md
 
 ## Resources
 
-- [spring-rs Documentation](https://spring-rs.github.io/)
-- [spring-lsp GitHub](https://github.com/spring-rs/spring-lsp)
-- [Issue Tracker](https://github.com/spring-rs/spring-lsp/issues)
+- [summer-rs Documentation](https://summer-rs.github.io/)
+- [summer-lsp GitHub](https://github.com/summer-rs/summer-lsp)
+- [Issue Tracker](https://github.com/summer-rs/summer-lsp/issues)
 - [Changelog](CHANGELOG.md)
 
 ## License
@@ -361,8 +361,8 @@ This extension is inspired by:
 - [vscode-spring-boot-dashboard](https://github.com/microsoft/vscode-spring-boot-dashboard) - Microsoft's Spring Boot Dashboard
 - [spring-tools](https://github.com/spring-projects/sts4) - Spring Tools for various IDEs
 
-Special thanks to the spring-rs community and all contributors!
+Special thanks to the summer-rs community and all contributors!
 
 ---
 
-**Enjoy coding with Spring RS! 🚀**
+**Enjoy coding with Summer RS! 🚀**

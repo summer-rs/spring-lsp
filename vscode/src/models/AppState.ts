@@ -1,7 +1,7 @@
 /**
  * 应用状态枚举
  * 
- * 定义 Spring RS 应用的所有可能状态
+ * 定义 Summer RS 应用的所有可能状态
  */
 export enum AppState {
   /**

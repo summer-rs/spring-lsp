@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
-import { SpringApp, AppState } from '../models';
+import { SummerApp, AppState } from '../models';
 import { LocalAppManager } from '../controllers';
 
 /**
  * Apps 树视图数据提供者
  * 
- * 负责显示工作空间中的 Spring RS 应用列表，并支持选择当前要查看的应用
+ * 负责显示工作空间中的 Summer RS 应用列表，并支持选择当前要查看的应用
  */
 export class AppsTreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
   /**
@@ -22,12 +22,12 @@ export class AppsTreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
   /**
    * 应用选择事件发射器
    */
-  private _onDidSelectApp = new vscode.EventEmitter<SpringApp>();
+  private _onDidSelectApp = new vscode.EventEmitter<SummerApp>();
 
   /**
    * 应用选择事件
    */
-  readonly onDidSelectApp: vscode.Event<SpringApp> = this._onDidSelectApp.event;
+  readonly onDidSelectApp: vscode.Event<SummerApp> = this._onDidSelectApp.event;
 
   /**
    * 应用管理器
@@ -37,7 +37,7 @@ export class AppsTreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
   /**
    * 当前选中的应用
    */
-  private selectedApp: SpringApp | undefined;
+  private selectedApp: SummerApp | undefined;
 
   /**
    * 创建 AppsTreeDataProvider 实例
@@ -75,7 +75,7 @@ export class AppsTreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
    * 
    * @param app 要选择的应用
    */
-  public selectApp(app: SpringApp): void {
+  public selectApp(app: SummerApp): void {
     if (this.selectedApp === app) {
       return;
     }
@@ -92,7 +92,7 @@ export class AppsTreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
    * 
    * @returns 当前选中的应用，如果没有选中则返回 undefined
    */
-  public getSelectedApp(): SpringApp | undefined {
+  public getSelectedApp(): SummerApp | undefined {
     return this.selectedApp;
   }
 
@@ -197,7 +197,7 @@ export class AppTreeItem extends vscode.TreeItem {
   /**
    * 应用实例
    */
-  public readonly app: SpringApp;
+  public readonly app: SummerApp;
 
   /**
    * 是否为当前选中的应用
@@ -210,7 +210,7 @@ export class AppTreeItem extends vscode.TreeItem {
    * @param app 应用实例
    * @param isSelected 是否为当前选中的应用
    */
-  constructor(app: SpringApp, isSelected: boolean = false) {
+  constructor(app: SummerApp, isSelected: boolean = false) {
     super(app.getDisplayName(), vscode.TreeItemCollapsibleState.Collapsed);
 
     this.app = app;
@@ -218,8 +218,8 @@ export class AppTreeItem extends vscode.TreeItem {
 
     // 设置上下文值（用于命令菜单）
     this.contextValue = isSelected 
-      ? `SpringApp_${app.state}_selected` 
-      : `SpringApp_${app.state}`;
+      ? `SummerApp_${app.state}_selected` 
+      : `SummerApp_${app.state}`;
 
     // 设置工具提示
     this.tooltip = this.buildTooltip();
@@ -272,10 +272,10 @@ export class AppTreeItem extends vscode.TreeItem {
     // 添加依赖信息
     if (this.app.dependencies.length > 0) {
       tooltip.appendMarkdown(`**Dependencies:**\n`);
-      const springDeps = this.app.dependencies.filter((dep) =>
-        dep.startsWith('spring')
+      const summerDeps = this.app.dependencies.filter((dep) =>
+        dep.startsWith('summer')
       );
-      springDeps.forEach((dep) => {
+      summerDeps.forEach((dep) => {
         tooltip.appendMarkdown(`- ${dep}\n`);
       });
     }

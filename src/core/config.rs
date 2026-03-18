@@ -1,6 +1,6 @@
 //! 服务器配置管理
 //!
-//! 本模块提供 spring-lsp 服务器的配置管理功能，支持：
+//! 本模块提供 summer-lsp 服务器的配置管理功能，支持：
 //! - 从配置文件读取用户配置
 //! - 自定义补全触发字符
 //! - 诊断过滤配置
@@ -9,9 +9,9 @@
 //!
 //! ## 配置文件
 //!
-//! spring-lsp 支持从以下位置读取配置文件（按优先级排序）：
-//! 1. 工作空间根目录下的 `.spring-lsp.toml`
-//! 2. 用户主目录下的 `.config/spring-lsp/config.toml`
+//! summer-lsp 支持从以下位置读取配置文件（按优先级排序）：
+//! 1. 工作空间根目录下的 `.summer-lsp.toml`
+//! 2. 用户主目录下的 `.config/summer-lsp/config.toml`
 //! 3. 环境变量配置
 //! 4. 默认配置
 //!
@@ -22,7 +22,7 @@
 //! [logging]
 //! level = "info"  # trace, debug, info, warn, error
 //! verbose = false
-//! log_file = "/tmp/spring-lsp.log"  # 可选
+//! log_file = "/tmp/summer-lsp.log"  # 可选
 //!
 //! # 补全配置
 //! [completion]
@@ -35,7 +35,7 @@
 //!
 //! # Schema 配置
 //! [schema]
-//! url = "https://spring-rs.github.io/config-schema.json"
+//! url = "https://summer-rs.github.io/config-schema.json"
 //! # 或使用本地文件
 //! # url = "file:///path/to/schema.json"
 //! ```
@@ -43,10 +43,10 @@
 //! ## 环境变量
 //!
 //! 环境变量会覆盖配置文件中的设置：
-//! - `SPRING_LSP_LOG_LEVEL`: 日志级别
-//! - `SPRING_LSP_VERBOSE`: 启用详细日志
-//! - `SPRING_LSP_LOG_FILE`: 日志文件路径
-//! - `SPRING_LSP_SCHEMA_URL`: Schema URL
+//! - `SUMMER_LSP_LOG_LEVEL`: 日志级别
+//! - `SUMMER_LSP_VERBOSE`: 启用详细日志
+//! - `SUMMER_LSP_LOG_FILE`: 日志文件路径
+//! - `SUMMER_LSP_SCHEMA_URL`: Schema URL
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
@@ -88,7 +88,7 @@ impl ServerConfig {
 
         // 2. 尝试加载工作空间配置
         if let Some(workspace_root) = workspace_root {
-            let workspace_config_path = workspace_root.join(".spring-lsp.toml");
+            let workspace_config_path = workspace_root.join(".summer-lsp.toml");
             if let Ok(workspace_config) = Self::load_from_file(&workspace_config_path) {
                 config = config.merge(workspace_config);
             }
@@ -110,7 +110,7 @@ impl ServerConfig {
 
     /// 获取用户配置文件路径
     fn user_config_path() -> Option<PathBuf> {
-        dirs::config_dir().map(|dir| dir.join("spring-lsp").join("config.toml"))
+        dirs::config_dir().map(|dir| dir.join("summer-lsp").join("config.toml"))
     }
 
     /// 合并另一个配置（other 的值会覆盖 self 的值）
@@ -170,13 +170,13 @@ impl LoggingConfig {
     }
 
     fn apply_env_overrides(mut self) -> Self {
-        if let Ok(level) = env::var("SPRING_LSP_LOG_LEVEL") {
+        if let Ok(level) = env::var("SUMMER_LSP_LOG_LEVEL") {
             self.level = level.to_lowercase();
         }
-        if let Ok(verbose) = env::var("SPRING_LSP_VERBOSE") {
+        if let Ok(verbose) = env::var("SUMMER_LSP_VERBOSE") {
             self.verbose = verbose == "1" || verbose.to_lowercase() == "true";
         }
-        if let Ok(log_file) = env::var("SPRING_LSP_LOG_FILE") {
+        if let Ok(log_file) = env::var("SUMMER_LSP_LOG_FILE") {
             self.log_file = Some(PathBuf::from(log_file));
         }
         self
@@ -271,7 +271,7 @@ pub struct SchemaConfig {
 impl Default for SchemaConfig {
     fn default() -> Self {
         Self {
-            url: "https://spring-rs.github.io/config-schema.json".to_string(),
+            url: "https://summer-rs.github.io/config-schema.json".to_string(),
         }
     }
 }
@@ -282,7 +282,7 @@ impl SchemaConfig {
     }
 
     fn apply_env_overrides(mut self) -> Self {
-        if let Ok(url) = env::var("SPRING_LSP_SCHEMA_URL") {
+        if let Ok(url) = env::var("SUMMER_LSP_SCHEMA_URL") {
             self.url = url;
         }
         self
@@ -323,7 +323,7 @@ mod tests {
         assert!(config.diagnostics.disabled.is_empty());
         assert_eq!(
             config.schema.url,
-            "https://spring-rs.github.io/config-schema.json"
+            "https://summer-rs.github.io/config-schema.json"
         );
     }
 
@@ -446,14 +446,14 @@ mod tests {
     #[test]
     fn test_env_overrides() {
         // 保存原始环境变量
-        let original_level = env::var("SPRING_LSP_LOG_LEVEL").ok();
-        let original_verbose = env::var("SPRING_LSP_VERBOSE").ok();
-        let original_schema = env::var("SPRING_LSP_SCHEMA_URL").ok();
+        let original_level = env::var("SUMMER_LSP_LOG_LEVEL").ok();
+        let original_verbose = env::var("SUMMER_LSP_VERBOSE").ok();
+        let original_schema = env::var("SUMMER_LSP_SCHEMA_URL").ok();
 
         // 设置测试环境变量
-        env::set_var("SPRING_LSP_LOG_LEVEL", "trace");
-        env::set_var("SPRING_LSP_VERBOSE", "true");
-        env::set_var("SPRING_LSP_SCHEMA_URL", "https://test.com/schema.json");
+        env::set_var("SUMMER_LSP_LOG_LEVEL", "trace");
+        env::set_var("SUMMER_LSP_VERBOSE", "true");
+        env::set_var("SUMMER_LSP_SCHEMA_URL", "https://test.com/schema.json");
 
         let config = ServerConfig::default().apply_env_overrides();
 
@@ -463,16 +463,16 @@ mod tests {
 
         // 恢复原始环境变量
         match original_level {
-            Some(v) => env::set_var("SPRING_LSP_LOG_LEVEL", v),
-            None => env::remove_var("SPRING_LSP_LOG_LEVEL"),
+            Some(v) => env::set_var("SUMMER_LSP_LOG_LEVEL", v),
+            None => env::remove_var("SUMMER_LSP_LOG_LEVEL"),
         }
         match original_verbose {
-            Some(v) => env::set_var("SPRING_LSP_VERBOSE", v),
-            None => env::remove_var("SPRING_LSP_VERBOSE"),
+            Some(v) => env::set_var("SUMMER_LSP_VERBOSE", v),
+            None => env::remove_var("SUMMER_LSP_VERBOSE"),
         }
         match original_schema {
-            Some(v) => env::set_var("SPRING_LSP_SCHEMA_URL", v),
-            None => env::remove_var("SPRING_LSP_SCHEMA_URL"),
+            Some(v) => env::set_var("SUMMER_LSP_SCHEMA_URL", v),
+            None => env::remove_var("SUMMER_LSP_SCHEMA_URL"),
         }
     }
 
@@ -482,7 +482,7 @@ mod tests {
 [logging]
 level = "debug"
 verbose = true
-log_file = "/tmp/spring-lsp.log"
+log_file = "/tmp/summer-lsp.log"
 
 [completion]
 trigger_characters = ["[", ".", "$"]
@@ -500,7 +500,7 @@ url = "https://custom.com/schema.json"
         assert!(config.logging.verbose);
         assert_eq!(
             config.logging.log_file,
-            Some(PathBuf::from("/tmp/spring-lsp.log"))
+            Some(PathBuf::from("/tmp/summer-lsp.log"))
         );
         assert_eq!(config.completion.trigger_characters.len(), 3);
         assert!(config.diagnostics.is_disabled("deprecated_warning"));

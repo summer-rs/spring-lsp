@@ -4,7 +4,7 @@
 
 set -e
 
-echo "🔨 Building Spring LSP server for current platform..."
+echo "🔨 Building Summer LSP server for current platform..."
 
 # 进入项目根目录
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -23,21 +23,21 @@ ARCH=$(uname -m)
 
 case "$PLATFORM" in
   Linux)
-    cp "target/release/spring-lsp" "vscode/bin/spring-lsp-linux-x64"
-    echo "✅ Copied to vscode/bin/spring-lsp-linux-x64"
+    cp "target/release/summer-lsp" "vscode/bin/summer-lsp-linux-x64"
+    echo "✅ Copied to vscode/bin/summer-lsp-linux-x64"
     ;;
   Darwin)
     if [ "$ARCH" = "arm64" ]; then
-      cp "target/release/spring-lsp" "vscode/bin/spring-lsp-darwin-arm64"
-      echo "✅ Copied to vscode/bin/spring-lsp-darwin-arm64"
+      cp "target/release/summer-lsp" "vscode/bin/summer-lsp-darwin-arm64"
+      echo "✅ Copied to vscode/bin/summer-lsp-darwin-arm64"
     else
-      cp "target/release/spring-lsp" "vscode/bin/spring-lsp-darwin-x64"
-      echo "✅ Copied to vscode/bin/spring-lsp-darwin-x64"
+      cp "target/release/summer-lsp" "vscode/bin/summer-lsp-darwin-x64"
+      echo "✅ Copied to vscode/bin/summer-lsp-darwin-x64"
     fi
     ;;
   MINGW*|MSYS*|CYGWIN*)
-    cp "target/release/spring-lsp.exe" "vscode/bin/spring-lsp-win32-x64.exe"
-    echo "✅ Copied to vscode/bin/spring-lsp-win32-x64.exe"
+    cp "target/release/summer-lsp.exe" "vscode/bin/summer-lsp-win32-x64.exe"
+    echo "✅ Copied to vscode/bin/summer-lsp-win32-x64.exe"
     ;;
   *)
     echo "❌ Unsupported platform: $PLATFORM"

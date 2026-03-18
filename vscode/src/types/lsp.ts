@@ -9,7 +9,7 @@ import { Location, ComponentScope, ComponentSource, JobType } from './common';
 /**
  * Component 接口
  * 
- * 表示一个 Spring RS 组件
+ * 表示一个 Summer RS 组件
  */
 export interface Component {
   /**

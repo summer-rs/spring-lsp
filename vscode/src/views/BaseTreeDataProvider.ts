@@ -41,7 +41,7 @@ export class FileTreeNode extends vscode.TreeItem {
     this.description = dirName;
 
     // 设置上下文值
-    this.contextValue = 'spring:file';
+    this.contextValue = 'summer:file';
 
     // 设置工具提示
     this.tooltip = new vscode.MarkdownString(

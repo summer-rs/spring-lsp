@@ -1,8 +1,8 @@
-//! # spring-lsp
+//! # summer-lsp
 //!
-//! Language Server Protocol implementation for spring-rs framework.
+//! Language Server Protocol implementation for summer-rs framework.
 //!
-//! spring-lsp 提供智能的开发体验，包括：
+//! summer-lsp 提供智能的开发体验，包括：
 //! - TOML 配置文件的智能补全和验证
 //! - Rust 宏的分析和展开
 //! - 路由的识别和导航
@@ -10,7 +10,7 @@
 //!
 //! ## 架构
 //!
-//! spring-lsp 采用分层架构：
+//! summer-lsp 采用分层架构：
 //! - **LSP Protocol Layer**: 处理 LSP 协议通信
 //! - **Server Core Layer**: 消息分发和状态管理
 //! - **Analysis Modules**: 各种分析功能模块
@@ -19,7 +19,7 @@
 //! ## 模块组织
 //!
 //! ```text
-//! spring-lsp/
+//! summer-lsp/
 //! ├── protocol/          # LSP 协议层
 //! │   ├── server.rs      # LSP 服务器核心
 //! │   ├── handlers/      # 请求处理器
@@ -109,8 +109,6 @@ pub mod core {
     pub use document::DocumentManager;
     pub use index::SymbolIndex;
     pub use schema::SchemaProvider;
-    // ConfigManager 尚未实现，暂时注释
-    // pub use config::ConfigManager;
 }
 
 // ============================================================================

@@ -6,7 +6,7 @@
 
 import * as vscode from 'vscode';
 import { LanguageClientManager } from '../languageClient/LanguageClientManager';
-import { SpringApp } from '../models/SpringApp';
+import { SummerApp } from '../models/SummerApp';
 
 /**
  * 依赖图节点
@@ -82,7 +82,7 @@ interface WebViewMessage {
  */
 export class DependencyGraphView {
   private panel: vscode.WebviewPanel | undefined;
-  private currentApp: SpringApp | undefined;
+  private currentApp: SummerApp | undefined;
 
   constructor(
     private readonly context: vscode.ExtensionContext,
@@ -92,7 +92,7 @@ export class DependencyGraphView {
   /**
    * 显示依赖图
    */
-  public async show(app: SpringApp): Promise<void> {
+  public async show(app: SummerApp): Promise<void> {
     this.currentApp = app;
 
     // 如果面板已存在，则显示并更新
@@ -104,7 +104,7 @@ export class DependencyGraphView {
 
     // 创建新的 WebView 面板
     this.panel = vscode.window.createWebviewPanel(
-      'springDependencyGraph',
+      'summerDependencyGraph',
       `Dependency Graph - ${app.name}`,
       vscode.ViewColumn.One,
       {
@@ -152,7 +152,7 @@ export class DependencyGraphView {
   /**
    * 更新依赖图
    */
-  private async updateGraph(app: SpringApp): Promise<void> {
+  private async updateGraph(app: SummerApp): Promise<void> {
     if (!this.panel) {
       return;
     }
@@ -173,9 +173,9 @@ export class DependencyGraphView {
   /**
    * 从语言服务器获取依赖图数据
    */
-  private async fetchDependencyGraph(app: SpringApp): Promise<DependencyGraph> {
+  private async fetchDependencyGraph(app: SummerApp): Promise<DependencyGraph> {
     const response = await this.languageClient.sendRequest<DependencyGraphResponse>(
-      'spring/dependencyGraph',
+      'summer/dependencyGraph',
       {
         appPath: app.path
       }
@@ -225,7 +225,7 @@ export class DependencyGraphView {
       // 从语言服务器获取组件位置
       const location = await this.languageClient.sendRequest<
         { uri: string; range: any } | null
-      >('spring/componentLocation', {
+      >('summer/componentLocation', {
         appPath: this.currentApp.path,
         componentName
       });
@@ -260,7 +260,7 @@ export class DependencyGraphView {
   /**
    * 生成 WebView HTML 内容
    */
-  private getHtmlContent(graph: DependencyGraph, app: SpringApp): string {
+  private getHtmlContent(graph: DependencyGraph, app: SummerApp): string {
     const graphData = JSON.stringify(graph);
     const appName = app.name;
 

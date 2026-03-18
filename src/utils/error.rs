@@ -1,6 +1,6 @@
 //! 错误类型定义和错误处理策略
 //!
-//! 本模块定义了 spring-lsp 的错误类型体系和错误处理策略。
+//! 本模块定义了 summer-lsp 的错误类型体系和错误处理策略。
 //!
 //! ## 错误分类
 //!
@@ -26,7 +26,7 @@
 use lsp_types::Url;
 use thiserror::Error;
 
-/// spring-lsp 错误类型
+/// summer-lsp 错误类型
 #[derive(Debug, Error)]
 pub enum Error {
     // ========== 协议错误 ==========

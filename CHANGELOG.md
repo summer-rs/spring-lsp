@@ -10,9 +10,9 @@ All notable changes to this project will be documented in this file.
   - **Tree 模式**：按文件组织，显示文件树结构
 - 🌳 视图标题栏添加切换按钮（Toggle View Mode）
 - ⚙️ 添加配置选项：
-  - `spring-lsp.componentsViewMode`
-  - `spring-lsp.routesViewMode`
-  - `spring-lsp.configurationsViewMode`
+  - `summer-lsp.componentsViewMode`
+  - `summer-lsp.routesViewMode`
+  - `summer-lsp.configurationsViewMode`
 - 📄 新增 `FileTreeNode` 类，支持按文件分组显示
 - 🔧 新增 `BaseTreeDataProvider` 基类，提供通用的文件分组功能
 - 📝 完整的文档：
@@ -81,7 +81,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Dynamic schema loading with fallback strategies
 
 - **Rust Macro Analysis**
-  - Recognition of all spring-rs macros (`#[derive(Service)]`, `#[inject]`, route macros, job macros)
+  - Recognition of all summer-rs macros (`#[derive(Service)]`, `#[inject]`, route macros, job macros)
   - Macro expansion with readable generated code
   - Parameter validation and intelligent error messages
   - Hover tooltips with comprehensive macro documentation
@@ -102,7 +102,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Concurrent processing with thread-safe data structures
 
 - **Configuration and Extensibility**
-  - User configuration file support (`.spring-lsp.toml`)
+  - User configuration file support (`.summer-lsp.toml`)
   - Customizable completion trigger characters
   - Diagnostic filtering and severity levels
   - Custom schema URL configuration

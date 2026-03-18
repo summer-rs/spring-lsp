@@ -1,6 +1,6 @@
 # Change Log
 
-All notable changes to the "Spring LSP for Rust" extension will be documented in this file.
+All notable changes to the "Summer LSP for Rust" extension will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Planned Features
 - Gutter icons for components, routes, and jobs
-- Code snippets for common spring-rs patterns
+- Code snippets for common summer-rs patterns
 - Multi-workspace support improvements
 - Performance optimizations for large projects
 - Remote development enhancements
@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 #### Application Management
-- Auto-detection of spring-rs applications in workspace
+- Auto-detection of summer-rs applications in workspace
 - Run and debug applications with one click
 - Profile selection support (dev, prod, custom profiles)
 - Automatic port detection from `config/app.toml`
@@ -28,7 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Application state tracking (inactive, launching, running, stopping)
 
 #### Real-time Application Insights
-- **Apps View** - List all detected spring-rs applications
+- **Apps View** - List all detected summer-rs applications
   - Display app name, version, state, and port
   - Click to open configuration file
   - Context menu with run/debug/stop actions
@@ -59,34 +59,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Force-directed layout for clear visualization
 
 #### Language Server Integration
-- LSP client for spring-lsp language server
+- LSP client for summer-lsp language server
 - Automatic server discovery (config, extension bundle, system PATH)
 - TOML configuration file support
 - Rust source file support
 - LSP communication tracing (off, messages, verbose)
 
 #### Commands
-- `Spring RS: Refresh Apps` - Refresh application list
-- `Spring RS: Run` - Run selected application
-- `Spring RS: Debug` - Debug selected application
-- `Spring RS: Stop` - Stop running application
-- `Spring RS: Open in Browser` - Open application in browser
-- `Spring RS: Run with Profile...` - Run with profile selection
-- `Spring RS: Debug with Profile...` - Debug with profile selection
-- `Spring RS: Run Multiple Apps...` - Batch run applications
-- `Spring RS: Stop Multiple Apps...` - Batch stop applications
-- `Spring RS: Go to Definition` - Navigate to component/route definition
-- `Spring RS: Show Dependencies` - Show dependency graph
-- `Spring RS: Show Welcome Page` - Display welcome page
-- `Spring RS: Open Documentation` - Open spring-rs documentation
+- `Summer RS: Refresh Apps` - Refresh application list
+- `Summer RS: Run` - Run selected application
+- `Summer RS: Debug` - Debug selected application
+- `Summer RS: Stop` - Stop running application
+- `Summer RS: Open in Browser` - Open application in browser
+- `Summer RS: Run with Profile...` - Run with profile selection
+- `Summer RS: Debug with Profile...` - Debug with profile selection
+- `Summer RS: Run Multiple Apps...` - Batch run applications
+- `Summer RS: Stop Multiple Apps...` - Batch stop applications
+- `Summer RS: Go to Definition` - Navigate to component/route definition
+- `Summer RS: Show Dependencies` - Show dependency graph
+- `Summer RS: Show Welcome Page` - Display welcome page
+- `Summer RS: Open Documentation` - Open summer-rs documentation
 
 #### Configuration
-- `spring-lsp.serverPath` - Custom language server path
-- `spring-lsp.openWith` - Browser selection (integrated/external)
-- `spring-lsp.openUrl` - URL template with placeholders
-- `spring-lsp.enableGutter` - Toggle gutter icons (not yet implemented)
-- `spring-lsp.env` - Environment variables for running apps
-- `spring-lsp.trace.server` - LSP communication tracing level
+- `summer-lsp.serverPath` - Custom language server path
+- `summer-lsp.openWith` - Browser selection (integrated/external)
+- `summer-lsp.openUrl` - URL template with placeholders
+- `summer-lsp.enableGutter` - Toggle gutter icons (not yet implemented)
+- `summer-lsp.env` - Environment variables for running apps
+- `summer-lsp.trace.server` - LSP communication tracing level
 
 #### Developer Experience
 - Comprehensive test suite (310+ test cases)
@@ -115,7 +115,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial project setup
 - Basic extension structure
-- Core data models (SpringApp, AppState)
+- Core data models (SummerApp, AppState)
 - LocalAppManager for application detection
 - LocalAppController for application lifecycle
 - Basic views (Apps, Components, Routes)
@@ -152,22 +152,22 @@ This is the first official release. No upgrade steps required.
 - Full LSP integration
 
 **Configuration Changes:**
-- Extension ID changed from `spring-rs-lsp` to `spring-lsp`
-- Configuration prefix changed from `spring-rs-lsp.*` to `spring-lsp.*`
+- Extension ID changed from `summer-rs-lsp` to `summer-lsp`
+- Configuration prefix changed from `summer-rs-lsp.*` to `summer-lsp.*`
 
 If you were using the development version, update your settings:
 
 ```json
 // Old (0.0.x)
 {
-  "spring-rs-lsp.serverPath": "/path/to/server",
-  "spring-rs-lsp.trace.server": "verbose"
+  "summer-rs-lsp.serverPath": "/path/to/server",
+  "summer-rs-lsp.trace.server": "verbose"
 }
 
 // New (0.1.0)
 {
-  "spring-lsp.serverPath": "/path/to/server",
-  "spring-lsp.trace.server": "verbose"
+  "summer-lsp.serverPath": "/path/to/server",
+  "summer-lsp.trace.server": "verbose"
 }
 ```
 
@@ -175,11 +175,11 @@ If you were using the development version, update your settings:
 
 ## Contributing
 
-See [CONTRIBUTING.md](https://github.com/spring-rs/spring-lsp/blob/main/CONTRIBUTING.md) for details on how to contribute to this project.
+See [CONTRIBUTING.md](https://github.com/summer-rs/summer-lsp/blob/main/CONTRIBUTING.md) for details on how to contribute to this project.
 
 ## Links
 
-- [GitHub Repository](https://github.com/spring-rs/spring-lsp)
-- [Issue Tracker](https://github.com/spring-rs/spring-lsp/issues)
-- [spring-rs Documentation](https://spring-rs.github.io/)
-- [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=spring-rs.spring-lsp)
+- [GitHub Repository](https://github.com/summer-rs/summer-lsp)
+- [Issue Tracker](https://github.com/summer-rs/summer-lsp/issues)
+- [summer-rs Documentation](https://summer-rs.github.io/)
+- [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=summer-rs.summer-lsp)

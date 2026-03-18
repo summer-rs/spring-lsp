@@ -13,51 +13,51 @@ import { ConfigurationStruct } from '../types';
 import { ComponentsTreeDataProviderEnhanced } from '../views/ComponentsTreeDataProviderEnhanced';
 import { RoutesTreeDataProviderEnhanced } from '../views/RoutesTreeDataProviderEnhanced';
 import { ConfigurationsTreeDataProviderEnhanced } from '../views/ConfigurationsTreeDataProviderEnhanced';
-import { SpringApp } from '../models/SpringApp';
+import { SummerApp } from '../models/SummerApp';
 
 /**
  * 命令 ID 常量
  */
 export const Commands = {
   // 应用操作命令
-  REFRESH: 'spring-rs.refresh',
-  APP_RUN: 'spring-rs.app.run',
-  APP_DEBUG: 'spring-rs.app.debug',
-  APP_STOP: 'spring-rs.app.stop',
-  APP_OPEN: 'spring-rs.app.open',
-  APP_RUN_WITH_PROFILE: 'spring-rs.app.runWithProfile',
-  APP_DEBUG_WITH_PROFILE: 'spring-rs.app.debugWithProfile',
-  APP_RUN_MULTIPLE: 'spring-rs.app.runMultiple',
-  APP_STOP_MULTIPLE: 'spring-rs.app.stopMultiple',
+  REFRESH: 'summer-rs.refresh',
+  APP_RUN: 'summer-rs.app.run',
+  APP_DEBUG: 'summer-rs.app.debug',
+  APP_STOP: 'summer-rs.app.stop',
+  APP_OPEN: 'summer-rs.app.open',
+  APP_RUN_WITH_PROFILE: 'summer-rs.app.runWithProfile',
+  APP_DEBUG_WITH_PROFILE: 'summer-rs.app.debugWithProfile',
+  APP_RUN_MULTIPLE: 'summer-rs.app.runMultiple',
+  APP_STOP_MULTIPLE: 'summer-rs.app.stopMultiple',
 
   // 导航命令
-  COMPONENT_NAVIGATE: 'spring.component.navigate',
-  COMPONENT_SHOW_DEPENDENCIES: 'spring.component.showDependencies',
-  ROUTE_NAVIGATE: 'spring.route.navigate',
-  ROUTE_OPEN: 'spring.route.open',
-  JOB_NAVIGATE: 'spring.job.navigate',
-  PLUGIN_NAVIGATE: 'spring.plugin.navigate',
-  CONFIGURATION_REFRESH: 'spring.configuration.refresh',
-  CONFIGURATION_NAVIGATE: 'spring.configuration.navigate',
-  CONFIGURATION_COPY_EXAMPLE: 'spring.configuration.copyExample',
+  COMPONENT_NAVIGATE: 'summer.component.navigate',
+  COMPONENT_SHOW_DEPENDENCIES: 'summer.component.showDependencies',
+  ROUTE_NAVIGATE: 'summer.route.navigate',
+  ROUTE_OPEN: 'summer.route.open',
+  JOB_NAVIGATE: 'summer.job.navigate',
+  PLUGIN_NAVIGATE: 'summer.plugin.navigate',
+  CONFIGURATION_REFRESH: 'summer.configuration.refresh',
+  CONFIGURATION_NAVIGATE: 'summer.configuration.navigate',
+  CONFIGURATION_COPY_EXAMPLE: 'summer.configuration.copyExample',
 
   // 视图模式切换命令
-  COMPONENTS_SELECT_VIEW_MODE: 'spring.components.selectViewMode',
-  COMPONENTS_TOGGLE_VIEW_MODE: 'spring.components.toggleViewMode',
-  COMPONENTS_SWITCH_TO_LIST_VIEW: 'spring.components.switchToListView',
-  ROUTES_SELECT_VIEW_MODE: 'spring.routes.selectViewMode',
-  ROUTES_TOGGLE_VIEW_MODE: 'spring.routes.toggleViewMode',
-  ROUTES_SWITCH_TO_LIST_VIEW: 'spring.routes.switchToListView',
-  CONFIGURATIONS_SELECT_VIEW_MODE: 'spring.configurations.selectViewMode',
-  CONFIGURATIONS_TOGGLE_VIEW_MODE: 'spring.configurations.toggleViewMode',
-  CONFIGURATIONS_SWITCH_TO_LIST_VIEW: 'spring.configurations.switchToListView',
+  COMPONENTS_SELECT_VIEW_MODE: 'summer.components.selectViewMode',
+  COMPONENTS_TOGGLE_VIEW_MODE: 'summer.components.toggleViewMode',
+  COMPONENTS_SWITCH_TO_LIST_VIEW: 'summer.components.switchToListView',
+  ROUTES_SELECT_VIEW_MODE: 'summer.routes.selectViewMode',
+  ROUTES_TOGGLE_VIEW_MODE: 'summer.routes.toggleViewMode',
+  ROUTES_SWITCH_TO_LIST_VIEW: 'summer.routes.switchToListView',
+  CONFIGURATIONS_SELECT_VIEW_MODE: 'summer.configurations.selectViewMode',
+  CONFIGURATIONS_TOGGLE_VIEW_MODE: 'summer.configurations.toggleViewMode',
+  CONFIGURATIONS_SWITCH_TO_LIST_VIEW: 'summer.configurations.switchToListView',
 
   // 文档和帮助命令
-  OPEN_DOCUMENTATION: 'spring-rs.openDocumentation',
-  SHOW_WELCOME: 'spring-rs.showWelcome',
+  OPEN_DOCUMENTATION: 'summer-rs.openDocumentation',
+  SHOW_WELCOME: 'summer-rs.showWelcome',
 
   // 内部命令（用于测试和调试）
-  _GET_APPS: '_spring.getApps'
+  _GET_APPS: '_summer.getApps'
 } as const;
 
 /**
@@ -130,7 +130,7 @@ export class CommandManager {
     // 刷新应用列表
     this.register(Commands.REFRESH, () => {
       this.appManager.fireDidChangeApps(undefined);
-      vscode.window.showInformationMessage('Spring RS apps refreshed');
+      vscode.window.showInformationMessage('Summer RS apps refreshed');
     });
 
     // 运行应用
@@ -273,7 +273,7 @@ export class CommandManager {
     });
 
     // 显示组件依赖关系
-    this.register(Commands.COMPONENT_SHOW_DEPENDENCIES, async (app?: SpringApp) => {
+    this.register(Commands.COMPONENT_SHOW_DEPENDENCIES, async (app?: SummerApp) => {
       if (!app) {
         app = await this.selectApp('Select an app to show dependencies', app => app.state === 'running');
       }
@@ -326,7 +326,7 @@ export class CommandManager {
       
       // 提取路由和应用信息
       let route: { path: string } | undefined;
-      let app: SpringApp | undefined;
+      let app: SummerApp | undefined;
 
       if (!itemOrRoute) {
         vscode.window.showWarningMessage('No route or app provided');
@@ -380,7 +380,7 @@ export class CommandManager {
         console.log('[ROUTE_OPEN] Opening URL:', url);
 
         // 打开浏览器
-        const config = vscode.workspace.getConfiguration('spring-rs');
+        const config = vscode.workspace.getConfiguration('summer-rs');
         const openWith = config.get<string>('openWith', 'integrated');
         const command = openWith === 'external' ? 'vscode.open' : 'simpleBrowser.api.open';
 
@@ -755,8 +755,8 @@ export class CommandManager {
         
         // 创建文件
         const content = new TextEncoder().encode(
-          '# Spring RS 配置文件\n' +
-          '#:schema https://spring-rs.github.io/config-schema.json\n\n'
+          '# Summer RS 配置文件\n' +
+          '#:schema https://summer-rs.github.io/config-schema.json\n\n'
         );
         await vscode.workspace.fs.writeFile(configUri, content);
         
@@ -846,15 +846,15 @@ export class CommandManager {
   private registerDocumentationCommands(): void {
     // 打开文档
     this.register(Commands.OPEN_DOCUMENTATION, async () => {
-      const url = 'https://spring-rs.github.io/';
+      const url = 'https://summer-rs.github.io/';
       await vscode.env.openExternal(vscode.Uri.parse(url));
     });
 
     // 显示欢迎页面
     this.register(Commands.SHOW_WELCOME, async () => {
       const panel = vscode.window.createWebviewPanel(
-        'springWelcome',
-        'Welcome to Spring LSP',
+        'summerWelcome',
+        'Welcome to Summer LSP',
         vscode.ViewColumn.One,
         {
           enableScripts: false
@@ -888,28 +888,28 @@ export class CommandManager {
   }
 
   /**
-   * 从参数中提取 SpringApp 对象
+   * 从参数中提取 SummerApp 对象
    * 
    * 支持以下类型的参数：
-   * - SpringApp 实例
+   * - SummerApp 实例
    * - AppTreeItem 实例（包含 app 属性）
    * - 其他对象（尝试提取 app 属性）
    * 
    * @param item 参数对象
-   * @returns SpringApp 实例，如果无法提取返回 undefined
+   * @returns SummerApp 实例，如果无法提取返回 undefined
    */
-  private extractApp(item?: any): SpringApp | undefined {
+  private extractApp(item?: any): SummerApp | undefined {
     if (!item) {
       return undefined;
     }
 
-    // 如果已经是 SpringApp 实例
-    if (item instanceof SpringApp) {
+    // 如果已经是 SummerApp 实例
+    if (item instanceof SummerApp) {
       return item;
     }
 
     // 如果有 app 属性（AppTreeItem）
-    if (item.app && item.app instanceof SpringApp) {
+    if (item.app && item.app instanceof SummerApp) {
       return item.app;
     }
 
@@ -922,8 +922,8 @@ export class CommandManager {
    */
   private async selectApp(
     placeHolder: string,
-    filter?: (app: SpringApp) => boolean
-  ): Promise<SpringApp | undefined> {
+    filter?: (app: SummerApp) => boolean
+  ): Promise<SummerApp | undefined> {
     let apps = this.appManager.getAppList();
 
     if (filter) {
@@ -960,7 +960,7 @@ export class CommandManager {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome to Spring LSP</title>
+  <title>Welcome to Summer LSP</title>
   <style>
     body {
       font-family: var(--vscode-font-family);
@@ -994,10 +994,10 @@ export class CommandManager {
   </style>
 </head>
 <body>
-  <h1>🚀 Welcome to Spring LSP for Rust</h1>
+  <h1>🚀 Welcome to Summer LSP for Rust</h1>
   
   <p>
-    Spring LSP 为 <strong>spring-rs</strong> 框架提供完整的 IDE 支持，
+    Summer LSP 为 <strong>summer-rs</strong> 框架提供完整的 IDE 支持，
     帮助你更高效地开发 Rust 应用。
   </p>
 
@@ -1006,7 +1006,7 @@ export class CommandManager {
   <div class="feature">
     <div class="feature-title">📦 应用管理</div>
     <ul>
-      <li>自动检测工作空间中的 spring-rs 应用</li>
+      <li>自动检测工作空间中的 summer-rs 应用</li>
       <li>一键启动、停止和调试应用</li>
       <li>支持 Profile 选择和环境配置</li>
       <li>批量操作多个应用</li>
@@ -1037,8 +1037,8 @@ export class CommandManager {
   <h2>🚀 快速开始</h2>
 
   <ol>
-    <li>打开一个包含 spring-rs 应用的工作空间</li>
-    <li>在活动栏点击 <strong>Spring RS</strong> 图标</li>
+    <li>打开一个包含 summer-rs 应用的工作空间</li>
+    <li>在活动栏点击 <strong>Summer RS</strong> 图标</li>
     <li>在 <strong>Apps</strong> 视图中查看检测到的应用</li>
     <li>右键点击应用，选择 <strong>Run</strong> 或 <strong>Debug</strong></li>
     <li>应用启动后，查看 <strong>Components</strong>、<strong>Routes</strong> 等视图</li>
@@ -1046,32 +1046,32 @@ export class CommandManager {
 
   <h2>⚙️ 配置</h2>
 
-  <p>在 VSCode 设置中搜索 <code>spring-rs</code> 可以配置：</p>
+  <p>在 VSCode 设置中搜索 <code>summer-rs</code> 可以配置：</p>
   <ul>
-    <li><code>spring-rs.serverPath</code>：语言服务器路径</li>
-    <li><code>spring-rs.openWith</code>：浏览器打开方式（integrated/external）</li>
-    <li><code>spring-rs.openUrl</code>：URL 模板</li>
-    <li><code>spring-rs.env</code>：环境变量</li>
+    <li><code>summer-rs.serverPath</code>：语言服务器路径</li>
+    <li><code>summer-rs.openWith</code>：浏览器打开方式（integrated/external）</li>
+    <li><code>summer-rs.openUrl</code>：URL 模板</li>
+    <li><code>summer-rs.env</code>：环境变量</li>
   </ul>
 
   <h2>📚 资源</h2>
 
   <ul>
-    <li><a href="https://spring-rs.github.io/">Spring RS 官方文档</a></li>
-    <li><a href="https://github.com/spring-rs/spring-rs">Spring RS GitHub</a></li>
-    <li><a href="https://github.com/spring-rs/spring-lsp">Spring LSP GitHub</a></li>
+    <li><a href="https://summer-rs.github.io/">Summer RS 官方文档</a></li>
+    <li><a href="https://github.com/summer-rs/summer-rs">Summer RS GitHub</a></li>
+    <li><a href="https://github.com/summer-rs/summer-lsp">Summer LSP GitHub</a></li>
   </ul>
 
   <h2>💡 提示</h2>
 
   <ul>
     <li>使用 <code>Ctrl+Shift+P</code> (Windows/Linux) 或 <code>Cmd+Shift+P</code> (macOS) 打开命令面板</li>
-    <li>输入 <code>Spring</code> 查看所有可用命令</li>
+    <li>输入 <code>Summer</code> 查看所有可用命令</li>
     <li>右键点击视图中的项目查看可用操作</li>
   </ul>
 
   <p style="margin-top: 40px; text-align: center; color: var(--vscode-descriptionForeground);">
-    Happy coding with Spring RS! 🎉
+    Happy coding with Summer RS! 🎉
   </p>
 </body>
 </html>`;

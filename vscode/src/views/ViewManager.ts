@@ -47,22 +47,22 @@ export class ViewManager {
         this.pluginsProvider = new PluginsDataProvider(languageClient);
 
         // 创建树视图
-        this.componentsView = vscode.window.createTreeView('spring.components', {
+        this.componentsView = vscode.window.createTreeView('summer.components', {
             treeDataProvider: this.componentsProvider,
             showCollapseAll: true
         });
 
-        this.routesView = vscode.window.createTreeView('spring.routes', {
+        this.routesView = vscode.window.createTreeView('summer.routes', {
             treeDataProvider: this.routesProvider,
             showCollapseAll: true
         });
 
-        this.jobsView = vscode.window.createTreeView('spring.jobs', {
+        this.jobsView = vscode.window.createTreeView('summer.jobs', {
             treeDataProvider: this.jobsProvider,
             showCollapseAll: false
         });
 
-        this.pluginsView = vscode.window.createTreeView('spring.plugins', {
+        this.pluginsView = vscode.window.createTreeView('summer.plugins', {
             treeDataProvider: this.pluginsProvider,
             showCollapseAll: false
         });
@@ -88,49 +88,49 @@ export class ViewManager {
     private registerCommands(): void {
         // 刷新命令
         this.context.subscriptions.push(
-            vscode.commands.registerCommand('spring.components.refresh', () => {
+            vscode.commands.registerCommand('summer.components.refresh', () => {
                 this.componentsProvider.refresh();
             }),
-            vscode.commands.registerCommand('spring.routes.refresh', () => {
+            vscode.commands.registerCommand('summer.routes.refresh', () => {
                 this.routesProvider.refresh();
             }),
-            vscode.commands.registerCommand('spring.jobs.refresh', () => {
+            vscode.commands.registerCommand('summer.jobs.refresh', () => {
                 this.jobsProvider.refresh();
             }),
-            vscode.commands.registerCommand('spring.plugins.refresh', () => {
+            vscode.commands.registerCommand('summer.plugins.refresh', () => {
                 this.pluginsProvider.refresh();
             }),
-            vscode.commands.registerCommand('spring.views.refreshAll', () => {
+            vscode.commands.registerCommand('summer.views.refreshAll', () => {
                 this.refreshAll();
             })
         );
 
         // 导航命令
         this.context.subscriptions.push(
-            vscode.commands.registerCommand('spring.component.navigate', (component) => {
+            vscode.commands.registerCommand('summer.component.navigate', (component) => {
                 this.navigateToLocation(component.location);
             }),
-            vscode.commands.registerCommand('spring.route.navigate', (route) => {
+            vscode.commands.registerCommand('summer.route.navigate', (route) => {
                 this.navigateToLocation(route.location);
             }),
-            vscode.commands.registerCommand('spring.job.navigate', (job) => {
+            vscode.commands.registerCommand('summer.job.navigate', (job) => {
                 this.navigateToLocation(job.location);
             }),
-            vscode.commands.registerCommand('spring.plugin.navigate', (plugin) => {
+            vscode.commands.registerCommand('summer.plugin.navigate', (plugin) => {
                 this.navigateToLocation(plugin.location);
             })
         );
 
         // 路由特殊命令：在浏览器中打开
         this.context.subscriptions.push(
-            vscode.commands.registerCommand('spring.route.open', async (route) => {
+            vscode.commands.registerCommand('summer.route.open', async (route) => {
                 await this.openRouteInBrowser(route);
             })
         );
 
         // 组件特殊命令：显示依赖图
         this.context.subscriptions.push(
-            vscode.commands.registerCommand('spring.component.showDependencies', async (component) => {
+            vscode.commands.registerCommand('summer.component.showDependencies', async (component) => {
                 await this.showComponentDependencies(component);
             })
         );
@@ -171,7 +171,7 @@ export class ViewManager {
             return;
         }
 
-        const config = vscode.workspace.getConfiguration('spring-rs');
+        const config = vscode.workspace.getConfiguration('summer-rs');
         const urlTemplate = config.get<string>('openUrl', 'http://localhost:{port}{path}');
 
         const url = urlTemplate
@@ -220,7 +220,7 @@ export class ViewManager {
         };
 
         // 更新上下文
-        vscode.commands.executeCommand('setContext', 'spring:hasRunningApp', true);
+        vscode.commands.executeCommand('setContext', 'summer:hasRunningApp', true);
 
         // 刷新运行时信息
         await this.refreshRuntime(port);
@@ -237,7 +237,7 @@ export class ViewManager {
         this.currentAppState = { isRunning: false };
 
         // 更新上下文
-        vscode.commands.executeCommand('setContext', 'spring:hasRunningApp', false);
+        vscode.commands.executeCommand('setContext', 'summer:hasRunningApp', false);
 
         // 清除运行时信息
         this.clearRuntime();

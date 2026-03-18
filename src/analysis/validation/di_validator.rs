@@ -7,7 +7,7 @@
 //! - 循环依赖检测
 //! - 配置注入验证
 
-use crate::analysis::rust::macro_analyzer::{InjectMacro, InjectType, RustDocument, SpringMacro};
+use crate::analysis::rust::macro_analyzer::{InjectMacro, InjectType, RustDocument, SummerMacro};
 use crate::analysis::toml::toml_analyzer::TomlDocument;
 use crate::core::index::IndexManager;
 use lsp_types::{Diagnostic, DiagnosticSeverity, Location, NumberOrString};
@@ -127,7 +127,7 @@ impl DependencyInjectionValidator {
                         "组件 '{}' 的类型不匹配。期望类型: {}，实际类型: {}",
                         component_name, field.type_name, component_info.type_name
                     ),
-                    source: Some("spring-lsp".to_string()),
+                    source: Some("summer-lsp".to_string()),
                     ..Default::default()
                 });
             }
@@ -145,7 +145,7 @@ impl DependencyInjectionValidator {
                         "组件类型 '{}' 不存在。请确保该类型已定义。",
                         field.type_name
                     ),
-                    source: Some("spring-lsp".to_string()),
+                    source: Some("summer-lsp".to_string()),
                     ..Default::default()
                 });
             } else {
@@ -160,7 +160,7 @@ impl DependencyInjectionValidator {
                         "组件 '{}' 未注册。请确保该组件已通过插件注册。",
                         component_name
                     ),
-                    source: Some("spring-lsp".to_string()),
+                    source: Some("summer-lsp".to_string()),
                     ..Default::default()
                 });
             }
@@ -195,7 +195,7 @@ impl DependencyInjectionValidator {
                             "组件名称 '{}' 的类型不匹配。期望类型: {}，实际类型: {}{}",
                             specified_name, field.type_name, component_info.type_name, suggestion
                         ),
-                        source: Some("spring-lsp".to_string()),
+                        source: Some("summer-lsp".to_string()),
                         ..Default::default()
                     });
                 }
@@ -220,7 +220,7 @@ impl DependencyInjectionValidator {
                         "component-name-not-found".to_string(),
                     )),
                     message: format!("组件名称 '{}' 不存在。{}", specified_name, suggestion),
-                    source: Some("spring-lsp".to_string()),
+                    source: Some("summer-lsp".to_string()),
                     ..Default::default()
                 });
             }
@@ -277,7 +277,7 @@ impl DependencyInjectionValidator {
                 severity: Some(DiagnosticSeverity::ERROR),
                 code: Some(NumberOrString::String("config-not-found".to_string())),
                 message,
-                source: Some("spring-lsp".to_string()),
+                source: Some("summer-lsp".to_string()),
                 related_information: config_file_uri.map(|uri| {
                     vec![lsp_types::DiagnosticRelatedInformation {
                         location: Location {
@@ -355,7 +355,7 @@ impl DependencyInjectionValidator {
                                 "检测到循环依赖: {}。建议使用 LazyComponent<T> 打破循环。",
                                 cycle.join(" -> ")
                             ),
-                            source: Some("spring-lsp".to_string()),
+                            source: Some("summer-lsp".to_string()),
                             ..Default::default()
                         });
                     }
@@ -407,8 +407,8 @@ impl DependencyInjectionValidator {
         let mut services = HashMap::new();
 
         for doc in rust_docs {
-            for spring_macro in &doc.macros {
-                if let SpringMacro::DeriveService(service_macro) = spring_macro {
+            for summer_macro in &doc.macros {
+                if let SummerMacro::DeriveService(service_macro) = summer_macro {
                     let service_info = ServiceInfo {
                         name: service_macro.struct_name.clone(),
                         fields: service_macro

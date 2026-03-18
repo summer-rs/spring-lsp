@@ -121,24 +121,24 @@ jobs:
         include:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
-            artifact_name: spring-lsp
-            asset_name: spring-lsp-linux-x86_64
+            artifact_name: summer-lsp
+            asset_name: summer-lsp-linux-x86_64
           - os: ubuntu-latest
             target: x86_64-unknown-linux-musl
-            artifact_name: spring-lsp
-            asset_name: spring-lsp-linux-x86_64-musl
+            artifact_name: summer-lsp
+            asset_name: summer-lsp-linux-x86_64-musl
           - os: macos-latest
             target: x86_64-apple-darwin
-            artifact_name: spring-lsp
-            asset_name: spring-lsp-macos-x86_64
+            artifact_name: summer-lsp
+            asset_name: summer-lsp-macos-x86_64
           - os: macos-latest
             target: aarch64-apple-darwin
-            artifact_name: spring-lsp
-            asset_name: spring-lsp-macos-aarch64
+            artifact_name: summer-lsp
+            asset_name: summer-lsp-macos-aarch64
           - os: windows-latest
             target: x86_64-pc-windows-msvc
-            artifact_name: spring-lsp.exe
-            asset_name: spring-lsp-windows-x86_64.exe
+            artifact_name: summer-lsp.exe
+            asset_name: summer-lsp-windows-x86_64.exe
     
     steps:
       - uses: actions/checkout@v4
@@ -203,7 +203,7 @@ jobs:
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         run: |
-          echo "Publishing spring-lsp version ${{ needs.version-check.outputs.version }} to crates.io..."
+          echo "Publishing summer-lsp version ${{ needs.version-check.outputs.version }} to crates.io..."
           cargo publish --token $CARGO_REGISTRY_TOKEN
 
   # 创建 GitHub Release
@@ -266,14 +266,14 @@ jobs:
             echo "Release $VERSION" > release-notes.md
             echo "" >> release-notes.md
             echo "## Features" >> release-notes.md
-            echo "- Language Server Protocol implementation for spring-rs framework" >> release-notes.md
+            echo "- Language Server Protocol implementation for summer-rs framework" >> release-notes.md
             echo "- TOML configuration support with smart completion" >> release-notes.md
             echo "- Rust macro analysis and validation" >> release-notes.md
             echo "- Route management and navigation" >> release-notes.md
             echo "" >> release-notes.md
             echo "## Installation" >> release-notes.md
             echo '```bash' >> release-notes.md
-            echo "cargo install spring-lsp" >> release-notes.md
+            echo "cargo install summer-lsp" >> release-notes.md
             echo '```' >> release-notes.md
           fi
           
@@ -284,7 +284,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ needs.version-check.outputs.version }}
-          name: spring-lsp v${{ needs.version-check.outputs.version }}
+          name: summer-lsp v${{ needs.version-check.outputs.version }}
           body_path: release-notes.md
           prerelease: ${{ needs.version-check.outputs.is_prerelease }}
           files: release-assets/*
@@ -302,10 +302,10 @@ jobs:
     steps:
       - name: Summary
         run: |
-          echo "🎉 Successfully released spring-lsp v${{ needs.version-check.outputs.version }}!"
+          echo "🎉 Successfully released summer-lsp v${{ needs.version-check.outputs.version }}!"
           echo ""
-          echo "📦 Published to crates.io: https://crates.io/crates/spring-lsp"
+          echo "📦 Published to crates.io: https://crates.io/crates/summer-lsp"
           echo "🏷️ GitHub Release: https://github.com/${{ github.repository }}/releases/tag/v${{ needs.version-check.outputs.version }}"
           echo ""
           echo "Installation:"
-          echo "cargo install spring-lsp"
+          echo "cargo install summer-lsp"

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { SpringApp } from '../models';
+import { SummerApp } from '../models';
 import { LanguageClientManager } from '../languageClient';
 import { Component, ComponentsResponse, ComponentSource, DataSource } from '../types';
 import { ViewMode, VIEW_MODE_KEYS } from '../types/viewMode';
@@ -21,7 +21,7 @@ export class ComponentsTreeDataProviderEnhanced
 
   private staticComponents: Map<string, Component> = new Map();
   private runtimeComponents: Map<string, Component> = new Map();
-  private currentApp: SpringApp | undefined;
+  private currentApp: SummerApp | undefined;
   private viewMode: ViewMode = ViewMode.List;
 
   constructor(
@@ -151,7 +151,7 @@ export class ComponentsTreeDataProviderEnhanced
     
     try {
       const response = await this.clientManager.sendRequest<ComponentsResponse>(
-        'spring/components',
+        'summer/components',
         { appPath }
       );
 
@@ -174,7 +174,7 @@ export class ComponentsTreeDataProviderEnhanced
   /**
    * 刷新（兼容接口）
    */
-  public async refresh(app?: SpringApp): Promise<void> {
+  public async refresh(app?: SummerApp): Promise<void> {
     if (!app) {
       this.clearRuntime();
       return;
@@ -191,7 +191,7 @@ export class ComponentsTreeDataProviderEnhanced
   /**
    * 刷新运行时信息
    */
-  private async refreshRuntime(app: SpringApp): Promise<void> {
+  private async refreshRuntime(app: SummerApp): Promise<void> {
     if (!app.port) {
       return;
     }
@@ -381,7 +381,7 @@ class ComponentTreeNode extends vscode.TreeItem {
     this.component = component;
 
     // 设置上下文值
-    this.contextValue = `spring:component-${source}`;
+    this.contextValue = `summer:component-${source}`;
 
     // 设置工具提示
     this.tooltip = this.buildTooltip();
@@ -395,7 +395,7 @@ class ComponentTreeNode extends vscode.TreeItem {
     // 设置点击命令
     if (component.location) {
       this.command = {
-        command: 'spring.component.navigate',
+        command: 'summer.component.navigate',
         title: 'Go to Definition',
         arguments: [component.location],
       };
@@ -486,7 +486,7 @@ class PlaceholderTreeNode extends vscode.TreeItem {
   constructor(typeName: string) {
     super(typeName, vscode.TreeItemCollapsibleState.None);
 
-    this.contextValue = 'spring:dependency:external';
+    this.contextValue = 'summer:dependency:external';
     this.description = 'external';
     this.iconPath = new vscode.ThemeIcon(
       'symbol-interface',

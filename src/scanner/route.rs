@@ -2,7 +2,7 @@
 //!
 //! 扫描项目中的所有路由定义
 
-use crate::analysis::rust::macro_analyzer::{MacroAnalyzer, SpringMacro};
+use crate::analysis::rust::macro_analyzer::{MacroAnalyzer, SummerMacro};
 use crate::protocol::types::{LocationResponse, PositionResponse, RangeResponse};
 use lsp_types::Url;
 use serde::{Deserialize, Serialize};
@@ -87,8 +87,8 @@ impl RouteScanner {
             };
 
             // 提取路由信息
-            for spring_macro in &rust_doc.macros {
-                if let SpringMacro::Route(route_macro) = spring_macro {
+            for summer_macro in &rust_doc.macros {
+                if let SummerMacro::Route(route_macro) = summer_macro {
                     // 为每个 HTTP 方法创建独立的路由条目
                     for method in &route_macro.methods {
                         routes.push(RouteInfoResponse {
@@ -141,7 +141,7 @@ pub struct RouteInfoResponse {
     pub location: LocationResponse,
 }
 
-/// spring/routes 请求参数
+/// summer/routes 请求参数
 #[derive(Debug, Deserialize)]
 pub struct RoutesRequest {
     /// 应用路径
@@ -149,7 +149,7 @@ pub struct RoutesRequest {
     pub app_path: String,
 }
 
-/// spring/routes 响应
+/// summer/routes 响应
 #[derive(Debug, Serialize)]
 pub struct RoutesResponse {
     /// 路由列表

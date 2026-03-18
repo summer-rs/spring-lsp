@@ -11,13 +11,13 @@ pub struct RustDocument {
     pub uri: Url,
     /// 文档内容
     pub content: String,
-    /// 提取的 spring-rs 宏
-    pub macros: Vec<SpringMacro>,
+    /// 提取的 summer-rs 宏
+    pub macros: Vec<SummerMacro>,
 }
 
-/// Spring-rs 宏枚举
+/// Summer-rs 宏枚举
 #[derive(Debug, Clone)]
-pub enum SpringMacro {
+pub enum SummerMacro {
     /// Service 派生宏
     DeriveService(ServiceMacro),
     /// Component 属性宏
@@ -219,7 +219,7 @@ impl MacroAnalyzer {
 
     /// 为宏提供悬停提示
     ///
-    /// 当用户悬停在 spring-rs 宏上时，显示宏的详细信息和展开后的代码
+    /// 当用户悬停在 summer-rs 宏上时，显示宏的详细信息和展开后的代码
     ///
     /// # Arguments
     ///
@@ -228,14 +228,14 @@ impl MacroAnalyzer {
     /// # Returns
     ///
     /// 返回格式化的悬停提示内容（Markdown 格式）
-    pub fn hover_macro(&self, macro_info: &SpringMacro) -> String {
+    pub fn hover_macro(&self, macro_info: &SummerMacro) -> String {
         match macro_info {
-            SpringMacro::DeriveService(service) => self.hover_service_macro(service),
-            SpringMacro::Component(component) => self.hover_component_macro(component),
-            SpringMacro::Inject(inject) => self.hover_inject_macro(inject),
-            SpringMacro::AutoConfig(auto_config) => self.hover_auto_config_macro(auto_config),
-            SpringMacro::Route(route) => self.hover_route_macro(route),
-            SpringMacro::Job(job) => self.hover_job_macro(job),
+            SummerMacro::DeriveService(service) => self.hover_service_macro(service),
+            SummerMacro::Component(component) => self.hover_component_macro(component),
+            SummerMacro::Inject(inject) => self.hover_inject_macro(inject),
+            SummerMacro::AutoConfig(auto_config) => self.hover_auto_config_macro(auto_config),
+            SummerMacro::Route(route) => self.hover_route_macro(route),
+            SummerMacro::Job(job) => self.hover_job_macro(job),
         }
     }
 
@@ -496,7 +496,7 @@ impl MacroAnalyzer {
 
     /// 展开宏，生成展开后的代码
     ///
-    /// 为 spring-rs 宏生成展开后的 Rust 代码，帮助开发者理解宏的实际效果
+    /// 为 summer-rs 宏生成展开后的 Rust 代码，帮助开发者理解宏的实际效果
     ///
     /// # Arguments
     ///
@@ -505,14 +505,14 @@ impl MacroAnalyzer {
     /// # Returns
     ///
     /// 返回展开后的 Rust 代码字符串
-    pub fn expand_macro(&self, macro_info: &SpringMacro) -> String {
+    pub fn expand_macro(&self, macro_info: &SummerMacro) -> String {
         match macro_info {
-            SpringMacro::DeriveService(service) => self.expand_service_macro(service),
-            SpringMacro::Component(component) => self.expand_component_macro(component),
-            SpringMacro::Inject(inject) => self.expand_inject_macro(inject),
-            SpringMacro::AutoConfig(auto_config) => self.expand_auto_config_macro(auto_config),
-            SpringMacro::Route(route) => self.expand_route_macro(route),
-            SpringMacro::Job(job) => self.expand_job_macro(job),
+            SummerMacro::DeriveService(service) => self.expand_service_macro(service),
+            SummerMacro::Component(component) => self.expand_component_macro(component),
+            SummerMacro::Inject(inject) => self.expand_inject_macro(inject),
+            SummerMacro::AutoConfig(auto_config) => self.expand_auto_config_macro(auto_config),
+            SummerMacro::Route(route) => self.expand_route_macro(route),
+            SummerMacro::Job(job) => self.expand_job_macro(job),
         }
     }
 
@@ -563,12 +563,12 @@ impl MacroAnalyzer {
             .unwrap_or_else(|| format!("{}Plugin", component.component_type));
 
         code.push_str(&format!("struct {};\n\n", plugin_name));
-        code.push_str("#[::spring::async_trait]\n");
+        code.push_str("#[::summer::async_trait]\n");
         code.push_str(&format!(
-            "impl ::spring::plugin::Plugin for {} {{\n",
+            "impl ::summer::plugin::Plugin for {} {{\n",
             plugin_name
         ));
-        code.push_str("    async fn build(&self, app: &mut ::spring::app::AppBuilder) {{\n");
+        code.push_str("    async fn build(&self, app: &mut ::summer::app::AppBuilder) {{\n");
 
         // 生成依赖获取代码
         for dep in &component.dependencies {
@@ -614,7 +614,7 @@ impl MacroAnalyzer {
 
         // 生成自动注册代码
         code.push_str(&format!(
-            "::spring::submit_component_plugin!({}); \n",
+            "::summer::submit_component_plugin!({}); \n",
             plugin_name
         ));
 
@@ -890,9 +890,9 @@ impl MacroAnalyzer {
         Ok(doc)
     }
 
-    /// 从 RustDocument 中提取 spring-rs 宏
+    /// 从 RustDocument 中提取 summer-rs 宏
     ///
-    /// 遍历语法树，识别并提取所有 spring-rs 特定的宏
+    /// 遍历语法树，识别并提取所有 summer-rs 特定的宏
     ///
     /// # Arguments
     ///
@@ -914,29 +914,29 @@ impl MacroAnalyzer {
                 syn::Item::Struct(item_struct) => {
                     // 检查是否有 #[derive(Service)]
                     if let Some(service_macro) = self.extract_service_macro(item_struct) {
-                        macros.push(SpringMacro::DeriveService(service_macro));
+                        macros.push(SummerMacro::DeriveService(service_macro));
                     }
                 }
                 // 处理函数定义
                 syn::Item::Fn(item_fn) => {
                     // 检查 Component 宏
                     if let Some(component_macro) = self.extract_component_macro(item_fn) {
-                        macros.push(SpringMacro::Component(component_macro));
+                        macros.push(SummerMacro::Component(component_macro));
                     }
 
                     // 检查路由宏
                     if let Some(route_macro) = self.extract_route_macro(item_fn) {
-                        macros.push(SpringMacro::Route(route_macro));
+                        macros.push(SummerMacro::Route(route_macro));
                     }
 
                     // 检查 AutoConfig 宏
                     if let Some(auto_config_macro) = self.extract_auto_config_macro(item_fn) {
-                        macros.push(SpringMacro::AutoConfig(auto_config_macro));
+                        macros.push(SummerMacro::AutoConfig(auto_config_macro));
                     }
 
                     // 检查任务调度宏
                     if let Some(job_macro) = self.extract_job_macro(item_fn) {
-                        macros.push(SpringMacro::Job(job_macro));
+                        macros.push(SummerMacro::Job(job_macro));
                     }
                 }
                 _ => {}
@@ -1412,7 +1412,7 @@ impl MacroAnalyzer {
 
     /// 验证宏参数的正确性
     ///
-    /// 检查宏参数是否符合 spring-rs 的要求，生成错误诊断和修复建议
+    /// 检查宏参数是否符合 summer-rs 的要求，生成错误诊断和修复建议
     ///
     /// # Arguments
     ///
@@ -1421,14 +1421,14 @@ impl MacroAnalyzer {
     /// # Returns
     ///
     /// 返回诊断信息列表，如果没有错误则返回空列表
-    pub fn validate_macro(&self, macro_info: &SpringMacro) -> Vec<lsp_types::Diagnostic> {
+    pub fn validate_macro(&self, macro_info: &SummerMacro) -> Vec<lsp_types::Diagnostic> {
         match macro_info {
-            SpringMacro::DeriveService(service) => self.validate_service_macro(service),
-            SpringMacro::Component(component) => self.validate_component_macro(component),
-            SpringMacro::Inject(inject) => self.validate_inject_macro(inject),
-            SpringMacro::AutoConfig(auto_config) => self.validate_auto_config_macro(auto_config),
-            SpringMacro::Route(route) => self.validate_route_macro(route),
-            SpringMacro::Job(job) => self.validate_job_macro(job),
+            SummerMacro::DeriveService(service) => self.validate_service_macro(service),
+            SummerMacro::Component(component) => self.validate_component_macro(component),
+            SummerMacro::Inject(inject) => self.validate_inject_macro(inject),
+            SummerMacro::AutoConfig(auto_config) => self.validate_auto_config_macro(auto_config),
+            SummerMacro::Route(route) => self.validate_route_macro(route),
+            SummerMacro::Job(job) => self.validate_job_macro(job),
         }
     }
 
@@ -1444,7 +1444,7 @@ impl MacroAnalyzer {
                 range: component.range,
                 severity: Some(lsp_types::DiagnosticSeverity::ERROR),
                 code: Some(lsp_types::NumberOrString::String("E016".to_string())),
-                source: Some("spring-lsp".to_string()),
+                source: Some("summer-lsp".to_string()),
                 message: "Component 函数必须返回一个具体的类型，不能是 ()".to_string(),
                 related_information: None,
                 tags: None,
@@ -1460,7 +1460,7 @@ impl MacroAnalyzer {
                     range: component.range,
                     severity: Some(lsp_types::DiagnosticSeverity::ERROR),
                     code: Some(lsp_types::NumberOrString::String("E017".to_string())),
-                    source: Some("spring-lsp".to_string()),
+                    source: Some("summer-lsp".to_string()),
                     message: "插件名称不能为空字符串".to_string(),
                     related_information: None,
                     tags: None,
@@ -1479,7 +1479,7 @@ impl MacroAnalyzer {
                     range: component.range,
                     severity: Some(lsp_types::DiagnosticSeverity::WARNING),
                     code: Some(lsp_types::NumberOrString::String("W002".to_string())),
-                    source: Some("spring-lsp".to_string()),
+                    source: Some("summer-lsp".to_string()),
                     message: format!(
                         "重复的依赖: {} {}",
                         match dep.dep_type {
@@ -1519,7 +1519,7 @@ impl MacroAnalyzer {
                             range: inject.range,
                             severity: Some(lsp_types::DiagnosticSeverity::ERROR),
                             code: Some(lsp_types::NumberOrString::String("E001".to_string())),
-                            source: Some("spring-lsp".to_string()),
+                            source: Some("summer-lsp".to_string()),
                             message: format!("字段 '{}' 的组件名称不能为空字符串", field.name),
                             related_information: None,
                             tags: None,
@@ -1546,7 +1546,7 @@ impl MacroAnalyzer {
                 range: inject.range,
                 severity: Some(lsp_types::DiagnosticSeverity::ERROR),
                 code: Some(lsp_types::NumberOrString::String("E002".to_string())),
-                source: Some("spring-lsp".to_string()),
+                source: Some("summer-lsp".to_string()),
                 message: "配置注入 (config) 不应该指定组件名称".to_string(),
                 related_information: None,
                 tags: None,
@@ -1573,7 +1573,7 @@ impl MacroAnalyzer {
                 range: auto_config.range,
                 severity: Some(lsp_types::DiagnosticSeverity::ERROR),
                 code: Some(lsp_types::NumberOrString::String("E003".to_string())),
-                source: Some("spring-lsp".to_string()),
+                source: Some("summer-lsp".to_string()),
                 message: "AutoConfig 宏必须指定配置器类型".to_string(),
                 related_information: None,
                 tags: None,
@@ -1597,7 +1597,7 @@ impl MacroAnalyzer {
                 range: route.range,
                 severity: Some(lsp_types::DiagnosticSeverity::ERROR),
                 code: Some(lsp_types::NumberOrString::String("E004".to_string())),
-                source: Some("spring-lsp".to_string()),
+                source: Some("summer-lsp".to_string()),
                 message: "路由路径不能为空".to_string(),
                 related_information: None,
                 tags: None,
@@ -1611,7 +1611,7 @@ impl MacroAnalyzer {
                     range: route.range,
                     severity: Some(lsp_types::DiagnosticSeverity::ERROR),
                     code: Some(lsp_types::NumberOrString::String("E005".to_string())),
-                    source: Some("spring-lsp".to_string()),
+                    source: Some("summer-lsp".to_string()),
                     message: format!("路由路径必须以 '/' 开头，当前路径: '{}'", route.path),
                     related_information: None,
                     tags: None,
@@ -1630,7 +1630,7 @@ impl MacroAnalyzer {
                 range: route.range,
                 severity: Some(lsp_types::DiagnosticSeverity::ERROR),
                 code: Some(lsp_types::NumberOrString::String("E006".to_string())),
-                source: Some("spring-lsp".to_string()),
+                source: Some("summer-lsp".to_string()),
                 message: "路由必须至少指定一个 HTTP 方法".to_string(),
                 related_information: None,
                 tags: None,
@@ -1645,7 +1645,7 @@ impl MacroAnalyzer {
                 range: route.range,
                 severity: Some(lsp_types::DiagnosticSeverity::ERROR),
                 code: Some(lsp_types::NumberOrString::String("E007".to_string())),
-                source: Some("spring-lsp".to_string()),
+                source: Some("summer-lsp".to_string()),
                 message: "路由处理器函数名称不能为空".to_string(),
                 related_information: None,
                 tags: None,
@@ -1678,7 +1678,7 @@ impl MacroAnalyzer {
                             range,
                             severity: Some(lsp_types::DiagnosticSeverity::ERROR),
                             code: Some(lsp_types::NumberOrString::String("E008".to_string())),
-                            source: Some("spring-lsp".to_string()),
+                            source: Some("summer-lsp".to_string()),
                             message: format!("路径参数不能嵌套，位置: {}", i),
                             related_information: None,
                             tags: None,
@@ -1696,7 +1696,7 @@ impl MacroAnalyzer {
                             range,
                             severity: Some(lsp_types::DiagnosticSeverity::ERROR),
                             code: Some(lsp_types::NumberOrString::String("E009".to_string())),
-                            source: Some("spring-lsp".to_string()),
+                            source: Some("summer-lsp".to_string()),
                             message: format!("路径参数缺少开括号 '{{', 位置: {}", i),
                             related_information: None,
                             tags: None,
@@ -1716,7 +1716,7 @@ impl MacroAnalyzer {
                                     code: Some(lsp_types::NumberOrString::String(
                                         "E010".to_string(),
                                     )),
-                                    source: Some("spring-lsp".to_string()),
+                                    source: Some("summer-lsp".to_string()),
                                     message: format!("路径参数名称不能为空，位置: {}", start),
                                     related_information: None,
                                     tags: None,
@@ -1731,7 +1731,7 @@ impl MacroAnalyzer {
                                     code: Some(lsp_types::NumberOrString::String(
                                         "E011".to_string(),
                                     )),
-                                    source: Some("spring-lsp".to_string()),
+                                    source: Some("summer-lsp".to_string()),
                                     message: format!(
                                         "路径参数名称只能包含字母、数字和下划线，当前参数: '{}'",
                                         param_name
@@ -1756,7 +1756,7 @@ impl MacroAnalyzer {
                 range,
                 severity: Some(lsp_types::DiagnosticSeverity::ERROR),
                 code: Some(lsp_types::NumberOrString::String("E012".to_string())),
-                source: Some("spring-lsp".to_string()),
+                source: Some("summer-lsp".to_string()),
                 message: "路径参数缺少闭括号 '}'".to_string(),
                 related_information: None,
                 tags: None,
@@ -1780,7 +1780,7 @@ impl MacroAnalyzer {
                         range: *range,
                         severity: Some(lsp_types::DiagnosticSeverity::ERROR),
                         code: Some(lsp_types::NumberOrString::String("E013".to_string())),
-                        source: Some("spring-lsp".to_string()),
+                        source: Some("summer-lsp".to_string()),
                         message: "Cron 表达式不能为空".to_string(),
                         related_information: None,
                         tags: None,
@@ -1799,7 +1799,7 @@ impl MacroAnalyzer {
                         range: *range,
                         severity: Some(lsp_types::DiagnosticSeverity::WARNING),
                         code: Some(lsp_types::NumberOrString::String("W001".to_string())),
-                        source: Some("spring-lsp".to_string()),
+                        source: Some("summer-lsp".to_string()),
                         message: "延迟秒数为 0 可能不是预期的行为".to_string(),
                         related_information: None,
                         tags: None,
@@ -1815,7 +1815,7 @@ impl MacroAnalyzer {
                         range: *range,
                         severity: Some(lsp_types::DiagnosticSeverity::ERROR),
                         code: Some(lsp_types::NumberOrString::String("E014".to_string())),
-                        source: Some("spring-lsp".to_string()),
+                        source: Some("summer-lsp".to_string()),
                         message: "频率秒数不能为 0".to_string(),
                         related_information: None,
                         tags: None,
@@ -1846,7 +1846,7 @@ impl MacroAnalyzer {
                 range,
                 severity: Some(lsp_types::DiagnosticSeverity::ERROR),
                 code: Some(lsp_types::NumberOrString::String("E015".to_string())),
-                source: Some("spring-lsp".to_string()),
+                source: Some("summer-lsp".to_string()),
                 message: format!(
                     "Cron 表达式应该包含 6 个部分（秒 分 时 日 月 星期），当前有 {} 个部分",
                     parts.len()
