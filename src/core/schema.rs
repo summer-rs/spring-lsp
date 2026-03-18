@@ -814,6 +814,7 @@ impl SchemaProvider {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use serial_test::serial;
 
     #[tokio::test]
     async fn test_load_real_schema() {
@@ -976,6 +977,7 @@ mod tests {
     }
 
     #[test]
+    #[serial]
     fn test_find_schema_in_target_multiple_profiles() {
         use std::fs;
         use std::thread;
@@ -1096,6 +1098,7 @@ mod tests {
     }
 
     #[test]
+    #[serial]
     fn test_merge_schema_files() {
         use std::fs;
         use tempfile::TempDir;
@@ -1168,6 +1171,7 @@ mod tests {
     }
 
     #[test]
+    #[serial]
     fn test_find_schema_in_target_multiple_crates() {
         use std::fs;
         use tempfile::TempDir;
