@@ -2,7 +2,7 @@
   "name": "summer-rs",
   "displayName": "Summer RS",
   "description": "Language Server Protocol support and application management for summer-rs framework",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "publisher": "summer-rs",
   "license": "MIT OR Apache-2.0",
   "icon": "resources/logo.png",

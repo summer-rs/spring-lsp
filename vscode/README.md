@@ -1,8 +1,8 @@
 # Summer RS
 
-[![Version](https://img.shields.io/visual-studio-marketplace/v/holmofy.summer-rs)](https://marketplace.visualstudio.com/items?itemName=holmofy.summer-rs)
-[![Installs](https://img.shields.io/visual-studio-marketplace/i/holmofy.summer-rs)](https://marketplace.visualstudio.com/items?itemName=holmofy.summer-rs)
-[![Rating](https://img.shields.io/visual-studio-marketplace/r/holmofy.summer-rs)](https://marketplace.visualstudio.com/items?itemName=holmofy.summer-rs)
+[![Version](https://img.shields.io/visual-studio-marketplace/v/summer-rs.summer-rs)](https://marketplace.visualstudio.com/items?itemName=summer-rs.summer-rs)
+[![Installs](https://img.shields.io/visual-studio-marketplace/i/summer-rs.summer-rs)](https://marketplace.visualstudio.com/items?itemName=summer-rs.summer-rs)
+[![Rating](https://img.shields.io/visual-studio-marketplace/r/summer-rs.summer-rs)](https://marketplace.visualstudio.com/items?itemName=summer-rs.summer-rs)
 
 Language Server Protocol support and application management for the [summer-rs](https://summer-rs.github.io/) framework.
 
