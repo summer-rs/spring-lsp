@@ -995,7 +995,7 @@ export class CommandManager {
 </head>
 <body>
   <h1>🚀 Welcome to Spring LSP for Rust</h1>
-  
+  <h2>spring-rs has been renamed to summer-rs</h2>
   <p>
     Spring LSP 为 <strong>spring-rs</strong> 框架提供完整的 IDE 支持，
     帮助你更高效地开发 Rust 应用。

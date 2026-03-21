@@ -2,7 +2,7 @@
   "name": "spring-rs",
   "displayName": "Spring RS",
   "description": "Language Server Protocol support and application management for spring-rs framework",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "publisher": "holmofy",
   "license": "MIT OR Apache-2.0",
   "icon": "resources/logo.png",
