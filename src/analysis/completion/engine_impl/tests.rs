@@ -3,7 +3,7 @@
 use super::*;
 use crate::macro_analyzer::{
     AutoConfigMacro, HttpMethod, InjectMacro, InjectType, JobMacro, RouteMacro, ServiceMacro,
-    SummerMacro,
+    ServiceScope, SummerMacro,
 };
 use crate::schema::SchemaProvider;
 use crate::toml_analyzer::TomlAnalyzer;
@@ -41,6 +41,7 @@ fn test_complete_service_macro() {
     let service_macro = ServiceMacro {
         struct_name: "TestService".to_string(),
         fields: vec![],
+        scope: ServiceScope::Singleton,
         range: test_range(),
     };
 
@@ -284,6 +285,7 @@ fn test_completion_items_have_documentation() {
         SummerMacro::DeriveService(ServiceMacro {
             struct_name: "Test".to_string(),
             fields: vec![],
+            scope: ServiceScope::Singleton,
             range: test_range(),
         }),
         SummerMacro::Inject(InjectMacro {
@@ -342,6 +344,7 @@ fn test_completion_items_have_correct_kind() {
         &SummerMacro::DeriveService(ServiceMacro {
             struct_name: "Test".to_string(),
             fields: vec![],
+            scope: ServiceScope::Singleton,
             range: test_range(),
         }),
         None,
@@ -422,6 +425,7 @@ fn test_complete_with_macro_context() {
     let service_macro = ServiceMacro {
         struct_name: "TestService".to_string(),
         fields: vec![],
+        scope: ServiceScope::Singleton,
         range: test_range(),
     };
 
@@ -501,6 +505,7 @@ fn test_complete_dispatches_to_correct_handler() {
             SummerMacro::DeriveService(ServiceMacro {
                 struct_name: "Test".to_string(),
                 fields: vec![],
+                scope: ServiceScope::Singleton,
                 range: test_range(),
             }),
             3, // Service 宏应该返回 3 个补全项
@@ -1649,6 +1654,7 @@ fn test_macro_parameter_insertion_completeness() {
     let service_macro = ServiceMacro {
         struct_name: "Test".to_string(),
         fields: vec![],
+        scope: ServiceScope::Singleton,
         range: test_range(),
     };
 

@@ -4,7 +4,7 @@
 //! - 带有 #[derive(Service)] 的结构体
 //! - 带有 #[component] 的函数
 
-use crate::analysis::rust::macro_analyzer::{MacroAnalyzer, SummerMacro};
+use crate::analysis::rust::macro_analyzer::{MacroAnalyzer, ServiceScope, SummerMacro};
 use crate::protocol::types::{LocationResponse, PositionResponse, RangeResponse};
 use lsp_types::Url;
 use serde::{Deserialize, Serialize};
@@ -155,7 +155,10 @@ impl ComponentScanner {
                         components.push(ComponentInfoResponse {
                             name: service_macro.struct_name.clone(),
                             type_name: service_macro.struct_name.clone(),
-                            scope: ComponentScope::Singleton, // summer-rs 默认是单例
+                            scope: match service_macro.scope {
+                                ServiceScope::Singleton => ComponentScope::Singleton,
+                                ServiceScope::Prototype => ComponentScope::Prototype,
+                            },
                             source: ComponentSource::Service,
                             dependencies: service_macro
                                 .fields

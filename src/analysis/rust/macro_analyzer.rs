@@ -32,6 +32,15 @@ pub enum SummerMacro {
     Job(JobMacro),
 }
 
+/// Service 作用域
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ServiceScope {
+    /// 单例（默认）
+    Singleton,
+    /// 原型（每次注入创建新实例）
+    Prototype,
+}
+
 /// Service 派生宏信息
 #[derive(Debug, Clone)]
 pub struct ServiceMacro {
@@ -39,6 +48,8 @@ pub struct ServiceMacro {
     pub struct_name: String,
     /// 字段列表
     pub fields: Vec<Field>,
+    /// 作用域（从 #[service(prototype)] 提取）
+    pub scope: ServiceScope,
     /// 宏在源代码中的位置
     pub range: Range,
 }
@@ -300,6 +311,13 @@ impl MacroAnalyzer {
 
         // 添加结构体信息
         hover.push_str(&format!("**结构体**: `{}`\n\n", service.struct_name));
+
+        // 添加作用域信息
+        let scope_str = match service.scope {
+            ServiceScope::Singleton => "Singleton（单例）",
+            ServiceScope::Prototype => "Prototype（原型）",
+        };
+        hover.push_str(&format!("**作用域**: {}\n\n", scope_str));
 
         // 添加字段信息
         if !service.fields.is_empty() {
@@ -631,6 +649,9 @@ impl MacroAnalyzer {
         // 生成原始结构体定义（带注释）
         code.push_str("// 原始定义\n");
         code.push_str("#[derive(Clone)]\n");
+        if service.scope == ServiceScope::Prototype {
+            code.push_str("#[service(prototype)]\n");
+        }
         code.push_str(&format!("pub struct {} {{\n", struct_name));
         for field in &service.fields {
             if let Some(inject) = &field.inject {
@@ -1065,9 +1086,13 @@ impl MacroAnalyzer {
                         // 提取字段信息
                         let fields = self.extract_fields(&item_struct.fields);
 
+                        // 提取作用域（从 #[service(prototype)] 属性）
+                        let scope = self.extract_service_scope(&item_struct.attrs);
+
                         return Some(ServiceMacro {
                             struct_name: item_struct.ident.to_string(),
                             fields,
+                            scope,
                             range: self.span_to_range(&item_struct.ident.span()),
                         });
                     }
@@ -1075,6 +1100,24 @@ impl MacroAnalyzer {
             }
         }
         None
+    }
+
+    /// 从结构体属性中提取 Service 作用域
+    ///
+    /// 检查 `#[service(prototype)]` 属性，如果存在则返回 Prototype，否则返回 Singleton
+    fn extract_service_scope(&self, attrs: &[syn::Attribute]) -> ServiceScope {
+        for attr in attrs {
+            if attr.path().is_ident("service") {
+                // 解析 #[service(...)] 的参数
+                if let Ok(meta_list) = attr.meta.require_list() {
+                    let tokens_str = meta_list.tokens.to_string();
+                    if tokens_str.contains("prototype") {
+                        return ServiceScope::Prototype;
+                    }
+                }
+            }
+        }
+        ServiceScope::Singleton
     }
 
     /// 提取结构体字段信息

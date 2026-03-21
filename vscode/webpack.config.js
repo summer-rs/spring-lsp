@@ -1,4 +1,14 @@
 const path = require('path');
+const webpack = require('webpack');
+const { execSync } = require('child_process');
+
+function getGitCommitHash() {
+  try {
+    return execSync('git rev-parse --short HEAD', { encoding: 'utf-8' }).trim();
+  } catch {
+    return 'unknown';
+  }
+}
 
 /**@type {import('webpack').Configuration}*/
 const config = {
@@ -42,6 +52,11 @@ const config = {
     level: "log", // 启用日志以便调试
   },
   // 确保 node_modules 中的依赖被正确打包
+  plugins: [
+    new webpack.DefinePlugin({
+      __GIT_COMMIT_HASH__: JSON.stringify(getGitCommitHash()),
+    }),
+  ],
   optimization: {
     minimize: false
   }

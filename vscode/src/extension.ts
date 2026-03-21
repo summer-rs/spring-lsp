@@ -28,6 +28,12 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     context.subscriptions.push(outputChannel);
     outputChannel.appendLine('Summer LSP extension starting...');
 
+    // 1.5 打印插件版本和 Git Commit Hash
+    const extensionVersion = context.extension.packageJSON.version ?? 'unknown';
+    const gitCommitHash: string = typeof __GIT_COMMIT_HASH__ !== 'undefined' ? __GIT_COMMIT_HASH__ : 'unknown';
+    outputChannel.appendLine(`Version: ${extensionVersion}, Git Commit: ${gitCommitHash}`);
+    console.log(`[Summer LSP] Version: ${extensionVersion}, Git Commit: ${gitCommitHash}`);
+
     // 2. 创建语言客户端管理器（会创建单独的语言服务器输出通道）
     outputChannel.appendLine('Initializing language client...');
     const languageClient = new LanguageClientManager(context, outputChannel);

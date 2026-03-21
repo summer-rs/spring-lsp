@@ -87,6 +87,7 @@ fn test_service_macro_creation() {
                 range: test_range(),
             }),
         }],
+        scope: ServiceScope::Singleton,
         range: test_range(),
     };
 
@@ -175,6 +176,7 @@ fn test_summer_macro_variants() {
     let service = SummerMacro::DeriveService(ServiceMacro {
         struct_name: "MyService".to_string(),
         fields: vec![],
+        scope: ServiceScope::Singleton,
         range: test_range(),
     });
 
@@ -802,6 +804,7 @@ fn test_expand_service_macro() {
                 }),
             },
         ],
+        scope: ServiceScope::Singleton,
         range: test_range(),
     };
 
@@ -842,6 +845,7 @@ fn test_expand_service_macro_with_named_component() {
                 }),
             },
         ],
+        scope: ServiceScope::Singleton,
         range: test_range(),
     };
 
@@ -865,6 +869,7 @@ fn test_expand_service_macro_without_inject() {
             type_name: "String".to_string(),
             inject: None,
         }],
+        scope: ServiceScope::Singleton,
         range: test_range(),
     };
 
@@ -1064,6 +1069,7 @@ fn test_expand_macro_produces_valid_syntax() {
     let service = SummerMacro::DeriveService(ServiceMacro {
         struct_name: "TestService".to_string(),
         fields: vec![],
+        scope: ServiceScope::Singleton,
         range: test_range(),
     });
 
@@ -1081,6 +1087,7 @@ fn test_expand_empty_service() {
     let service = ServiceMacro {
         struct_name: "EmptyService".to_string(),
         fields: vec![],
+        scope: ServiceScope::Singleton,
         range: test_range(),
     };
 
@@ -1102,6 +1109,7 @@ fn test_expand_all_macro_types() {
         SummerMacro::DeriveService(ServiceMacro {
             struct_name: "TestService".to_string(),
             fields: vec![],
+            scope: ServiceScope::Singleton,
             range: test_range(),
         }),
         SummerMacro::Inject(InjectMacro {
@@ -1225,6 +1233,7 @@ fn test_expand_macro_readability() {
                 range: test_range(),
             }),
         }],
+        scope: ServiceScope::Singleton,
         range: test_range(),
     };
 
@@ -1395,6 +1404,7 @@ fn test_hover_service_macro() {
                 }),
             },
         ],
+        scope: ServiceScope::Singleton,
         range: test_range(),
     };
 
@@ -1427,6 +1437,7 @@ fn test_hover_service_macro_with_named_component() {
                 range: test_range(),
             }),
         }],
+        scope: ServiceScope::Singleton,
         range: test_range(),
     };
 
@@ -1444,6 +1455,7 @@ fn test_hover_service_macro_empty_fields() {
     let service = ServiceMacro {
         struct_name: "EmptyService".to_string(),
         fields: vec![],
+        scope: ServiceScope::Singleton,
         range: test_range(),
     };
 
@@ -1652,6 +1664,7 @@ fn test_hover_all_macro_types() {
         SummerMacro::DeriveService(ServiceMacro {
             struct_name: "TestService".to_string(),
             fields: vec![],
+            scope: ServiceScope::Singleton,
             range: test_range(),
         }),
         SummerMacro::Inject(InjectMacro {
@@ -1705,6 +1718,7 @@ fn test_hover_markdown_format() {
                 range: test_range(),
             }),
         }],
+        scope: ServiceScope::Singleton,
         range: test_range(),
     };
 
@@ -1841,6 +1855,7 @@ fn test_hover_service_with_mixed_fields() {
                 inject: None,
             },
         ],
+        scope: ServiceScope::Singleton,
         range: test_range(),
     };
 
@@ -1874,6 +1889,7 @@ fn test_validate_service_macro_valid() {
                 range: test_range(),
             }),
         }],
+        scope: ServiceScope::Singleton,
         range: test_range(),
     };
 
@@ -1897,6 +1913,7 @@ fn test_validate_service_macro_empty_component_name() {
                 range: test_range(),
             }),
         }],
+        scope: ServiceScope::Singleton,
         range: test_range(),
     };
 
@@ -2338,6 +2355,7 @@ fn test_validate_all_macro_types() {
         SummerMacro::DeriveService(ServiceMacro {
             struct_name: "TestService".to_string(),
             fields: vec![],
+            scope: ServiceScope::Singleton,
             range: test_range(),
         }),
         SummerMacro::Inject(InjectMacro {
