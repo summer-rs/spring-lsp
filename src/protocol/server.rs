@@ -414,7 +414,7 @@ impl LspServer {
     /// 处理文档打开通知
     pub fn handle_did_open(&mut self, params: DidOpenTextDocumentParams) -> Result<()> {
         let doc = params.text_document;
-        tracing::info!("Document opened: {}", doc.uri);
+        tracing::debug!("Document opened: {}", doc.uri);
 
         self.document_manager.open(
             doc.uri.clone(),
