@@ -1,3 +1,8 @@
+# Migrate
+
+* spring-rs rename to [summer-rs](https://github.com/summer-rs/summer-rs)
+* [spring-lsp](https://marketplace.visualstudio.com/items?itemName=holmofy.spring-rs) rename to [summer-lsp](https://marketplace.visualstudio.com/items?itemName=summer-rs.summer-rs)
+
 # Spring RS
 
 [![Version](https://img.shields.io/visual-studio-marketplace/v/holmofy.spring-rs)](https://marketplace.visualstudio.com/items?itemName=holmofy.spring-rs)
