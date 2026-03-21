@@ -3,7 +3,7 @@
   "displayName": "Summer RS",
   "description": "Language Server Protocol support and application management for summer-rs framework",
   "version": "0.5.0",
-  "publisher": "holmofy",
+  "publisher": "summer-rs",
   "license": "MIT OR Apache-2.0",
   "icon": "resources/logo.png",
   "repository": {
@@ -13,7 +13,7 @@
   "bugs": {
     "url": "https://github.com/summer-rs/summer-lsp/issues"
   },
-  "homepage": "https://summer-rs.github.io/summer-lsp",
+  "homepage": "https://github.com/summer-rs/summer-lsp",
   "engines": {
     "vscode": "^1.75.0"
   },
